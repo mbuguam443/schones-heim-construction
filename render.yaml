@@ -1,0 +1,43 @@
+services:
+  - type: web
+    name: schones-heim-construction
+    runtime: python
+    buildCommand: pip install -r requirements.txt && python manage.py collectstatic --noinput && python manage.py migrate
+    startCommand: gunicorn config.wsgi --bind 0.0.0.0:$PORT --workers 4
+    envVars:
+      - key: SECRET_KEY
+        generateValue: true
+      - key: DEBUG
+        value: false
+      - key: ALLOWED_HOSTS
+        value: schones-heim-construction.onrender.com
+      - key: CSRF_TRUSTED_ORIGINS
+        value: https://schones-heim-construction.onrender.com
+      - key: DB_ENGINE
+        value: django.db.backends.postgresql
+      - key: DB_NAME
+        fromDatabase:
+          name: schones-heim-db
+          property: database
+      - key: DB_USER
+        fromDatabase:
+          name: schones-heim-db
+          property: user
+      - key: DB_PASSWORD
+        fromDatabase:
+          name: schones-heim-db
+          property: password
+      - key: DB_HOST
+        fromDatabase:
+          name: schones-heim-db
+          property: host
+      - key: DB_PORT
+        fromDatabase:
+          name: schones-heim-db
+          property: port
+
+databases:
+  - name: schones-heim-db
+    plan: free
+    databaseType: postgresql
+    ipAllowList: []
