@@ -8,36 +8,12 @@ services:
       - key: SECRET_KEY
         generateValue: true
       - key: DEBUG
-        value: false
+        value: true
       - key: ALLOWED_HOSTS
         value: schones-heim-construction.onrender.com
       - key: CSRF_TRUSTED_ORIGINS
         value: https://schones-heim-construction.onrender.com
       - key: DB_ENGINE
-        value: django.db.backends.postgresql
+        value: django.db.backends.sqlite3
       - key: DB_NAME
-        fromDatabase:
-          name: schones-heim-db
-          property: database
-      - key: DB_USER
-        fromDatabase:
-          name: schones-heim-db
-          property: user
-      - key: DB_PASSWORD
-        fromDatabase:
-          name: schones-heim-db
-          property: password
-      - key: DB_HOST
-        fromDatabase:
-          name: schones-heim-db
-          property: host
-      - key: DB_PORT
-        fromDatabase:
-          name: schones-heim-db
-          property: port
-
-databases:
-  - name: schones-heim-db
-    plan: free
-    databaseType: postgresql
-    ipAllowList: []
+        value: db.sqlite3
