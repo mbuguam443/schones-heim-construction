@@ -3,12 +3,85 @@
 {% block nav_home %}active{% endblock %}
 {% block title %}Home{% endblock %}
 
+{% block extra_css %}
+<style>
+  .parallax-hero {
+    background-attachment: fixed;
+    transition: transform 0.1s ease-out;
+  }
+  .hero-content {
+    transition: transform 0.15s ease-out;
+  }
+  .stat-number {
+    font-size: 2.5rem;
+    font-weight: 800;
+    color: var(--primary);
+    transition: transform 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+  .stat-number.counted {
+    animation: pop 0.4s ease-out;
+  }
+  @keyframes pop {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.15); }
+    100% { transform: scale(1); }
+  }
+  .reveal {
+    opacity: 0;
+    transform: translateY(30px);
+    transition: opacity 0.7s ease-out, transform 0.7s ease-out;
+  }
+  .reveal.visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  .reveal-delay-1 { transition-delay: 0.1s; }
+  .reveal-delay-2 { transition-delay: 0.2s; }
+  .reveal-delay-3 { transition-delay: 0.3s; }
+  .reveal-delay-4 { transition-delay: 0.4s; }
+  .reveal-delay-5 { transition-delay: 0.5s; }
+  .reveal-delay-6 { transition-delay: 0.6s; }
+
+  .service-card {
+    transform: translateY(0);
+    transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.3s;
+  }
+  .service-card:hover {
+    transform: translateY(-8px) scale(1.02);
+  }
+  .project-card {
+    transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.3s;
+  }
+  .project-card:hover {
+    transform: translateY(-8px) scale(1.02);
+  }
+  .cta-section {
+    position: relative;
+    overflow: hidden;
+  }
+  .cta-section::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 300%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.06), transparent);
+    animation: shimmer 4s ease-in-out infinite;
+  }
+  @keyframes shimmer {
+    0% { transform: translateX(-33%); }
+    100% { transform: translateX(33%); }
+  }
+</style>
+{% endblock %}
+
 {% block content %}
 
-<section class="hero-section" style="background: linear-gradient(135deg, rgba(26,60,110,0.55) 0%, rgba(15,42,78,0.7) 100%), url('{% static 'homepage.png' %}') center/cover no-repeat; padding: 120px 0;">
-  <div class="container position-relative" style="z-index:1;">
+<section class="hero-section parallax-hero" style="background: linear-gradient(135deg, rgba(26,60,110,0.55) 0%, rgba(15,42,78,0.7) 100%), url('{% static 'homepage.png' %}') center/cover no-repeat; padding: 120px 0;">
+  <div class="container position-relative hero-content" style="z-index:1;">
     <div class="row align-items-center">
-      <div class="col-lg-7">
+      <div class="col-lg-7 reveal visible">
         <h1 class="hero-title">Building Dreams,<br>Constructing Realities</h1>
         <p class="hero-subtitle mt-3 mb-4">Schones Heim Builders is a premier construction and general contracting company dedicated to delivering excellence in every project we undertake.</p>
         <div class="hero-btn">
@@ -16,30 +89,30 @@
           <a href="{% url 'core:services' %}" class="btn btn-outline-light btn-lg">Our Services</a>
         </div>
       </div>
-      <div class="col-lg-5 text-center mt-4 mt-lg-0">
+      <div class="col-lg-5 text-center mt-4 mt-lg-0 reveal visible">
         <img src="{% static 'homepage.png' %}" alt="Schones Heim Builders" style="max-width:100%; border-radius:16px; box-shadow:0 8px 30px rgba(0,0,0,0.3);">
       </div>
     </div>
   </div>
 </section>
 
-<section class="py-5">
+<section class="py-5" id="stats-section">
   <div class="container">
     <div class="row text-center g-4">
-      <div class="col-md-3 col-6">
-        <div class="stat-number">{{ stats.projects_completed }}+</div>
+      <div class="col-md-3 col-6 reveal">
+        <div class="stat-number" data-target="{{ stats.projects_completed }}">0</div>
         <div class="stat-label">Projects Completed</div>
       </div>
-      <div class="col-md-3 col-6">
-        <div class="stat-number">{{ stats.years_established }}+</div>
+      <div class="col-md-3 col-6 reveal reveal-delay-1">
+        <div class="stat-number" data-target="{{ stats.years_established }}">0</div>
         <div class="stat-label">Years Experience</div>
       </div>
-      <div class="col-md-3 col-6">
-        <div class="stat-number">{{ stats.happy_clients }}+</div>
+      <div class="col-md-3 col-6 reveal reveal-delay-2">
+        <div class="stat-number" data-target="{{ stats.happy_clients }}">0</div>
         <div class="stat-label">Happy Clients</div>
       </div>
-      <div class="col-md-3 col-6">
-        <div class="stat-number">{{ stats.professionals }}+</div>
+      <div class="col-md-3 col-6 reveal reveal-delay-3">
+        <div class="stat-number" data-target="{{ stats.professionals }}">0</div>
         <div class="stat-label">Professionals</div>
       </div>
     </div>
@@ -48,13 +121,13 @@
 
 <section class="py-5 bg-light">
   <div class="container">
-    <div class="text-center mb-5">
+    <div class="text-center mb-5 reveal">
       <h2 class="section-title">Our Services</h2>
       <p class="section-subtitle">Comprehensive construction solutions tailored to your needs</p>
     </div>
     <div class="row g-4">
-      <div class="col-md-4">
-        <div class="card service-card text-center">
+      <div class="col-md-4 reveal">
+        <div class="card service-card text-center h-100">
           <div class="card-body">
             <div class="service-icon"><i class="fas fa-drafting-compass"></i></div>
             <h5>Design & Planning</h5>
@@ -62,8 +135,8 @@
           </div>
         </div>
       </div>
-      <div class="col-md-4">
-        <div class="card service-card text-center">
+      <div class="col-md-4 reveal reveal-delay-1">
+        <div class="card service-card text-center h-100">
           <div class="card-body">
             <div class="service-icon"><i class="fas fa-hard-hat"></i></div>
             <h5>General Contracting</h5>
@@ -71,8 +144,8 @@
           </div>
         </div>
       </div>
-      <div class="col-md-4">
-        <div class="card service-card text-center">
+      <div class="col-md-4 reveal reveal-delay-2">
+        <div class="card service-card text-center h-100">
           <div class="card-body">
             <div class="service-icon"><i class="fas fa-tools"></i></div>
             <h5>Renovations</h5>
@@ -80,8 +153,8 @@
           </div>
         </div>
       </div>
-      <div class="col-md-4">
-        <div class="card service-card text-center">
+      <div class="col-md-4 reveal reveal-delay-3">
+        <div class="card service-card text-center h-100">
           <div class="card-body">
             <div class="service-icon"><i class="fas fa-water"></i></div>
             <h5>Plumbing & Electrical</h5>
@@ -89,8 +162,8 @@
           </div>
         </div>
       </div>
-      <div class="col-md-4">
-        <div class="card service-card text-center">
+      <div class="col-md-4 reveal reveal-delay-4">
+        <div class="card service-card text-center h-100">
           <div class="card-body">
             <div class="service-icon"><i class="fas fa-paint-roller"></i></div>
             <h5>Finishing Works</h5>
@@ -98,8 +171,8 @@
           </div>
         </div>
       </div>
-      <div class="col-md-4">
-        <div class="card service-card text-center">
+      <div class="col-md-4 reveal reveal-delay-5">
+        <div class="card service-card text-center h-100">
           <div class="card-body">
             <div class="service-icon"><i class="fas fa-road"></i></div>
             <h5>Infrastructure</h5>
@@ -114,14 +187,14 @@
 {% if projects %}
 <section class="py-5">
   <div class="container">
-    <div class="text-center mb-5">
+    <div class="text-center mb-5 reveal">
       <h2 class="section-title">Our Projects</h2>
       <p class="section-subtitle">Showcasing our commitment to quality and excellence</p>
     </div>
     <div class="row g-4">
       {% for p in projects %}
-      <div class="col-md-4">
-        <div class="card project-card">
+      <div class="col-md-4 reveal {% if forloop.counter == 2 %}reveal-delay-1{% elif forloop.counter == 3 %}reveal-delay-2{% endif %}">
+        <div class="card project-card h-100">
           <div class="card-body">
             <span class="badge bg-primary-custom mb-2">{{ p.get_status_display }}</span>
             <h5>{{ p.name }}</h5>
@@ -136,12 +209,70 @@
 </section>
 {% endif %}
 
-<section class="py-5 bg-primary-custom text-white text-center">
-  <div class="container">
-    <h2 class="fw-bold mb-3">Ready to Start Your Project?</h2>
-    <p class="mb-4 opacity-75" style="font-size:1.1rem;">Get in touch with us for a free consultation and quotation.</p>
-    <a href="{% url 'core:contact' %}" class="btn btn-light btn-lg"><i class="fas fa-envelope me-2"></i>Contact Us Today</a>
+<section class="py-5 bg-primary-custom text-white text-center cta-section">
+  <div class="container position-relative" style="z-index:1;">
+    <div class="reveal">
+      <h2 class="fw-bold mb-3">Ready to Start Your Project?</h2>
+      <p class="mb-4 opacity-75" style="font-size:1.1rem;">Get in touch with us for a free consultation and quotation.</p>
+      <a href="{% url 'core:contact' %}" class="btn btn-light btn-lg"><i class="fas fa-envelope me-2"></i>Contact Us Today</a>
+    </div>
   </div>
 </section>
 
+{% endblock %}
+
+{% block extra_js %}
+<script>
+(function() {
+  // === Count-up animation ===
+  function animateCountUp(el) {
+    var target = parseInt(el.getAttribute('data-target'), 10);
+    if (isNaN(target) || target === 0) { el.textContent = '0'; return; }
+    var current = 0;
+    var step = Math.max(1, Math.ceil(target / 60));
+    var interval = setInterval(function() {
+      current += step;
+      if (current >= target) {
+        current = target;
+        clearInterval(interval);
+        el.classList.add('counted');
+      }
+      el.textContent = current + '+';
+    }, 25);
+  }
+
+  // === Scroll Reveal (IntersectionObserver) ===
+  var revealObserver = new IntersectionObserver(function(entries) {
+    entries.forEach(function(entry) {
+      if (entry.isIntersecting) {
+        entry.target.classList.add('visible');
+        // If it's a stat-number, trigger count-up
+        var statNum = entry.target.querySelector('.stat-number');
+        if (statNum && statNum.getAttribute('data-target')) {
+          animateCountUp(statNum);
+        }
+        revealObserver.unobserve(entry.target);
+      }
+    });
+  }, { threshold: 0.3 });
+
+  document.querySelectorAll('.reveal').forEach(function(el) {
+    revealObserver.observe(el);
+  });
+
+  // === Parallax on scroll ===
+  var hero = document.querySelector('.parallax-hero');
+  var heroContent = document.querySelector('.hero-content');
+  if (hero && heroContent) {
+    window.addEventListener('scroll', function() {
+      var scrollY = window.pageYOffset;
+      var heroBottom = hero.offsetTop + hero.offsetHeight;
+      if (scrollY <= heroBottom) {
+        heroContent.style.transform = 'translateY(' + (scrollY * 0.08) + 'px)';
+        hero.style.backgroundPosition = 'center ' + (scrollY * 0.15) + 'px';
+      }
+    }, { passive: true });
+  }
+})();
+</script>
 {% endblock %}
