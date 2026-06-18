@@ -16,6 +16,7 @@ urlpatterns = [
     path('dashboard/', views.dashboard_view, name='dashboard'),
     path('profile/', views.profile_view, name='profile'),
     path('notifications/', views.notifications_list, name='notifications'),
+    path('notifications/count/', views.notification_count, name='notification_count'),
     path(
         'notifications/<int:pk>/read/',
         views.mark_notification_read,

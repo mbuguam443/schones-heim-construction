@@ -5,6 +5,7 @@ from django.contrib import messages
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from django.db.models import Count, Sum
+from django.http import JsonResponse
 from django.db.models.functions import TruncMonth
 from django.shortcuts import get_object_or_404, redirect, render
 from django.utils import timezone
@@ -397,6 +398,11 @@ def contact_view(request):
     return render(request, 'public/contact.html', {
         'company_settings': company_settings,
     })
+
+
+@login_required
+def notification_count(request):
+    return JsonResponse({'count': Notification.objects.filter(recipient=request.user, is_read=False).count()})
 
 
 # --- Client Inquiry System ---

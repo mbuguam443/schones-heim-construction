@@ -13,16 +13,18 @@
     </div>
   </div>
   <div class="user-area">
-    <a href="#" class="notification-bell" title="Notifications">
-      <i class="fas fa-bell"></i>
-      {% with unread_count=user.notifications.all.count %}
+    {% with unread_count=user.notifications.all.count %}
+    <div class="dropdown" style="position:relative;">
+      <a href="{% url 'core:notifications' %}" class="notification-bell{% if unread_count > 0 %} has-unread{% endif %}" title="Notifications">
+        <i class="fas fa-bell"></i>
         {% if unread_count > 0 %}
-          <span class="badge-count">{{ unread_count|default:0 }}</span>
+          <span class="badge-count">{{ unread_count }}</span>
         {% endif %}
-      {% endwith %}
-    </a>
+      </a>
+    </div>
+    {% endwith %}
     <div class="dropdown user-dropdown">
-      <a href="#" class="dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+      <a href="#" class="dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false" role="button">
         <div class="user-avatar">
           {{ user.get_full_name|default:user.username|first|upper }}
         </div>
@@ -33,18 +35,18 @@
       </a>
       <ul class="dropdown-menu dropdown-menu-end shadow-sm">
         <li>
-          <a class="dropdown-item" href="#">
+          <a class="dropdown-item" href="{% url 'core:profile' %}">
             <i class="fas fa-user-circle me-2"></i>Profile
           </a>
         </li>
         <li>
-          <a class="dropdown-item" href="#">
+          <a class="dropdown-item" href="{% url 'core:notifications' %}">
             <i class="fas fa-bell me-2"></i>Notifications
             {% if unread_count %}<span class="badge bg-danger ms-1">{{ unread_count }}</span>{% endif %}
           </a>
         </li>
         <li>
-          <a class="dropdown-item" href="#">
+          <a class="dropdown-item" href="{% url 'core:settings' %}">
             <i class="fas fa-cog me-2"></i>Settings
           </a>
         </li>
