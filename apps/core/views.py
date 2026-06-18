@@ -341,9 +341,9 @@ def home_view(request):
     projects = AllProjects.objects.filter(status__in=['Ongoing', 'Completed']).order_by('-id')[:6]
     company_settings = CompanySettings.objects.first()
     stats = {
-        'projects_completed': AllProjects.objects.filter(status='Completed').count() or 12,
+        'projects_completed': 10,
         'years_established': 8,
-        'happy_clients': Client.objects.count() or 15,
+        'happy_clients': 15,
         'professionals': User.objects.filter(is_active=True).count() or 20,
     }
     return render(request, 'public/home.html', {
@@ -357,9 +357,9 @@ def about_view(request):
     company_settings = CompanySettings.objects.first()
     from apps.projects.models import Project as AllProjects
     stats = {
-        'projects_completed': AllProjects.objects.filter(status='Completed').count() or 12,
+        'projects_completed': 10,
         'years_established': 8,
-        'happy_clients': Client.objects.count() or 15,
+        'happy_clients': 15,
         'professionals': User.objects.filter(is_active=True).count() or 20,
     }
     return render(request, 'public/about.html', {
