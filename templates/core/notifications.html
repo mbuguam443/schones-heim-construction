@@ -71,7 +71,7 @@
           <a href="{% url 'core:mark_notification_read' notif.pk %}" class="btn btn-sm btn-outline-primary">Mark Read</a>
         {% endif %}
         {% if notif.link %}
-          <a href="{{ notif.link }}" class="btn btn-sm btn-primary">View</a>
+          <a href="{% url 'core:mark_notification_read' notif.pk %}" class="btn btn-sm btn-primary">View</a>
         {% endif %}
       </div>
     </div>

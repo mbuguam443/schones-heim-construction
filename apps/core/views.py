@@ -162,7 +162,11 @@ def profile_view(request):
 @login_required
 def notifications_list(request):
     notifications = Notification.objects.filter(recipient=request.user)
-    return render(request, 'core/notifications.html', {'notifications': notifications})
+    unread_count = notifications.filter(is_read=False).count()
+    return render(request, 'core/notifications.html', {
+        'notifications': notifications,
+        'unread_notifications_count': unread_count,
+    })
 
 
 @login_required
