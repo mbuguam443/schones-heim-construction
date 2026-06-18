@@ -7,16 +7,11 @@
 <style>
   .parallax-hero {
     background-attachment: fixed;
-    transition: transform 0.1s ease-out;
-  }
-  .hero-content {
-    transition: transform 0.15s ease-out;
   }
   .stat-number {
     font-size: 2.5rem;
     font-weight: 800;
     color: var(--primary);
-    transition: transform 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
   }
   .stat-number.counted {
     animation: pop 0.4s ease-out;
@@ -43,11 +38,11 @@
   .reveal-delay-6 { transition-delay: 0.6s; }
 
   .service-card {
-    transform: translateY(0);
     transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.3s;
   }
   .service-card:hover {
     transform: translateY(-8px) scale(1.02);
+    box-shadow: 0 8px 25px rgba(0,0,0,0.12);
   }
   .project-card {
     transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.3s;
@@ -81,7 +76,7 @@
 <section class="hero-section parallax-hero" style="background: linear-gradient(135deg, rgba(26,60,110,0.55) 0%, rgba(15,42,78,0.7) 100%), url('{% static 'homepage.png' %}') center/cover no-repeat; padding: 120px 0;">
   <div class="container position-relative hero-content" style="z-index:1;">
     <div class="row align-items-center">
-      <div class="col-lg-7 reveal visible">
+      <div class="col-lg-7">
         <h1 class="hero-title">Building Dreams,<br>Constructing Realities</h1>
         <p class="hero-subtitle mt-3 mb-4">Schones Heim Builders is a premier construction and general contracting company dedicated to delivering excellence in every project we undertake.</p>
         <div class="hero-btn">
@@ -89,7 +84,7 @@
           <a href="{% url 'core:services' %}" class="btn btn-outline-light btn-lg">Our Services</a>
         </div>
       </div>
-      <div class="col-lg-5 text-center mt-4 mt-lg-0 reveal visible">
+      <div class="col-lg-5 text-center mt-4 mt-lg-0">
         <img src="{% static 'homepage.png' %}" alt="Schones Heim Builders" style="max-width:100%; border-radius:16px; box-shadow:0 8px 30px rgba(0,0,0,0.3);">
       </div>
     </div>
@@ -100,19 +95,19 @@
   <div class="container">
     <div class="row text-center g-4">
       <div class="col-md-3 col-6 reveal">
-        <div class="stat-number" data-target="{{ stats.projects_completed }}">0</div>
+        <div class="stat-number" data-target="{{ stats.projects_completed }}">{{ stats.projects_completed }}</div>
         <div class="stat-label">Projects Completed</div>
       </div>
       <div class="col-md-3 col-6 reveal reveal-delay-1">
-        <div class="stat-number" data-target="{{ stats.years_established }}">0</div>
+        <div class="stat-number" data-target="{{ stats.years_established }}">{{ stats.years_established }}</div>
         <div class="stat-label">Years Experience</div>
       </div>
       <div class="col-md-3 col-6 reveal reveal-delay-2">
-        <div class="stat-number" data-target="{{ stats.happy_clients }}">0</div>
+        <div class="stat-number" data-target="{{ stats.happy_clients }}">{{ stats.happy_clients }}</div>
         <div class="stat-label">Happy Clients</div>
       </div>
       <div class="col-md-3 col-6 reveal reveal-delay-3">
-        <div class="stat-number" data-target="{{ stats.professionals }}">0</div>
+        <div class="stat-number" data-target="{{ stats.professionals }}">{{ stats.professionals }}</div>
         <div class="stat-label">Professionals</div>
       </div>
     </div>
@@ -224,51 +219,66 @@
 {% block extra_js %}
 <script>
 (function() {
-  // === Count-up animation ===
+  var hasAnimated = false;
+
   function animateCountUp(el) {
     var target = parseInt(el.getAttribute('data-target'), 10);
-    if (isNaN(target) || target === 0) { el.textContent = '0'; return; }
+    if (isNaN(target) || target < 1) return;
     var current = 0;
-    var step = Math.max(1, Math.ceil(target / 60));
-    var interval = setInterval(function() {
-      current += step;
-      if (current >= target) {
-        current = target;
-        clearInterval(interval);
+    var duration = 1500;
+    var startTime = null;
+
+    function step(timestamp) {
+      if (!startTime) startTime = timestamp;
+      var progress = Math.min((timestamp - startTime) / duration, 1);
+      var eased = 1 - Math.pow(1 - progress, 3);
+      current = Math.round(eased * target);
+      el.textContent = current + '+';
+      if (progress < 1) {
+        requestAnimationFrame(step);
+      } else {
         el.classList.add('counted');
       }
-      el.textContent = current + '+';
-    }, 25);
+    }
+    requestAnimationFrame(step);
   }
 
-  // === Scroll Reveal (IntersectionObserver) ===
-  var revealObserver = new IntersectionObserver(function(entries) {
-    entries.forEach(function(entry) {
-      if (entry.isIntersecting) {
-        entry.target.classList.add('visible');
-        // If it's a stat-number, trigger count-up
-        var statNum = entry.target.querySelector('.stat-number');
-        if (statNum && statNum.getAttribute('data-target')) {
-          animateCountUp(statNum);
-        }
-        revealObserver.unobserve(entry.target);
-      }
-    });
-  }, { threshold: 0.3 });
+  function triggerStats() {
+    if (hasAnimated) return;
+    var section = document.getElementById('stats-section');
+    if (!section) return;
+    var rect = section.getBoundingClientRect();
+    if (rect.top < window.innerHeight - 50) {
+      hasAnimated = true;
+      document.querySelectorAll('.stat-number[data-target]').forEach(function(el) {
+        animateCountUp(el);
+      });
+      window.removeEventListener('scroll', triggerStats);
+      window.removeEventListener('resize', triggerStats);
+    }
+  }
 
   document.querySelectorAll('.reveal').forEach(function(el) {
-    revealObserver.observe(el);
+    var observer = new IntersectionObserver(function(entries) {
+      entries.forEach(function(entry) {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('visible');
+          observer.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.15 });
+    observer.observe(el);
   });
 
-  // === Parallax on scroll ===
+  window.addEventListener('scroll', triggerStats, { passive: true });
+  window.addEventListener('resize', triggerStats, { passive: true });
+  triggerStats();
+
   var hero = document.querySelector('.parallax-hero');
-  var heroContent = document.querySelector('.hero-content');
-  if (hero && heroContent) {
+  if (hero) {
     window.addEventListener('scroll', function() {
       var scrollY = window.pageYOffset;
-      var heroBottom = hero.offsetTop + hero.offsetHeight;
-      if (scrollY <= heroBottom) {
-        heroContent.style.transform = 'translateY(' + (scrollY * 0.08) + 'px)';
+      if (scrollY <= hero.offsetHeight) {
         hero.style.backgroundPosition = 'center ' + (scrollY * 0.15) + 'px';
       }
     }, { passive: true });
