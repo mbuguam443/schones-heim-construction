@@ -13,7 +13,6 @@
     </div>
   </div>
   <div class="user-area">
-    {% with unread_count=user.notifications.all.count %}
     <div class="dropdown" style="position:relative;">
       <a href="{% url 'core:notifications' %}" class="notification-bell" title="Notifications">
         <i class="fas fa-bell"></i>
@@ -22,7 +21,6 @@
         {% endif %}
       </a>
     </div>
-    {% endwith %}
     <div class="dropdown user-dropdown">
       <a href="#" class="dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false" role="button">
         <div class="user-avatar">
