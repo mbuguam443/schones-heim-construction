@@ -1,0 +1,114 @@
+{% extends 'base.html' %}
+
+{% block title %}Projects - SCHONES HEIM BUILDERS{% endblock %}
+{% block page_header %}Projects{% endblock %}
+
+{% block content %}
+<div class="card mb-4">
+    <div class="card-header d-flex justify-content-between align-items-center flex-wrap gap-2">
+        <form method="get" class="d-flex gap-2 align-items-center flex-wrap">
+            <div class="input-group" style="max-width:300px;">
+                <span class="input-group-text bg-white"><i class="fas fa-search"></i></span>
+                <input type="text" name="q" class="form-control" placeholder="Search projects..." value="{{ search_query }}">
+            </div>
+            <select name="status" class="form-select" style="width:auto;min-width:150px;" onchange="this.form.submit()">
+                <option value="">All Statuses</option>
+                {% for value, label in status_choices %}
+                <option value="{{ value }}" {% if status_filter == value %}selected{% endif %}>{{ label }}</option>
+                {% endfor %}
+            </select>
+            <button class="btn btn-primary" type="submit">Filter</button>
+            {% if search_query or status_filter %}
+            <a href="{% url 'projects:project_list' %}" class="btn btn-outline-secondary">Clear</a>
+            {% endif %}
+        </form>
+        {% if can_edit %}
+        <a href="{% url 'projects:project_create' %}" class="btn btn-primary">
+            <i class="fas fa-plus"></i> New Project
+        </a>
+        {% endif %}
+    </div>
+</div>
+
+{% if projects %}
+<div class="row g-4">
+    {% for project in projects %}
+    <div class="col-12 col-md-6 col-xl-4">
+        <div class="card h-100">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-start mb-2">
+                    <h5 class="card-title fw-semibold mb-0">
+                        <a href="{% url 'projects:project_detail' project.pk %}">
+                            {{ project.name }}
+                        </a>
+                    </h5>
+                    <span class="badge 
+                        {% if project.status == 'Completed' %}bg-success
+                        {% elif project.status == 'Ongoing' %}bg-primary
+                        {% elif project.status == 'Planning' %}bg-secondary
+                        {% elif project.status == 'On Hold' %}bg-warning text-dark
+                        {% elif project.status == 'Cancelled' %}bg-danger
+                        {% endif %}">
+                        {{ project.status }}
+                    </span>
+                </div>
+                {% if project.client %}
+                <p class="text-muted small mb-1">
+                    <i class="fas fa-users me-1"></i> {{ project.client.full_name }}
+                </p>
+                {% endif %}
+                {% if project.location %}
+                <p class="text-muted small mb-2">
+                    <i class="fas fa-map-marker-alt me-1"></i> {{ project.location }}
+                </p>
+                {% endif %}
+                <div class="mb-2">
+                    <div class="d-flex justify-content-between align-items-center mb-1">
+                        <small class="text-muted">Progress</small>
+                        <small class="fw-medium">{{ project.progress_percent }}%</small>
+                    </div>
+                    <div class="progress" style="height:6px;">
+                        <div class="progress-bar" role="progressbar" style="width:{{ project.progress_percent }}%" aria-valuenow="{{ project.progress_percent }}" aria-valuemin="0" aria-valuemax="100"></div>
+                    </div>
+                </div>
+                <div class="d-flex justify-content-between text-muted small">
+                    <span><i class="fas fa-money-bill me-1"></i> KSh {{ project.budget|floatformat:0|default:'—' }}</span>
+                    <span><i class="fas fa-calendar me-1"></i> {{ project.start_date|date:"M d, Y"|default:'TBD' }}</span>
+                </div>
+            </div>
+            <div class="card-footer bg-transparent d-flex gap-2 justify-content-end">
+                <a href="{% url 'projects:project_detail' project.pk %}" class="btn btn-sm btn-outline-secondary"><i class="fas fa-eye"></i> View</a>
+                {% if can_edit %}
+                <a href="{% url 'projects:project_update' project.pk %}" class="btn btn-sm btn-outline-primary"><i class="fas fa-pencil"></i> Edit</a>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% else %}
+<div class="text-center py-5 text-muted">
+    <i class="fas fa-building" style="font-size:3rem;display:block;margin-bottom:1rem;"></i>
+    <p class="mb-0">No projects found.</p>
+    {% if can_edit %}
+    <a href="{% url 'projects:project_create' %}" class="btn btn-primary mt-3"><i class="fas fa-plus"></i> Start Your First Project</a>
+    {% endif %}
+</div>
+{% endif %}
+
+{% if is_paginated %}
+<nav class="mt-4">
+    <ul class="pagination pagination-sm justify-content-center">
+        {% if page_obj.has_previous %}
+        <li class="page-item"><a class="page-link" href="?page=1{% if search_query %}&q={{ search_query }}{% endif %}{% if status_filter %}&status={{ status_filter }}{% endif %}">&laquo;</a></li>
+        <li class="page-item"><a class="page-link" href="?page={{ page_obj.previous_page_number }}{% if search_query %}&q={{ search_query }}{% endif %}{% if status_filter %}&status={{ status_filter }}{% endif %}">Previous</a></li>
+        {% endif %}
+        <li class="page-item disabled"><span class="page-link">Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}</span></li>
+        {% if page_obj.has_next %}
+        <li class="page-item"><a class="page-link" href="?page={{ page_obj.next_page_number }}{% if search_query %}&q={{ search_query }}{% endif %}{% if status_filter %}&status={{ status_filter }}{% endif %}">Next</a></li>
+        <li class="page-item"><a class="page-link" href="?page={{ page_obj.paginator.num_pages }}{% if search_query %}&q={{ search_query }}{% endif %}{% if status_filter %}&status={{ status_filter }}{% endif %}">&raquo;</a></li>
+        {% endif %}
+    </ul>
+</nav>
+{% endif %}
+{% endblock %}

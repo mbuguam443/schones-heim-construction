@@ -1,0 +1,45 @@
+{% extends 'base.html' %}
+{% load crispy_forms_tags %}
+{% block title %}Record Payment - {{ invoice.invoice_number }}{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h2><i class="fas fa-money-bill-wave"></i> Record Payment</h2>
+</div>
+
+<div class="row">
+    <div class="col-md-6">
+        <div class="card shadow-sm mb-4">
+            <div class="card-header bg-primary text-white"><h5 class="mb-0">Payment for {{ invoice.invoice_number }}</h5></div>
+            <div class="card-body">
+                <div class="alert alert-info d-flex justify-content-between">
+                    <span>Outstanding Balance:</span>
+                    <strong class="fs-5">KSh {{ invoice.balance|floatformat:2 }}</strong>
+                </div>
+                <form method="post">
+                    {% csrf_token %}
+                    {{ form|crispy }}
+                    <div class="d-flex gap-2 mt-3">
+                        <button type="submit" class="btn btn-success"><i class="fas fa-check-circle"></i> Record Payment</button>
+                        <a href="{% url 'invoices:detail' invoice.pk %}" class="btn btn-outline-secondary">Cancel</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.querySelector('[name="amount"]')?.addEventListener('input', function() {
+        const balance = {{ invoice.balance|floatformat:2 }};
+        const amount = parseFloat(this.value) || 0;
+        if (amount > balance) {
+            this.setCustomValidity('Amount cannot exceed outstanding balance of KSh ' + balance.toFixed(2));
+        } else {
+            this.setCustomValidity('');
+        }
+    });
+</script>
+{% endblock %}

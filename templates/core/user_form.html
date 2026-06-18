@@ -1,0 +1,115 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}{{ title }}{% endblock %}
+{% block extra_css %}
+<style>
+    .form-container { max-width: 700px; margin: 0 auto; }
+</style>
+{% endblock %}
+{% block content %}
+<div class="form-container">
+    <div class="d-flex justify-content-between align-items-center page-header">
+        <h2><i class="fas fa-user{% if editing %}-edit{% else %}-plus{% endif %}"></i> {{ title }}</h2>
+        <a href="{% url 'core:user_list' %}" class="btn btn-outline-secondary"><i class="fas fa-arrow-left"></i> Back to Users</a>
+    </div>
+
+    <div class="card shadow-sm">
+        <div class="card-body">
+            <form method="post" novalidate>
+                {% csrf_token %}
+
+                {% if form.non_field_errors %}
+                <div class="alert alert-danger">
+                    {% for err in form.non_field_errors %}{{ err }}{% endfor %}
+                </div>
+                {% endif %}
+
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <label class="form-label">Username <span class="text-danger">*</span></label>
+                        <input type="text" name="username" class="form-control {% if form.username.errors %}is-invalid{% endif %}" value="{{ form.username.value|default:'' }}" required>
+                        {% for err in form.username.errors %}<div class="invalid-feedback">{{ err }}</div>{% endfor %}
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label">Email</label>
+                        <input type="email" name="email" class="form-control {% if form.email.errors %}is-invalid{% endif %}" value="{{ form.email.value|default:'' }}">
+                        {% for err in form.email.errors %}<div class="invalid-feedback">{{ err }}</div>{% endfor %}
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label">First Name</label>
+                        <input type="text" name="first_name" class="form-control {% if form.first_name.errors %}is-invalid{% endif %}" value="{{ form.first_name.value|default:'' }}">
+                        {% for err in form.first_name.errors %}<div class="invalid-feedback">{{ err }}</div>{% endfor %}
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label">Last Name</label>
+                        <input type="text" name="last_name" class="form-control {% if form.last_name.errors %}is-invalid{% endif %}" value="{{ form.last_name.value|default:'' }}">
+                        {% for err in form.last_name.errors %}<div class="invalid-feedback">{{ err }}</div>{% endfor %}
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label">Role <span class="text-danger">*</span></label>
+                        <select name="role" class="form-select {% if form.role.errors %}is-invalid{% endif %}">
+                            {% for key, val in form.fields.role.choices %}
+                            <option value="{{ key }}" {% if form.role.value == key %}selected{% endif %}>{{ val }}</option>
+                            {% endfor %}
+                        </select>
+                        {% for err in form.role.errors %}<div class="invalid-feedback">{{ err }}</div>{% endfor %}
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label">Phone</label>
+                        <input type="text" name="phone" class="form-control {% if form.phone.errors %}is-invalid{% endif %}" value="{{ form.phone.value|default:'' }}">
+                        {% for err in form.phone.errors %}<div class="invalid-feedback">{{ err }}</div>{% endfor %}
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label">Position</label>
+                        <input type="text" name="position" class="form-control {% if form.position.errors %}is-invalid{% endif %}" value="{{ form.position.value|default:'' }}">
+                        {% for err in form.position.errors %}<div class="invalid-feedback">{{ err }}</div>{% endfor %}
+                    </div>
+
+                    {% if not editing %}
+                    <div class="col-md-6">
+                        <label class="form-label">Password <span class="text-danger">*</span></label>
+                        <input type="password" name="password1" class="form-control {% if form.password1.errors %}is-invalid{% endif %}" required>
+                        {% for err in form.password1.errors %}<div class="invalid-feedback">{{ err }}</div>{% endfor %}
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label">Confirm Password <span class="text-danger">*</span></label>
+                        <input type="password" name="password2" class="form-control {% if form.password2.errors %}is-invalid{% endif %}" required>
+                        {% for err in form.password2.errors %}<div class="invalid-feedback">{{ err }}</div>{% endfor %}
+                    </div>
+                    {% endif %}
+
+                    {% if not editing and form.client_link %}
+                    <div class="col-md-12">
+                        <label class="form-label">Link to Client</label>
+                        <select name="client_link" class="form-select {% if form.client_link.errors %}is-invalid{% endif %}">
+                            <option value="">-- Not linked --</option>
+                            {% for c in form.client_link.field.queryset %}
+                            <option value="{{ c.pk }}" {% if form.client_link.value|stringformat:'s' == c.pk|stringformat:'s' %}selected{% endif %}>{{ c.full_name }} ({{ c.company_name|default:'No Company' }})</option>
+                            {% endfor %}
+                        </select>
+                        <div class="form-text text-muted">Optionally link this user to an existing client record</div>
+                        {% for err in form.client_link.errors %}<div class="invalid-feedback">{{ err }}</div>{% endfor %}
+                    </div>
+                    {% endif %}
+
+                    {% if editing %}
+                    <div class="col-md-6">
+                        <div class="form-check mt-4">
+                            <input type="checkbox" name="is_active" class="form-check-input" id="id_is_active" {% if form.is_active.value %}checked{% endif %}>
+                            <label class="form-check-label" for="id_is_active">Active</label>
+                        </div>
+                    </div>
+                    {% endif %}
+                </div>
+
+                <div class="mt-4 d-flex gap-2">
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-save"></i> {% if editing %}Update User{% else %}Create User{% endif %}
+                    </button>
+                    <a href="{% url 'core:user_list' %}" class="btn btn-outline-secondary">Cancel</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

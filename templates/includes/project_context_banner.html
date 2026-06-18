@@ -1,0 +1,15 @@
+{% if active_project or active_client %}
+<div class="alert alert-info py-2 mb-3 d-flex align-items-center gap-2">
+  <i class="fas fa-crosshairs"></i>
+  <strong>Context:</strong>
+  {% if active_project %}
+    <span class="badge bg-primary">{{ active_project.name }}</span>
+    {% if active_client %}
+      <span class="text-muted">({{ active_client.full_name }})</span>
+    {% endif %}
+  {% elif active_client %}
+    <span class="badge bg-info">{{ active_client.full_name }}</span>
+  {% endif %}
+  <span class="text-muted small ms-2">— new records will be scoped to this context</span>
+</div>
+{% endif %}

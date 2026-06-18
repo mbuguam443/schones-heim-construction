@@ -1,0 +1,326 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Quotation {{ qtn.quotation_number }} - {{ company.company_name|default:'SCHONES HEIM BUILDERS' }}</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  @page { margin: 20mm; size: A4; }
+  body {
+    font-family: 'Segoe UI', Arial, sans-serif;
+    font-size: 11pt;
+    color: #333;
+    line-height: 1.5;
+    padding: 0;
+  }
+  .container {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 10px;
+  }
+  .header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 3px solid #1a3c6e;
+    padding-bottom: 16px;
+    margin-bottom: 20px;
+  }
+  @media print {
+    .header { margin: -20mm -20mm 20mm -20mm; padding: 15px 30px 16px; }
+  }
+  .logo-area {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
+  .logo-area img {
+    max-height: 70px;
+  }
+  .company-name {
+    font-size: 22px;
+    font-weight: 700;
+    color: #1a3c6e;
+    letter-spacing: 1px;
+  }
+  .tagline {
+    font-size: 11px;
+    color: #666;
+    font-style: italic;
+  }
+  .quotation-title {
+    text-align: center;
+    font-size: 24px;
+    font-weight: 700;
+    color: #1a3c6e;
+    margin-bottom: 16px;
+    border-bottom: 1px dashed #ccc;
+    padding-bottom: 8px;
+  }
+  .info-grid {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 20px;
+    padding: 14px;
+    background: #f8f9fc;
+    border-radius: 8px;
+    border: 1px solid #e0e3e8;
+  }
+  .info-grid .col p {
+    margin: 3px 0;
+    font-size: 11pt;
+  }
+  .info-grid .col p strong {
+    display: inline-block;
+    width: 110px;
+    color: #555;
+  }
+  .status-badge {
+    display: inline-block;
+    padding: 2px 10px;
+    border-radius: 20px;
+    font-size: 10pt;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+  .status-badge.Draft { background: #6c757d; color: #fff; }
+  .status-badge.Sent { background: #0d6efd; color: #fff; }
+  .status-badge.Accepted { background: #198754; color: #fff; }
+  .status-badge.Rejected { background: #dc3545; color: #fff; }
+  .status-badge.Converted { background: #0dcaf0; color: #000; }
+  table.items-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 16px;
+  }
+  th, td {
+    border: 1px solid #ccc;
+    padding: 8px 10px;
+    text-align: left;
+    font-size: 10pt;
+  }
+  th {
+    background: #1a3c6e;
+    color: #fff;
+    font-weight: 600;
+  }
+  th.right { text-align: right; }
+  th.center { text-align: center; }
+  td.right { text-align: right; }
+  td.center { text-align: center; }
+  .total-row {
+    font-weight: 700;
+    background: #e8edf4;
+  }
+  .grand-total-row {
+    font-weight: 700;
+    background: #1a3c6e;
+    color: #fff;
+    font-size: 12pt;
+  }
+  .grand-total-row td { color: #fff; }
+  .terms {
+    margin-bottom: 20px;
+    padding: 14px;
+    background: #f8f9fc;
+    border-radius: 8px;
+    border: 1px solid #e0e3e8;
+  }
+  .terms h3 {
+    font-size: 12pt;
+    color: #1a3c6e;
+    margin-bottom: 6px;
+  }
+  .terms p {
+    font-size: 10pt;
+    line-height: 1.5;
+    color: #444;
+    white-space: pre-line;
+  }
+  .payment-details {
+    display: flex;
+    gap: 40px;
+    margin-bottom: 20px;
+    padding: 14px;
+    background: #f8f9fc;
+    border-radius: 8px;
+    border: 1px solid #e0e3e8;
+  }
+  .payment-details h3 {
+    font-size: 12pt;
+    color: #1a3c6e;
+    margin-bottom: 6px;
+  }
+  .payment-details .field {
+    margin-bottom: 3px;
+    font-size: 10pt;
+  }
+  .payment-details .field span {
+    display: inline-block;
+    width: 100px;
+    font-weight: 600;
+    color: #555;
+  }
+  .signature {
+    display: flex;
+    justify-content: space-between;
+    align-items: end;
+    margin-top: 24px;
+    padding-top: 16px;
+    border-top: 1px solid #ddd;
+  }
+  .signature .left { font-size: 10pt; color: #666; }
+  .signature .right { text-align: right; }
+  .signature .right .name {
+    font-size: 14pt;
+    font-weight: 600;
+    color: #1a3c6e;
+  }
+  .signature .right .title {
+    font-size: 10pt;
+    color: #666;
+    margin-top: 3px;
+  }
+  .watermark {
+    display: none;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    opacity: 0.12;
+    pointer-events: none;
+    z-index: 9999;
+    max-width: 500px;
+    width: 60%;
+  }
+  @media print {
+    body { color: #000 !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; color-adjust: exact; }
+    th { background: #1a3c6e !important; color: #fff !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; color-adjust: exact; }
+    td, th { border-color: #000 !important; border-width: 1.5px !important; }
+    .total-row { background: #e0e4ec !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; color-adjust: exact; }
+    .grand-total-row td { background: #1a3c6e !important; color: #fff !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; color-adjust: exact; }
+    .info-grid { background: #eef0f5 !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; color-adjust: exact; border-color: #000 !important; }
+    .terms { background: #eef0f5 !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; color-adjust: exact; }
+    .payment-details { background: #eef0f5 !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; color-adjust: exact; border-color: #000 !important; }
+    .status-badge { -webkit-print-color-adjust: exact; print-color-adjust: exact; color-adjust: exact; }
+    .watermark { display: block; }
+  }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <img src="{% static 'logo.png' %}" class="watermark" alt="watermark">
+
+  <div class="header">
+    <div class="logo-area">
+      <img src="{% if company and company.logo %}{{ company.logo.url }}{% else %}{% static 'logo.png' %}{% endif %}" alt="Logo" onerror="this.style.display='none'">
+      <div>
+        <div class="company-name">{{ company.company_name|default:'SCHONES HEIM BUILDERS' }}</div>
+        <div class="tagline">Engineered by purpose, led by vision</div>
+      </div>
+    </div>
+    <div style="text-align:right;">
+      <div style="font-size:11pt; color:#666;">Date: <strong>{{ qtn.date|date:"d M Y" }}</strong></div>
+      <div style="font-size:11pt; color:#666; margin-top:3px;">Expiry: <strong>{{ qtn.expiry_date|date:"d M Y" }}</strong></div>
+    </div>
+  </div>
+
+  <div class="quotation-title">QUOTATION</div>
+
+  <div class="info-grid">
+    <div class="col">
+      <p><strong>Quotation No:</strong> {{ qtn.quotation_number }}</p>
+      <p><strong>Client:</strong> {{ qtn.client.full_name }}</p>
+      {% if qtn.client.company_name %}
+      <p><strong>Company:</strong> {{ qtn.client.company_name }}</p>
+      {% endif %}
+      <p><strong>Project:</strong> {{ qtn.project.name|default:"-" }}</p>
+    </div>
+    <div class="col" style="text-align:right;">
+      <p><strong>Status:</strong> <span class="status-badge {{ qtn.status }}">{{ qtn.status }}</span></p>
+      <p><strong>Created By:</strong> {% if qtn.created_by %}{{ qtn.created_by.get_full_name|default:qtn.created_by.username }}{% else %}System{% endif %}</p>
+    </div>
+  </div>
+
+  {% if qtn.notes %}
+  <div style="margin-bottom:16px; font-size:11pt; line-height:1.5; color:#444;">{{ qtn.notes|linebreaksbr }}</div>
+  {% endif %}
+
+  <table class="items-table">
+    <thead>
+      <tr>
+        <th style="width:40px;">#</th>
+        <th>Description</th>
+        <th style="width:60px;" class="center">Qty</th>
+        <th style="width:60px;" class="center">Unit</th>
+        <th style="width:100px;" class="right">Unit Price</th>
+        <th style="width:120px;" class="right">Total (KSh)</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for item in qtn.items.all %}
+      <tr>
+        <td>{{ forloop.counter }}</td>
+        <td>{{ item.description }}</td>
+        <td class="center">{{ item.quantity|floatformat:2 }}</td>
+        <td class="center">{{ item.unit }}</td>
+        <td class="right">{{ item.unit_price|floatformat:2 }}</td>
+        <td class="right fw-bold">{{ item.total|floatformat:2 }}</td>
+      </tr>
+      {% endfor %}
+      <tr class="total-row">
+        <td colspan="4"></td>
+        <td class="right">Subtotal:</td>
+        <td class="right">{{ qtn.subtotal|floatformat:2 }}</td>
+      </tr>
+      <tr class="total-row">
+        <td colspan="4"></td>
+        <td class="right">Tax ({{ qtn.tax_percent }}%):</td>
+        <td class="right">{{ qtn.tax_amount|floatformat:2 }}</td>
+      </tr>
+      <tr class="grand-total-row">
+        <td colspan="4"></td>
+        <td class="right">Grand Total:</td>
+        <td class="right">KSh {{ qtn.grand_total|floatformat:2 }}</td>
+      </tr>
+    </tbody>
+  </table>
+
+  {% if qtn.terms_conditions %}
+  <div class="terms">
+    <h3>Terms and Conditions</h3>
+    <p>{{ qtn.terms_conditions }}</p>
+  </div>
+  {% endif %}
+
+  <div class="payment-details">
+    <div>
+      <h3>PAYMENT DETAILS</h3>
+      <div class="field"><span>Bank:</span> {{ company.bank_name|default:'NCBA Bank' }}</div>
+      <div class="field"><span>Account No:</span> {{ company.bank_account|default:'1006092731' }}</div>
+    </div>
+    <div>
+      <h3>&nbsp;</h3>
+      <div class="field"><span>Mpesa No:</span> {{ company.mpesa_number|default:'0797770539' }}</div>
+      <div class="field"><span>KRA PIN:</span> {{ company.kra_pin|default:'P051234567Z' }}</div>
+    </div>
+  </div>
+
+  <div class="signature">
+    <div class="left">
+      Sincerely,<br><br>
+      <div style="font-weight:600;color:#1a3c6e;">{{ company.company_name|default:'SCHONES HEIM BUILDERS' }}</div>
+    </div>
+    <div class="right">
+      <div class="name">{% if qtn.created_by %}{{ qtn.created_by.get_full_name|default:qtn.created_by.username }}{% else %}---{% endif %}</div>
+      <div class="title">Authorized Signatory</div>
+    </div>
+  </div>
+
+</div>
+</body>
+</html>

@@ -1,0 +1,523 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tiling Quotation - {{ company_settings.company_name|default:'SCHONES HEIM BUILDERS' }}</title>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: 'Segoe UI', Arial, sans-serif;
+    background: #f0f2f5;
+    padding: 40px 20px;
+    color: #333;
+  }
+  .container {
+    max-width: 900px;
+    margin: 0 auto;
+    background: #fff;
+    border-radius: 12px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+    padding: 40px 50px;
+  }
+  .header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 3px solid #1a3c6e;
+    padding-bottom: 20px;
+    margin-bottom: 24px;
+  }
+  .logo-area {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
+  .logo-area img {
+    max-height: 70px;
+  }
+  .company-name {
+    font-size: 22px;
+    font-weight: 700;
+    color: #1a3c6e;
+    letter-spacing: 1px;
+  }
+  .tagline {
+    font-size: 12px;
+    color: #666;
+    font-style: italic;
+  }
+  .quotation-title {
+    text-align: center;
+    font-size: 26px;
+    font-weight: 700;
+    color: #1a3c6e;
+    margin-bottom: 20px;
+    border-bottom: 1px dashed #ccc;
+    padding-bottom: 10px;
+  }
+  .intro { margin-bottom: 20px; }
+  .intro textarea {
+    width: 100%;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    padding: 10px;
+    font-family: inherit;
+    font-size: 14px;
+    resize: vertical;
+    background: #fafafa;
+  }
+  .intro textarea:focus { background: #fff; border-color: #1a3c6e; outline: none; }
+  .date-field {
+    text-align: right;
+    margin-bottom: 16px;
+    font-weight: 600;
+  }
+  .date-field input {
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    padding: 6px 10px;
+    font-family: inherit;
+    font-size: 14px;
+    width: 160px;
+  }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 20px;
+  }
+  th, td {
+    border: 1px solid #ccc;
+    padding: 8px 10px;
+    text-align: left;
+    font-size: 13px;
+  }
+  th {
+    background: #1a3c6e;
+    color: #fff;
+    font-weight: 600;
+  }
+  .section-header {
+    background: #e8edf4;
+    font-weight: 700;
+    color: #1a3c6e;
+  }
+  td input, td select {
+    width: 100%;
+    border: none;
+    background: transparent;
+    font-family: inherit;
+    font-size: 13px;
+    padding: 2px 4px;
+  }
+  td input:focus { outline: 1px solid #1a3c6e; background: #f0f6ff; }
+  td input.num { text-align: right; }
+  .total-row { font-weight: 700; background: #e8edf4; }
+  .grand-total-row { font-weight: 700; background: #1a3c6e; color: #fff; font-size: 15px; }
+  .grand-total-row td input { color: #fff; font-weight: 700; }
+  .terms { margin-bottom: 24px; }
+  .terms textarea {
+    width: 100%;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    padding: 10px;
+    font-family: inherit;
+    font-size: 13px;
+    resize: vertical;
+    background: #fafafa;
+    min-height: 100px;
+  }
+  .terms textarea:focus { background: #fff; border-color: #1a3c6e; outline: none; }
+  .payment-details {
+    display: flex;
+    gap: 40px;
+    margin-bottom: 24px;
+    padding: 16px;
+    background: #f8f9fc;
+    border-radius: 8px;
+    border: 1px solid #e0e3e8;
+  }
+  .payment-details h3 {
+    font-size: 14px;
+    color: #1a3c6e;
+    margin-bottom: 8px;
+  }
+  .payment-details .field {
+    margin-bottom: 4px;
+    font-size: 13px;
+  }
+  .payment-details .field label {
+    display: inline-block;
+    width: 100px;
+    font-weight: 600;
+    color: #555;
+  }
+  .payment-details input {
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    padding: 4px 8px;
+    font-size: 13px;
+    width: 180px;
+  }
+  .payment-details input:focus { border-color: #1a3c6e; outline: none; }
+  .signature {
+    display: flex;
+    justify-content: space-between;
+    align-items: end;
+    margin-top: 30px;
+    padding-top: 20px;
+    border-top: 1px solid #ddd;
+  }
+  .signature .left { font-size: 13px; color: #666; }
+  .signature .right { text-align: right; }
+  .signature .right input {
+    border: none;
+    border-bottom: 1px solid #999;
+    padding: 4px 8px;
+    font-family: inherit;
+    font-size: 14px;
+    width: 250px;
+    background: transparent;
+  }
+  .signature .right input:focus { border-bottom-color: #1a3c6e; outline: none; }
+  .signature .title { font-size: 13px; color: #666; margin-top: 4px; }
+  .btn-back {
+    display: inline-block;
+    margin: 30px 10px 0 0;
+    padding: 12px 24px;
+    background: #6c757d;
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.2s;
+    text-decoration: none;
+  }
+  .btn-back:hover { background: #5a6268; color: #fff; }
+  .btn-print {
+    display: inline-block;
+    margin: 30px auto 0;
+    padding: 12px 40px;
+    background: #1a3c6e;
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.2s;
+  }
+  .btn-print:hover { background: #2a5a9e; color: #fff; }
+  .btn-print:active { background: #0f2a4e; }
+  .watermark {
+    display: none;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    opacity: 0.12;
+    pointer-events: none;
+    z-index: 9999;
+    max-width: 500px;
+    width: 60%;
+  }
+  .action-bar {
+    text-align: center;
+  }
+  @media print {
+    body { background: #fff; padding: 0; color: #000 !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; color-adjust: exact; }
+    .container { box-shadow: none; padding: 20px; border-radius: 0; }
+    .btn-print, .btn-back, .action-bar { display: none; }
+    .print-hint { display: none; }
+    th { background: #1a3c6e !important; color: #fff !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; color-adjust: exact; }
+    td, th { border-color: #000 !important; border-width: 1.5px !important; }
+    .section-header { background: #d0d8e8 !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; color-adjust: exact; }
+    .total-row { background: #e0e4ec !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; color-adjust: exact; }
+    .grand-total-row td { background: #1a3c6e !important; color: #fff !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; color-adjust: exact; }
+    td input, .payment-details input, .signature .right input { border: none !important; background: transparent !important; color: #000 !important; font-weight: 600 !important; }
+    td .row-total { font-weight: 700 !important; }
+    td input:focus, .payment-details input:focus { outline: none; }
+    .grand-total-row td input { color: #fff !important; }
+    .payment-details { background: #eef0f5 !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; color-adjust: exact; border-color: #000 !important; }
+    .watermark { display: block; }
+  }
+  .print-hint {
+    display: block;
+    text-align: center;
+    font-size: 12px;
+    color: #888;
+    margin-top: 10px;
+    padding: 8px;
+    border: 1px dashed #ccc;
+    border-radius: 6px;
+  }
+  .print-hint strong { color: #1a3c6e; }
+</style>
+</head>
+<body>
+<div class="container" id="quotation">
+
+  <img src="{% static 'logo.png' %}" class="watermark" alt="watermark">
+
+  <div class="header">
+    <div class="logo-area">
+      <img src="{% static 'logo.png' %}" alt="Logo">
+      <div>
+        <div class="company-name">{{ company_settings.company_name|default:'SCHONES HEIM BUILDERS' }}</div>
+        <div class="tagline">Engineered by purpose, led by vision</div>
+      </div>
+    </div>
+    <div class="date-field">
+      Date: <input type="date" id="quotationDate">
+    </div>
+  </div>
+
+  <div class="quotation-title">TILING QUOTATION</div>
+
+  <div class="intro">
+    <textarea id="introText" rows="2">Dear Sir/Madam,
+We are pleased to submit our offer for tiling works as per the site requirements and specifications.</textarea>
+  </div>
+
+  <div style="margin-bottom:12px; text-align:right;">
+    <label style="font-weight:600;">Number of rooms/floors:</label>
+    <input type="number" id="numFloors" value="6" min="1" oninput="calcTotals()" style="width:60px; padding:4px 8px; border:1px solid #ddd; border-radius:4px;">
+  </div>
+  <table id="itemsTable">
+    <thead>
+      <tr>
+        <th style="width:50px;">Item No</th>
+        <th>Description</th>
+        <th style="width:70px;">Unit</th>
+        <th style="width:80px;">Qty</th>
+        <th style="width:90px;">Rate</th>
+        <th style="width:110px;">Total</th>
+      </tr>
+    </thead>
+    <tbody id="tableBody">
+      <tr class="section-header" data-section="labour">
+        <td colspan="6">LABOUR RATE PER ROOM</td>
+      </tr>
+      <tr data-type="labour">
+        <td>1</td>
+        <td><input type="text" value="Floor Tiling area" class="desc"></td>
+        <td><input type="text" value="m2" class="unit"></td>
+        <td><input type="number" value="36.29" class="qty" oninput="calcRow(this)"></td>
+        <td><input type="number" value="300.00" class="rate" oninput="calcRow(this)"></td>
+        <td><input type="text" class="row-total" readonly></td>
+      </tr>
+      <tr data-type="labour">
+        <td>2</td>
+        <td><input type="text" value="Wall tiling area + sink" class="desc"></td>
+        <td><input type="text" value="m2" class="unit"></td>
+        <td><input type="number" value="16.4" class="qty" oninput="calcRow(this)"></td>
+        <td><input type="number" value="300.00" class="rate" oninput="calcRow(this)"></td>
+        <td><input type="text" class="row-total" readonly></td>
+      </tr>
+      <tr class="total-row">
+        <td colspan="3"></td>
+        <td colspan="2">TOTAL per room</td>
+        <td><input type="text" id="totalPerRoom" readonly style="font-weight:700;"></td>
+      </tr>
+      <tr class="total-row">
+        <td colspan="3"></td>
+        <td colspan="2">LABOUR COST PER FLOOR</td>
+        <td><input type="text" id="labourPerFloor" readonly style="font-weight:700;"></td>
+      </tr>
+
+      <tr class="section-header" data-section="material">
+        <td colspan="5">MATERIALS</td>
+        <td>PER ROOM</td>
+      </tr>
+      <tr data-type="material">
+        <td>3</td>
+        <td><input type="text" value="Grout Dr.fix it" class="desc"></td>
+        <td><input type="text" value="KG" class="unit"></td>
+        <td><input type="number" value="22" class="qty" oninput="calcRow(this)"></td>
+        <td><input type="number" value="200.00" class="rate" oninput="calcRow(this)"></td>
+        <td><input type="text" class="row-total" readonly></td>
+      </tr>
+      <tr data-type="material">
+        <td>4</td>
+        <td><input type="text" value="Spacers" class="desc"></td>
+        <td><input type="text" value="PKT" class="unit"></td>
+        <td><input type="number" value="50" class="qty" oninput="calcRow(this)"></td>
+        <td><input type="number" value="100.00" class="rate" oninput="calcRow(this)"></td>
+        <td><input type="text" class="row-total" readonly></td>
+      </tr>
+      <tr data-type="material">
+        <td>5</td>
+        <td><input type="text" value="Waterproof" class="desc"></td>
+        <td><input type="text" value="KG" class="unit"></td>
+        <td><input type="number" value="48" class="qty" oninput="calcRow(this)"></td>
+        <td><input type="number" value="140.00" class="rate" oninput="calcRow(this)"></td>
+        <td><input type="text" class="row-total" readonly></td>
+      </tr>
+      <tr data-type="material">
+        <td>6</td>
+        <td><input type="text" value="Tiles 300*300" class="desc"></td>
+        <td><input type="text" value="boxes" class="unit"></td>
+        <td><input type="number" value="41" class="qty" oninput="calcRow(this)"></td>
+        <td><input type="number" value="1000.00" class="rate" oninput="calcRow(this)"></td>
+        <td><input type="text" class="row-total" readonly></td>
+      </tr>
+      <tr data-type="material">
+        <td>7</td>
+        <td><input type="text" value="Tiles 300*600" class="desc"></td>
+        <td><input type="text" value="boxes" class="unit"></td>
+        <td><input type="number" value="12" class="qty" oninput="calcRow(this)"></td>
+        <td><input type="number" value="1500.00" class="rate" oninput="calcRow(this)"></td>
+        <td><input type="text" class="row-total" readonly></td>
+      </tr>
+      <tr data-type="material">
+        <td>8</td>
+        <td><input type="text" value="Adhesive 25kg" class="desc"></td>
+        <td><input type="text" value="bags" class="unit"></td>
+        <td><input type="number" value="5" class="qty" oninput="calcRow(this)"></td>
+        <td><input type="number" value="900.00" class="rate" oninput="calcRow(this)"></td>
+        <td><input type="text" class="row-total" readonly></td>
+      </tr>
+      <tr data-type="material">
+        <td>9</td>
+        <td><input type="text" value="L-shape Corner strip" class="desc"></td>
+        <td><input type="text" value="pc" class="unit"></td>
+        <td><input type="number" value="1" class="qty" oninput="calcRow(this)"></td>
+        <td><input type="number" value="250.00" class="rate" oninput="calcRow(this)"></td>
+        <td><input type="text" class="row-total" readonly></td>
+      </tr>
+      <tr data-type="material">
+        <td>10</td>
+        <td><input type="text" value="Cement" class="desc"></td>
+        <td><input type="text" value="bags" class="unit"></td>
+        <td><input type="number" value="16" class="qty" oninput="calcRow(this)"></td>
+        <td><input type="number" value="800.00" class="rate" oninput="calcRow(this)"></td>
+        <td><input type="text" class="row-total" readonly></td>
+      </tr>
+      <tr class="total-row">
+        <td colspan="3"></td>
+        <td colspan="2">TOTAL AMOUNT (per room)</td>
+        <td><input type="text" id="totalPerRoomMaterials" readonly style="font-weight:700;"></td>
+      </tr>
+      <tr class="total-row">
+        <td colspan="3"></td>
+        <td colspan="2">Total materials cost per floor</td>
+        <td><input type="text" id="totalMaterialsFloor" readonly style="font-weight:700;"></td>
+      </tr>
+
+      <tr class="grand-total-row">
+        <td colspan="3"></td>
+        <td colspan="2">Grand total (materials + labour)</td>
+        <td><input type="text" id="grandTotal" readonly></td>
+      </tr>
+      <tr class="grand-total-row">
+        <td colspan="3"></td>
+        <td colspan="2">Total labour cost</td>
+        <td><input type="text" id="totalLabourDisplay" readonly></td>
+      </tr>
+      <tr class="grand-total-row">
+        <td colspan="3"></td>
+        <td colspan="2">% labour</td>
+        <td><input type="text" id="percentLabour" readonly></td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="terms">
+    <h3 style="color:#1a3c6e; margin-bottom:8px; font-size:15px;">Terms and Conditions</h3>
+    <textarea id="termsText">- Validity is 30 days from the day of quotation
+- Payment terms: 50% advance and 50% upon completion
+- This excludes waterproofing and housekeeping onsite.</textarea>
+  </div>
+
+  <div class="payment-details">
+    <div>
+      <h3>PAYMENT DETAILS</h3>
+      <div class="field"><label>Bank:</label> <input type="text" id="bank" value="NCBA"></div>
+      <div class="field"><label>Acc Name:</label> <input type="text" id="accName" value="EVA MUTHONI"></div>
+      <div class="field"><label>Acc Number:</label> <input type="text" id="accNumber" value="1006092731"></div>
+    </div>
+    <div>
+      <h3>&nbsp;</h3>
+      <div class="field"><label>Mpesa No:</label> <input type="text" id="mpesaNo" value="0797770539"></div>
+      <div class="field"><label>Mpesa Name:</label> <input type="text" id="mpesaName" value="EVA NJOROGE"></div>
+    </div>
+  </div>
+
+  <div class="intro">
+    <textarea id="closingText" rows="2">We trust this meets your requirements and we look forward to your confirmation.</textarea>
+  </div>
+
+  <div class="signature">
+    <div class="left">Sincerely,</div>
+    <div class="right">
+      <input type="text" id="signatureName" value="Eva Muthoni Njoroge">
+      <div class="title">Director<br>Luveria Group Ltd.</div>
+    </div>
+  </div>
+
+  <div class="print-hint">If blue headers don't appear, check <strong>More settings → Background graphics</strong> in your browser's print dialog.</div>
+
+  <div class="action-bar">
+    <a href="{% url 'quotations:list' %}" class="btn-back"><i class="fas fa-arrow-left me-1"></i>Back to Quotations</a>
+    <button class="btn-print" onclick="window.print()"><i class="fas fa-print me-1"></i>Print / Save as PDF</button>
+  </div>
+</div>
+
+<script>
+function getRow(el) {
+  while (el && el.tagName !== 'TR') el = el.parentNode;
+  return el;
+}
+function calcRow(el) {
+  var row = getRow(el);
+  if (!row) return;
+  var qty = row.querySelector('.qty');
+  var rate = row.querySelector('.rate');
+  var total = row.querySelector('.row-total');
+  if (qty && rate && total) {
+    var v = (parseFloat(qty.value) || 0) * (parseFloat(rate.value) || 0);
+    total.value = v.toLocaleString('en-KE', {minimumFractionDigits:2, maximumFractionDigits:2});
+  }
+  calcTotals();
+}
+
+function calcTotals() {
+  var body = document.getElementById('tableBody');
+  var rows = body.querySelectorAll('tr');
+  var labourSum = 0, materialSum = 0;
+  for (var i = 0; i < rows.length; i++) {
+    var row = rows[i];
+    var type = row.getAttribute('data-type');
+    if (!type) continue;
+    var t = row.querySelector('.row-total');
+    if (!t) continue;
+    var val = parseFloat(t.value.replace(/,/g,'')) || 0;
+    if (type === 'labour') labourSum += val;
+    else if (type === 'material') materialSum += val;
+  }
+
+  var floorCount = parseFloat(document.getElementById('numFloors').value) || 1;
+
+  document.getElementById('totalPerRoom').value = labourSum.toLocaleString('en-KE', {minimumFractionDigits:2, maximumFractionDigits:2});
+  document.getElementById('labourPerFloor').value = (labourSum * floorCount).toLocaleString('en-KE', {minimumFractionDigits:2, maximumFractionDigits:2});
+  document.getElementById('totalPerRoomMaterials').value = materialSum.toLocaleString('en-KE', {minimumFractionDigits:2, maximumFractionDigits:2});
+  document.getElementById('totalMaterialsFloor').value = (materialSum * floorCount).toLocaleString('en-KE', {minimumFractionDigits:2, maximumFractionDigits:2});
+
+  var grand = (labourSum + materialSum) * floorCount;
+  document.getElementById('grandTotal').value = grand.toLocaleString('en-KE', {minimumFractionDigits:2, maximumFractionDigits:2});
+  document.getElementById('totalLabourDisplay').value = (labourSum * floorCount).toLocaleString('en-KE', {minimumFractionDigits:2, maximumFractionDigits:2});
+
+  var pct = grand > 0 ? ((labourSum * floorCount / grand) * 100).toFixed(1) : '0.0';
+  document.getElementById('percentLabour').value = pct + '%';
+}
+
+document.getElementById('quotationDate').value = new Date().toISOString().split('T')[0];
+calcTotals();
+</script>
+
+</body>
+</html>

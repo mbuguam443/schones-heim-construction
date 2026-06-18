@@ -1,0 +1,75 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}{{ equipment.name }} - Equipment{% endblock %}
+{% block page_title %}{{ equipment.name }}{% endblock %}
+{% block content %}
+<div class="row g-4">
+  <div class="col-lg-5">
+    <div class="card">
+      <div class="card-header">Equipment Details</div>
+      <div class="card-body">
+        <table class="table table-sm mb-0">
+          <tr><th class="text-muted" style="width:45%">Category</th><td>{{ equipment.category }}</td></tr>
+          <tr><th class="text-muted">Registration</th><td><code>{{ equipment.registration_number }}</code></td></tr>
+          <tr><th class="text-muted">Status</th><td><span class="badge rounded-pill bg-{% if equipment.status == 'Available' %}success{% elif equipment.status == 'In Use' %}primary{% else %}warning{% endif %}">{{ equipment.status }}</span></td></tr>
+          <tr><th class="text-muted">Purchase Date</th><td>{{ equipment.purchase_date|default:'--' }}</td></tr>
+          <tr><th class="text-muted">Last Maintenance</th><td>{{ equipment.maintenance_date|default:'--' }}</td></tr>
+          <tr><th class="text-muted">Notes</th><td>{{ equipment.notes|linebreaks|default:'--' }}</td></tr>
+        </table>
+        <div class="mt-3 d-flex gap-2">
+          <a href="{% url 'equipment:equipment_update' equipment.pk %}" class="btn btn-sm btn-shb"><i class="fas fa-pen"></i> Edit</a>
+          <a href="{% url 'usage_log_add' equipment.pk %}" class="btn btn-sm btn-shb-outline"><i class="fas fa-history"></i> Log Usage</a>
+          <a href="{% url 'maintenance_add' equipment.pk %}" class="btn btn-sm btn-shb-outline"><i class="fas fa-wrench"></i> Add Maintenance</a>
+          {% if equipment.is_active %}
+          <a href="{% url 'equipment:equipment_cancel' equipment.pk %}" class="btn btn-sm btn-outline-warning"><i class="fas fa-ban"></i> Cancel</a>
+          {% else %}
+          <a href="{% url 'equipment:equipment_restore' equipment.pk %}" class="btn btn-sm btn-outline-success"><i class="fas fa-undo"></i> Restore</a>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="col-lg-7">
+    <div class="card mb-4">
+      <div class="card-header d-flex justify-content-between align-items-center">
+        <span>Usage Log</span>
+        <a href="{% url 'usage_log_add' equipment.pk %}" class="btn btn-sm btn-shb"><i class="fas fa-plus"></i> Add</a>
+      </div>
+      <div class="card-body p-0">
+        <div class="table-responsive">
+          <table class="table table-sm mb-0">
+            <thead><tr><th>Project</th><th>Assigned To</th><th>Start</th><th>End</th><th>Hours</th></tr></thead>
+            <tbody>
+              {% for log in usage_logs %}
+              <tr><td>{{ log.project|default:'--' }}</td><td>{{ log.assigned_to|default:'--' }}</td><td>{{ log.start_date }}</td><td>{{ log.end_date|default:'--' }}</td><td>{{ log.hours_used|default:'--' }}</td></tr>
+              {% empty %}
+              <tr><td colspan="5" class="text-center text-muted py-3">No usage records.</td></tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header d-flex justify-content-between align-items-center">
+        <span>Maintenance History</span>
+        <a href="{% url 'maintenance_add' equipment.pk %}" class="btn btn-sm btn-shb"><i class="fas fa-plus"></i> Add</a>
+      </div>
+      <div class="card-body p-0">
+        <div class="table-responsive">
+          <table class="table table-sm mb-0">
+            <thead><tr><th>Date</th><th>Description</th><th>Cost</th><th>Performed By</th><th>Next Due</th></tr></thead>
+            <tbody>
+              {% for rec in maintenance_records %}
+              <tr><td>{{ rec.maintenance_date }}</td><td>{{ rec.description|truncatewords:10 }}</td><td>{% if rec.cost %}KES {{ rec.cost|floatformat:2 }}{% else %}--{% endif %}</td><td>{{ rec.performed_by|default:'--' }}</td><td>{{ rec.next_maintenance_date|default:'--' }}</td></tr>
+              {% empty %}
+              <tr><td colspan="5" class="text-center text-muted py-3">No maintenance records.</td></tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

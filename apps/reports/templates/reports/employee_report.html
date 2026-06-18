@@ -1,0 +1,260 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}Employee Report - {{ site_name }}{% endblock %}
+{% block extra_css %}
+<style>
+  .summary-card {
+    border: none;
+    border-radius: 12px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.06);
+    height: 100%;
+  }
+  .summary-card .card-body { padding: 1.2rem; }
+  .summary-value {
+    font-size: 1.6rem;
+    font-weight: 700;
+    color: #1a3c6e;
+    line-height: 1.2;
+  }
+  .summary-label {
+    font-size: 0.8rem;
+    color: #6c757d;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+  .attendance-rate {
+    font-size: 0.9rem;
+    font-weight: 700;
+  }
+  .chart-container { position: relative; height: 280px; }
+  .attendance-present { color: #28a745; }
+  .attendance-absent { color: #dc3545; }
+  .attendance-late { color: #ffc107; }
+  .progress-thin { height: 6px; border-radius: 3px; }
+  .report-table th {
+    background: #1a3c6e !important;
+    color: #fff !important;
+    font-weight: 600;
+    font-size: 0.85rem;
+    padding: 10px 12px;
+    border: 1px solid #1a3c6e;
+    white-space: nowrap;
+  }
+  .report-table td {
+    padding: 8px 12px;
+    border: 1px solid #dee2e6;
+    font-size: 0.85rem;
+    vertical-align: middle;
+  }
+  .report-table tbody tr:hover { background: #f0f4f8; }
+  @media print {
+    .report-table th { background: #1a3c6e !important; color: #fff !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    .card { box-shadow: none !important; border: 1px solid #ddd !important; }
+  }
+</style>
+{% endblock %}
+{% block content %}
+{% include 'includes/breadcrumb.html' with items='Reports,Employee Report' %}
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+  <h4 class="mb-0" style="color: #1a3c6e; font-weight: 700;">
+    <i class="fas fa-users me-2"></i>Employee Report
+  </h4>
+  <div class="d-flex gap-2">
+    <a href="{% url 'reports:export_pdf' 'employee' %}" class="btn btn-danger btn-sm">
+      <i class="fas fa-file-pdf me-1"></i>Export PDF
+    </a>
+    <a href="{% url 'reports:export_excel' 'employee' %}" class="btn btn-success btn-sm">
+      <i class="fas fa-file-excel me-1"></i>Export Excel
+    </a>
+  </div>
+</div>
+
+<div class="card mb-4">
+  <div class="card-body">
+    <form method="get" class="row g-3 align-items-end">
+      <div class="col-md-3">
+        <label class="form-label small fw-semibold">Date From</label>
+        <input type="date" name="date_from" class="form-control" value="{{ date_from }}">
+      </div>
+      <div class="col-md-3">
+        <label class="form-label small fw-semibold">Date To</label>
+        <input type="date" name="date_to" class="form-control" value="{{ date_to }}">
+      </div>
+      <div class="col-md-3">
+        <label class="form-label small fw-semibold">&nbsp;</label>
+        <div class="d-flex gap-2">
+          <button type="submit" class="btn btn-primary">
+            <i class="fas fa-filter me-1"></i>Filter
+          </button>
+          <a href="{% url 'reports:employee_report' %}" class="btn btn-outline-secondary">
+            <i class="fas fa-undo me-1"></i>Reset
+          </a>
+        </div>
+      </div>
+    </form>
+  </div>
+</div>
+
+<div class="row g-3 mb-4">
+  <div class="col-xl-3 col-lg-4 col-md-6">
+    <div class="card summary-card">
+      <div class="card-body text-center">
+        <div class="summary-value">{{ total_employees }}</div>
+        <div class="summary-label">Total Employees</div>
+      </div>
+    </div>
+  </div>
+  <div class="col-xl-3 col-lg-4 col-md-6">
+    <div class="card summary-card">
+      <div class="card-body text-center">
+        <div class="summary-value text-success">{{ overall_present }}</div>
+        <div class="summary-label">Present</div>
+      </div>
+    </div>
+  </div>
+  <div class="col-xl-3 col-lg-4 col-md-6">
+    <div class="card summary-card">
+      <div class="card-body text-center">
+        <div class="summary-value text-danger">{{ overall_absent }}</div>
+        <div class="summary-label">Absent</div>
+      </div>
+    </div>
+  </div>
+  <div class="col-xl-3 col-lg-4 col-md-6">
+    <div class="card summary-card">
+      <div class="card-body text-center">
+        <div class="summary-value text-warning">{{ overall_late }}</div>
+        <div class="summary-label">Late</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="row g-4 mb-4">
+  <div class="col-xl-6">
+    <div class="card">
+      <div class="card-header">
+        <i class="fas fa-chart-pie me-2"></i>Attendance Breakdown
+      </div>
+      <div class="card-body">
+        <div class="chart-container"><canvas id="attendanceChart"></canvas></div>
+      </div>
+    </div>
+  </div>
+  <div class="col-xl-6">
+    <div class="card">
+      <div class="card-header">
+        <i class="fas fa-chart-bar me-2"></i>Employee Attendance Rates
+      </div>
+      <div class="card-body">
+        <div class="chart-container"><canvas id="rateChart"></canvas></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="card">
+  <div class="card-header d-flex justify-content-between align-items-center">
+    <span><i class="fas fa-list me-2"></i>Employee Attendance Summary</span>
+    <span class="badge bg-light text-dark">{{ employees|length }} employee(s)</span>
+  </div>
+  <div class="card-body p-0">
+    <div class="table-responsive">
+      <table class="table report-table mb-0">
+        <thead>
+          <tr>
+            <th>Employee</th>
+            <th>Position</th>
+            <th class="text-center">Total Days</th>
+            <th class="text-center">Present</th>
+            <th class="text-center">Absent</th>
+            <th class="text-center">Late</th>
+            <th class="text-center">Rate</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for emp in employees %}
+          <tr>
+            <td class="fw-semibold">{{ emp.user.get_full_name|default:emp.user.username }}</td>
+            <td>{{ emp.position|default:'-' }}</td>
+            <td class="text-center">{{ emp.total_days|default:'-' }}</td>
+            <td class="text-center attendance-present">{{ emp.present_days|default:'0' }}</td>
+            <td class="text-center attendance-absent">{{ emp.absent_days|default:'0' }}</td>
+            <td class="text-center attendance-late">{{ emp.late_days|default:'0' }}</td>
+            <td class="text-center">
+              <div class="d-flex align-items-center justify-content-center gap-1">
+                <div class="progress progress-thin" style="width: 60px; height: 6px;">
+                  <div class="progress-bar bg-{% if emp.attendance_rate >= 80 %}success{% elif emp.attendance_rate >= 60 %}warning{% else %}danger{% endif %}"
+                       role="progressbar" style="width: {{ emp.attendance_rate }}%">
+                  </div>
+                </div>
+                <span class="attendance-rate {% if emp.attendance_rate >= 80 %}attendance-present{% elif emp.attendance_rate >= 60 %}attendance-late{% else %}attendance-absent{% endif %}">
+                  {{ emp.attendance_rate }}%
+                </span>
+              </div>
+            </td>
+          </tr>
+          {% empty %}
+          <tr>
+            <td colspan="7" class="text-center text-muted py-4">No employees found.</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+{% endblock %}
+{% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+  var attCtx = document.getElementById('attendanceChart').getContext('2d');
+  new Chart(attCtx, {
+    type: 'pie',
+    data: {
+      labels: ['Present', 'Absent', 'Late'],
+      datasets: [{
+        data: [{{ overall_present }}, {{ overall_absent }}, {{ overall_late }}],
+        backgroundColor: ['#28a745', '#dc3545', '#ffc107'],
+        borderWidth: 0,
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: { position: 'bottom', labels: { padding: 12, usePointStyle: true } }
+      }
+    }
+  });
+
+  var rateCtx = document.getElementById('rateChart').getContext('2d');
+  var empLabels = [{% for emp in employees %}'{{ emp.user.get_full_name|default:emp.user.username|escapejs }}',{% endfor %}];
+  var empRates = [{% for emp in employees %}{{ emp.attendance_rate }},{% endfor %}];
+  new Chart(rateCtx, {
+    type: 'bar',
+    data: {
+      labels: empLabels,
+      datasets: [{
+        label: 'Attendance Rate (%)',
+        data: empRates,
+        backgroundColor: empRates.map(function(r) {
+          return r >= 80 ? '#28a745' : r >= 60 ? '#ffc107' : '#dc3545';
+        }),
+        borderRadius: 4,
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      indexAxis: 'y',
+      plugins: { legend: { display: false } },
+      scales: {
+        x: { beginAtZero: true, max: 100, title: { display: true, text: 'Rate (%)' } },
+        y: { grid: { display: false } }
+      }
+    }
+  });
+</script>
+{% endblock %}

@@ -1,0 +1,75 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}Site Report - {{ report.date }} - SCHONES HEIM BUILDERS{% endblock %}
+{% block page_title %}Site Report: {{ report.project }} - {{ report.date }}{% endblock %}
+{% block content %}
+<div class="row g-4">
+  <div class="col-lg-8">
+    <div class="card">
+      <div class="card-header d-flex justify-content-between align-items-center">
+        <span>Report Details</span>
+        <div class="d-flex gap-1">
+          <a href="{% url 'site_reports:report_update' report.pk %}" class="btn btn-sm btn-shb"><i class="fas fa-pen"></i> Edit</a>
+          <a href="{% url 'site_reports:report_export_pdf' report.pk %}" class="btn btn-sm btn-shb-outline"><i class="fas fa-file-pdf"></i> PDF</a>
+        </div>
+      </div>
+      <div class="card-body">
+        <table class="table table-sm mb-0">
+          <tr><th class="text-muted" style="width:30%">Project</th><td>{{ report.project }}</td></tr>
+          <tr><th class="text-muted">Date</th><td>{{ report.date }}</td></tr>
+          <tr><th class="text-muted">Weather</th><td>{{ report.weather|default:'--' }}</td></tr>
+          <tr><th class="text-muted">Workers Present</th><td>{{ report.workers_present }}</td></tr>
+          <tr><th class="text-muted">Submitted By</th><td>{{ report.submitted_by|default:'--' }}</td></tr>
+          <tr><th class="text-muted">Submitted At</th><td>{{ report.created_at }}</td></tr>
+        </table>
+        <hr>
+        <h6 class="fw-bold">Tasks Completed</h6>
+        <p>{{ report.tasks_completed|linebreaks|default:'<span class="text-muted">None reported</span>' }}</p>
+        <h6 class="fw-bold mt-3">Materials Used</h6>
+        <p>{{ report.materials_used|linebreaks|default:'<span class="text-muted">None reported</span>' }}</p>
+        <h6 class="fw-bold mt-3">Challenges</h6>
+        <p>{{ report.challenges|linebreaks|default:'<span class="text-muted">None reported</span>' }}</p>
+      </div>
+    </div>
+  </div>
+  <div class="col-lg-4">
+    <div class="card">
+      <div class="card-header d-flex justify-content-between align-items-center">
+        <span>Photos</span>
+        <button class="btn btn-sm btn-shb" data-bs-toggle="modal" data-bs-target="#photoModal"><i class="fas fa-camera"></i> Add</button>
+      </div>
+      <div class="card-body">
+        {% if photos %}
+        <div class="photo-grid">
+          {% for photo in photos %}
+          <div class="photo-item">
+            <img src="{{ photo.image.url }}" alt="{{ photo.caption }}">
+            {% if photo.caption %}<div class="photo-caption">{{ photo.caption }}</div>{% endif %}
+          </div>
+          {% endfor %}
+        </div>
+        {% else %}
+        <p class="text-muted text-center mb-0 py-3">No photos attached.</p>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</div>
+<div class="modal fade" id="photoModal" tabindex="-1">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <form method="post" enctype="multipart/form-data" action="{% url 'site_reports:report_detail' report.pk %}">
+        {% csrf_token %}
+        <div class="modal-header"><h5 class="modal-title">Add Photo</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
+        <div class="modal-body">
+          {{ photo_form.as_p }}
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+          <button type="submit" class="btn btn-shb">Upload</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %}

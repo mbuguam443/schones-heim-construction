@@ -1,0 +1,235 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}Project Report - {{ site_name }}{% endblock %}
+{% block extra_css %}
+<style>
+  .summary-card {
+    border: none;
+    border-radius: 12px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.06);
+    height: 100%;
+  }
+  .summary-card .card-body { padding: 1.2rem; }
+  .summary-value {
+    font-size: 1.6rem;
+    font-weight: 700;
+    color: #1a3c6e;
+    line-height: 1.2;
+  }
+  .summary-label {
+    font-size: 0.8rem;
+    color: #6c757d;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+  .progress-thin { height: 6px; border-radius: 3px; }
+  .chart-container { position: relative; height: 300px; }
+  .report-table th {
+    background: #1a3c6e !important;
+    color: #fff !important;
+    font-weight: 600;
+    font-size: 0.85rem;
+    padding: 10px 12px;
+    border: 1px solid #1a3c6e;
+    white-space: nowrap;
+  }
+  .report-table td {
+    padding: 8px 12px;
+    border: 1px solid #dee2e6;
+    font-size: 0.85rem;
+    vertical-align: middle;
+  }
+  .report-table tbody tr:hover { background: #f0f4f8; }
+  @media print {
+    .report-table th { background: #1a3c6e !important; color: #fff !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    .card { box-shadow: none !important; border: 1px solid #ddd !important; }
+  }
+</style>
+{% endblock %}
+{% block content %}
+{% include 'includes/breadcrumb.html' with items='Reports,Project Report' %}
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+  <h4 class="mb-0" style="color: #1a3c6e; font-weight: 700;">
+    <i class="fas fa-building me-2"></i>Project Report
+  </h4>
+  <div class="d-flex gap-2">
+    <a href="{% url 'reports:export_pdf' 'project' %}" class="btn btn-danger btn-sm">
+      <i class="fas fa-file-pdf me-1"></i>Export PDF
+    </a>
+    <a href="{% url 'reports:export_excel' 'project' %}" class="btn btn-success btn-sm">
+      <i class="fas fa-file-excel me-1"></i>Export Excel
+    </a>
+  </div>
+</div>
+
+<div class="card mb-4">
+  <div class="card-body">
+    {% include 'reports/report_filter.html' with form=form %}
+  </div>
+</div>
+
+<div class="row g-3 mb-4">
+  <div class="col-xl-3 col-lg-4 col-md-6">
+    <div class="card summary-card">
+      <div class="card-body text-center">
+        <div class="summary-value">{{ total_projects }}</div>
+        <div class="summary-label">Total Projects</div>
+      </div>
+    </div>
+  </div>
+  <div class="col-xl-3 col-lg-4 col-md-6">
+    <div class="card summary-card">
+      <div class="card-body text-center">
+        <div class="summary-value text-success">{{ active }}</div>
+        <div class="summary-label">Active</div>
+      </div>
+    </div>
+  </div>
+  <div class="col-xl-3 col-lg-4 col-md-6">
+    <div class="card summary-card">
+      <div class="card-body text-center">
+        <div class="summary-value" style="color: #17a2b8;">{{ completed }}</div>
+        <div class="summary-label">Completed</div>
+      </div>
+    </div>
+  </div>
+  <div class="col-xl-3 col-lg-4 col-md-6">
+    <div class="card summary-card">
+      <div class="card-body text-center">
+        <div class="summary-value">KES {{ total_budget|floatformat:'0' }}</div>
+        <div class="summary-label">Total Budget</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="row g-4 mb-4">
+  <div class="col-xl-6">
+    <div class="card">
+      <div class="card-header">
+        <i class="fas fa-chart-bar me-2"></i>Project Status Overview
+      </div>
+      <div class="card-body">
+        <div class="chart-container"><canvas id="statusChart"></canvas></div>
+      </div>
+    </div>
+  </div>
+  <div class="col-xl-6">
+    <div class="card">
+      <div class="card-header">
+        <i class="fas fa-chart-donut me-2"></i>Budget vs Actual
+      </div>
+      <div class="card-body">
+        <div class="chart-container"><canvas id="budgetChart"></canvas></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="card">
+  <div class="card-header d-flex justify-content-between align-items-center">
+    <span><i class="fas fa-list me-2"></i>Project Details</span>
+    <span class="badge bg-light text-dark">{{ projects|length }} project(s)</span>
+  </div>
+  <div class="card-body p-0">
+    <div class="table-responsive">
+      <table class="table report-table mb-0">
+        <thead>
+          <tr>
+            <th>Project</th>
+            <th>Client</th>
+            <th>Budget</th>
+            <th>Actual Cost</th>
+            <th>Progress</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for p in projects %}
+          <tr>
+            <td class="fw-semibold">{{ p.name }}</td>
+            <td>{{ p.client.full_name|default:'-' }}</td>
+            <td>KES {{ p.budget|floatformat:'0'|default:'-' }}</td>
+            <td>KES {{ p.budget|floatformat:'0'|default:'-' }}</td>
+            <td>
+              <div class="d-flex align-items-center gap-2">
+                <div class="progress progress-thin flex-grow-1">
+                  <div class="progress-bar bg-{% if p.completion_pct >= 80 %}success{% elif p.completion_pct >= 40 %}warning{% else %}danger{% endif %}"
+                       role="progressbar" style="width: {{ p.completion_pct }}%"
+                       aria-valuenow="{{ p.completion_pct }}" aria-valuemin="0" aria-valuemax="100">
+                  </div>
+                </div>
+                <small class="fw-semibold">{{ p.completion_pct }}%</small>
+              </div>
+            </td>
+            <td>
+              {% if p.status == 'Completed' %}
+                <span class="badge bg-success">Completed</span>
+              {% elif p.status == 'Ongoing' %}
+                <span class="badge bg-primary">Active</span>
+              {% elif p.status == 'On Hold' %}
+                <span class="badge bg-warning text-dark">On Hold</span>
+              {% elif p.status == 'Cancelled' %}
+                <span class="badge bg-danger">Cancelled</span>
+              {% else %}
+                <span class="badge bg-secondary">{{ p.get_status_display }}</span>
+              {% endif %}
+            </td>
+          </tr>
+          {% empty %}
+          <tr>
+            <td colspan="6" class="text-center text-muted py-4">No projects found.</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+{% endblock %}
+{% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+  var statusCtx = document.getElementById('statusChart').getContext('2d');
+  new Chart(statusCtx, {
+    type: 'bar',
+    data: {
+      labels: ['Active', 'Completed', 'On Hold', 'Cancelled'],
+      datasets: [{
+        label: 'Projects',
+        data: [{{ active }}, {{ completed }}, {{ on_hold }}, {{ cancelled }}],
+        backgroundColor: ['#1a3c6e', '#28a745', '#ffc107', '#dc3545'],
+        borderRadius: 6,
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: { legend: { display: false } },
+      scales: { y: { beginAtZero: true, ticks: { stepSize: 1 } }, x: { grid: { display: false } } }
+    }
+  });
+
+  var budgetCtx = document.getElementById('budgetChart').getContext('2d');
+  new Chart(budgetCtx, {
+    type: 'doughnut',
+    data: {
+      labels: ['Budget', 'Actual Spent'],
+      datasets: [{
+        data: [{{ total_budget|floatformat:'0' }}, {{ total_spent|floatformat:'0' }}],
+        backgroundColor: ['#1a3c6e', '#dc3545'],
+        borderWidth: 0,
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: { position: 'bottom', labels: { padding: 12, usePointStyle: true } }
+      },
+      cutout: '60%',
+    }
+  });
+</script>
+{% endblock %}

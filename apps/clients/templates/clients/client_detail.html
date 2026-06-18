@@ -1,0 +1,146 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ client.full_name }} - SCHONES HEIM BUILDERS{% endblock %}
+{% block page_header %}{{ client.full_name }}{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-lg-4">
+        <div class="card mb-4">
+            <div class="card-header">
+                <i class="fas fa-address-card me-1"></i> Client Details
+            </div>
+            <div class="card-body">
+                <table class="table table-sm mb-0">
+                    <tr>
+                        <th class="text-muted" style="width:35%">Name</th>
+                        <td class="fw-medium">{{ client.full_name }}</td>
+                    </tr>
+                    {% if client.company_name %}
+                    <tr>
+                        <th class="text-muted">Company</th>
+                        <td>{{ client.company_name }}</td>
+                    </tr>
+                    {% endif %}
+                    <tr>
+                        <th class="text-muted">Email</th>
+                        <td>{{ client.email|default:'—'|urlize }}</td>
+                    </tr>
+                    <tr>
+                        <th class="text-muted">Phone</th>
+                        <td>{{ client.phone|default:'—' }}</td>
+                    </tr>
+                    <tr>
+                        <th class="text-muted">KRA PIN</th>
+                        <td><code>{{ client.kra_pin|default:'—' }}</code></td>
+                    </tr>
+                    <tr>
+                        <th class="text-muted">Address</th>
+                        <td>{{ client.address|default:'—'|linebreaksbr }}</td>
+                    </tr>
+                    {% if client.notes %}
+                    <tr>
+                        <th class="text-muted">Notes</th>
+                        <td>{{ client.notes|linebreaksbr }}</td>
+                    </tr>
+                    {% endif %}
+                    <tr>
+                        <th class="text-muted">Created</th>
+                        <td><small class="text-muted">{{ client.created_at|date:"M d, Y" }}</small></td>
+                    </tr>
+                    <tr>
+                        <th class="text-muted">Updated</th>
+                        <td><small class="text-muted">{{ client.updated_at|date:"M d, Y" }}</small></td>
+                    </tr>
+                </table>
+            </div>
+            {% if can_edit %}
+            <div class="card-footer d-flex gap-2">
+                <a href="{% url 'clients:client_update' client.pk %}" class="btn btn-primary btn-sm">
+                    <i class="fas fa-pencil"></i> Edit
+                </a>
+                <a href="{% url 'clients:client_delete' client.pk %}" class="btn btn-outline-danger btn-sm">
+                    <i class="fas fa-trash"></i> Delete
+                </a>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+    <div class="col-lg-8">
+        <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <span><i class="fas fa-building me-1"></i> Associated Projects</span>
+                <span class="badge bg-primary">{{ projects|length }} project{{ projects|length|pluralize }}</span>
+            </div>
+            <div class="p-0">
+                {% if projects %}
+                <div class="table-responsive">
+                    <table class="table table-hover mb-0">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Project Name</th>
+                                <th>Status</th>
+                                <th>Progress</th>
+                                <th>Budget</th>
+                                <th>Timeline</th>
+                                <th class="text-end">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for project in projects %}
+                            <tr>
+                                <td>
+                                    <a href="{% url 'projects:project_detail' project.pk %}" class="fw-medium">
+                                        {{ project.name }}
+                                    </a>
+                                </td>
+                                <td>
+                                    <span class="badge 
+                                        {% if project.status == 'Completed' %}bg-success
+                                        {% elif project.status == 'Ongoing' %}bg-primary
+                                        {% elif project.status == 'Planning' %}bg-secondary
+                                        {% elif project.status == 'On Hold' %}bg-warning text-dark
+                                        {% elif project.status == 'Cancelled' %}bg-danger
+                                        {% endif %}">
+                                        {{ project.status }}
+                                    </span>
+                                </td>
+                                <td style="min-width:120px;">
+                                    <div class="d-flex align-items-center gap-2">
+                                        <div class="progress flex-grow-1" style="height:6px;">
+                                            <div class="progress-bar" role="progressbar" style="width:{{ project.progress_percent }}%" aria-valuenow="{{ project.progress_percent }}" aria-valuemin="0" aria-valuemax="100"></div>
+                                        </div>
+                                        <small>{{ project.progress_percent }}%</small>
+                                    </div>
+                                </td>
+                                <td>KSh {{ project.budget|floatformat:0|default:'—' }}</td>
+                                <td>
+                                    <small>
+                                        {% if project.start_date %}{{ project.start_date|date:"M d" }}{% endif %}
+                                        {% if project.end_date %} – {{ project.end_date|date:"M d, Y" }}{% endif %}
+                                    </small>
+                                </td>
+                                <td class="text-end">
+                                    <a href="{% url 'projects:project_detail' project.pk %}" class="btn btn-sm btn-outline-secondary">
+                                        <i class="fas fa-eye"></i>
+                                    </a>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <div class="text-center py-5 text-muted">
+                    <i class="fas fa-folder" style="font-size:2.5rem;display:block;margin-bottom:0.75rem;"></i>
+                    <p>No projects associated with this client.</p>
+                    <a href="{% url 'projects:project_create' %}" class="btn btn-primary btn-sm">
+                        <i class="fas fa-plus"></i> Create Project
+                    </a>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

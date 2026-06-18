@@ -1,0 +1,257 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}Inventory Report - {{ site_name }}{% endblock %}
+{% block extra_css %}
+<style>
+  .summary-card {
+    border: none;
+    border-radius: 12px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.06);
+    height: 100%;
+  }
+  .summary-card .card-body { padding: 1.2rem; }
+  .summary-value {
+    font-size: 1.6rem;
+    font-weight: 700;
+    color: #1a3c6e;
+    line-height: 1.2;
+  }
+  .summary-label {
+    font-size: 0.8rem;
+    color: #6c757d;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+  .stock-indicator {
+    width: 10px; height: 10px;
+    border-radius: 50%;
+    display: inline-block;
+  }
+  .chart-container { position: relative; height: 280px; }
+  .report-table th {
+    background: #1a3c6e !important;
+    color: #fff !important;
+    font-weight: 600;
+    font-size: 0.85rem;
+    padding: 10px 12px;
+    border: 1px solid #1a3c6e;
+    white-space: nowrap;
+  }
+  .report-table td {
+    padding: 8px 12px;
+    border: 1px solid #dee2e6;
+    font-size: 0.85rem;
+    vertical-align: middle;
+  }
+  .report-table tbody tr:hover { background: #f0f4f8; }
+  @media print {
+    .report-table th { background: #1a3c6e !important; color: #fff !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    .card { box-shadow: none !important; border: 1px solid #ddd !important; }
+  }
+  .low-stock { background: #fff3f3; }
+</style>
+{% endblock %}
+{% block content %}
+{% include 'includes/breadcrumb.html' with items='Reports,Inventory Report' %}
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+  <h4 class="mb-0" style="color: #1a3c6e; font-weight: 700;">
+    <i class="fas fa-boxes me-2"></i>Inventory Report
+  </h4>
+  <div class="d-flex gap-2">
+    <a href="{% url 'reports:export_pdf' 'inventory' %}" class="btn btn-danger btn-sm">
+      <i class="fas fa-file-pdf me-1"></i>Export PDF
+    </a>
+    <a href="{% url 'reports:export_excel' 'inventory' %}" class="btn btn-success btn-sm">
+      <i class="fas fa-file-excel me-1"></i>Export Excel
+    </a>
+  </div>
+</div>
+
+<div class="card mb-4">
+  <div class="card-body">
+    <form method="get" class="row g-3 align-items-end">
+      <div class="col-md-3">
+        <label class="form-label small fw-semibold">Stock Status</label>
+        <select name="stock_status" class="form-select">
+          <option value="">All Items</option>
+          <option value="in" {% if stock_status == 'in' %}selected{% endif %}>In Stock</option>
+          <option value="low" {% if stock_status == 'low' %}selected{% endif %}>Low Stock</option>
+          <option value="out" {% if stock_status == 'out' %}selected{% endif %}>Out of Stock</option>
+        </select>
+      </div>
+      <div class="col-md-3">
+        <label class="form-label small fw-semibold">&nbsp;</label>
+        <div class="d-flex gap-2">
+          <button type="submit" class="btn btn-primary">
+            <i class="fas fa-filter me-1"></i>Filter
+          </button>
+          <a href="{% url 'reports:inventory_report' %}" class="btn btn-outline-secondary">
+            <i class="fas fa-undo me-1"></i>Reset
+          </a>
+        </div>
+      </div>
+    </form>
+  </div>
+</div>
+
+<div class="row g-3 mb-4">
+  <div class="col-xl-3 col-lg-4 col-md-6">
+    <div class="card summary-card">
+      <div class="card-body text-center">
+        <div class="summary-value">{{ total_materials }}</div>
+        <div class="summary-label">Total Materials</div>
+      </div>
+    </div>
+  </div>
+  <div class="col-xl-3 col-lg-4 col-md-6">
+    <div class="card summary-card">
+      <div class="card-body text-center">
+        <div class="summary-value text-danger">{{ low_stock_count }}</div>
+        <div class="summary-label">Low Stock Items</div>
+      </div>
+    </div>
+  </div>
+  <div class="col-xl-3 col-lg-4 col-md-6">
+    <div class="card summary-card">
+      <div class="card-body text-center">
+        <div class="summary-value text-warning">{{ out_of_stock }}</div>
+        <div class="summary-label">Out of Stock</div>
+      </div>
+    </div>
+  </div>
+  <div class="col-xl-3 col-lg-4 col-md-6">
+    <div class="card summary-card">
+      <div class="card-body text-center">
+        <div class="summary-value">KES {{ total_stock_value|floatformat:'0' }}</div>
+        <div class="summary-label">Stock Value</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="row g-4 mb-4">
+  <div class="col-xl-6">
+    <div class="card">
+      <div class="card-header">
+        <i class="fas fa-chart-pie me-2"></i>Stock Status Distribution
+      </div>
+      <div class="card-body">
+        <div class="chart-container"><canvas id="stockChart"></canvas></div>
+      </div>
+    </div>
+  </div>
+  <div class="col-xl-6">
+    <div class="card">
+      <div class="card-header">
+        <i class="fas fa-chart-bar me-2"></i>Recent Transactions
+      </div>
+      <div class="card-body p-0">
+        <div class="table-responsive" style="max-height: 280px; overflow-y: auto;">
+          <table class="table table-sm report-table mb-0">
+            <thead>
+              <tr>
+                <th>Material</th>
+                <th>Type</th>
+                <th>Qty</th>
+                <th>Date</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for t in recent_transactions %}
+              <tr>
+                <td>{{ t.material.name }}</td>
+                <td>
+                  {% if t.transaction_type == 'in' %}
+                    <span class="badge bg-success">In</span>
+                  {% else %}
+                    <span class="badge bg-danger">Out</span>
+                  {% endif %}
+                </td>
+                <td>{{ t.quantity }}</td>
+                <td><small class="text-muted">{{ t.created_at|date:'d/m/Y' }}</small></td>
+              </tr>
+              {% empty %}
+              <tr><td colspan="4" class="text-center text-muted py-3">No transactions yet.</td></tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="card">
+  <div class="card-header d-flex justify-content-between align-items-center">
+    <span><i class="fas fa-list me-2"></i>Stock Levels</span>
+    <span class="badge bg-light text-dark">{{ materials|length }} item(s)</span>
+  </div>
+  <div class="card-body p-0">
+    <div class="table-responsive">
+      <table class="table report-table mb-0">
+        <thead>
+          <tr>
+            <th>Material</th>
+            <th>Category</th>
+            <th class="text-end">Quantity</th>
+            <th class="text-end">Unit Price</th>
+            <th class="text-end">Stock Value</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for m in materials %}
+          <tr class="{% if m.stock_status == 'low' %}low-stock{% endif %}">
+            <td class="fw-semibold">{{ m.name }}</td>
+            <td>{{ m.get_category_display|default:'-' }}</td>
+            <td class="text-end stock-level">{{ m.quantity|floatformat:'0' }}</td>
+            <td class="text-end">KES {{ m.unit_cost|floatformat:'2'|default:'-' }}</td>
+            <td class="text-end">KES {{ m.stock_value|floatformat:'2' }}</td>
+            <td>
+              {% if m.stock_status == 'out' %}
+                <span class="badge bg-danger">Out of Stock</span>
+              {% elif m.stock_status == 'low' %}
+                <span class="badge bg-warning text-dark">Low Stock</span>
+              {% else %}
+                <span class="badge bg-success">In Stock</span>
+              {% endif %}
+            </td>
+          </tr>
+          {% empty %}
+          <tr>
+            <td colspan="6" class="text-center text-muted py-4">No materials found.</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+{% endblock %}
+{% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+  var stockCtx = document.getElementById('stockChart').getContext('2d');
+  var adequate = {{ total_materials }} - {{ low_stock_count }} - {{ out_of_stock }};
+  new Chart(stockCtx, {
+    type: 'doughnut',
+    data: {
+      labels: ['In Stock', 'Low Stock', 'Out of Stock'],
+      datasets: [{
+        data: [adequate > 0 ? adequate : 0, {{ low_stock_count }}, {{ out_of_stock }}],
+        backgroundColor: ['#28a745', '#ffc107', '#dc3545'],
+        borderWidth: 0,
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: { position: 'bottom', labels: { padding: 12, usePointStyle: true } }
+      },
+      cutout: '60%',
+    }
+  });
+</script>
+{% endblock %}

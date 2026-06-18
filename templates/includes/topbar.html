@@ -1,0 +1,60 @@
+{% load static %}
+<div class="top-bar">
+  <div class="page-title-area">
+    <button class="sidebar-toggle" id="sidebarToggle" type="button" aria-label="Toggle sidebar">
+      <i class="fas fa-bars"></i>
+    </button>
+    <div>
+      <div class="fw-semibold" style="color: #1a3c6e;">
+        {% block page_header %}
+          {% if title %}{{ title }}{% else %}Welcome, {{ user.get_full_name|default:user.username }}{% endif %}
+        {% endblock %}
+      </div>
+    </div>
+  </div>
+  <div class="user-area">
+    <a href="#" class="notification-bell" title="Notifications">
+      <i class="fas fa-bell"></i>
+      {% with unread_count=user.notifications.all.count %}
+        {% if unread_count > 0 %}
+          <span class="badge-count">{{ unread_count|default:0 }}</span>
+        {% endif %}
+      {% endwith %}
+    </a>
+    <div class="dropdown user-dropdown">
+      <a href="#" class="dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+        <div class="user-avatar">
+          {{ user.get_full_name|default:user.username|first|upper }}
+        </div>
+        <div>
+          <div class="user-name">{{ user.get_full_name|default:user.username }}</div>
+          <div class="user-role">{{ user.get_role_display|default:'User' }}</div>
+        </div>
+      </a>
+      <ul class="dropdown-menu dropdown-menu-end shadow-sm">
+        <li>
+          <a class="dropdown-item" href="#">
+            <i class="fas fa-user-circle me-2"></i>Profile
+          </a>
+        </li>
+        <li>
+          <a class="dropdown-item" href="#">
+            <i class="fas fa-bell me-2"></i>Notifications
+            {% if unread_count %}<span class="badge bg-danger ms-1">{{ unread_count }}</span>{% endif %}
+          </a>
+        </li>
+        <li>
+          <a class="dropdown-item" href="#">
+            <i class="fas fa-cog me-2"></i>Settings
+          </a>
+        </li>
+        <li><hr class="dropdown-divider"></li>
+        <li>
+          <a class="dropdown-item text-danger" href="{% url 'core:logout' %}">
+            <i class="fas fa-sign-out-alt me-2"></i>Logout
+          </a>
+        </li>
+      </ul>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,131 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}Materials Inventory - {{ site_name }}{% endblock %}
+{% block extra_css %}
+<style>
+  .cancelled td {
+    text-decoration: line-through;
+    opacity: 0.6;
+  }
+</style>
+{% endblock %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center page-title">
+    <h4 class="mb-0"><i class="fas fa-box"></i> Materials Inventory</h4>
+    <div>
+        <a href="{% url 'inventory:stock_in' %}" class="btn btn-success me-1"><i class="fas fa-arrow-down"></i> Stock In</a>
+        <a href="{% url 'inventory:stock_out' %}" class="btn btn-warning me-1"><i class="fas fa-arrow-up"></i> Stock Out</a>
+        <a href="{% url 'inventory:material_create' %}" class="btn btn-primary"><i class="fas fa-plus"></i> Add Material</a>
+    </div>
+</div>
+
+{% if low_stock_count > 0 and not show_cancelled %}
+<div class="alert alert-danger d-flex justify-content-between align-items-center">
+    <span><i class="fas fa-exclamation-triangle"></i> <strong>{{ low_stock_count }}</strong> material(s) are below reorder level.</span>
+    <a href="{% url 'inventory:low_stock' %}" class="btn btn-outline-danger btn-sm">View Alerts</a>
+</div>
+{% endif %}
+
+<div class="card">
+    <div class="card-header"><i class="fas fa-filter"></i> Filter</div>
+    <div class="card-body">
+        <form method="get" class="row g-3 align-items-end">
+            <div class="col-md-3">
+                <input type="text" name="q" class="form-control" placeholder="Search..." value="{{ request.GET.q }}">
+            </div>
+            <div class="col-md-2">
+                <select name="category" class="form-select">
+                    <option value="">All Categories</option>
+                    {% for val, label in categories %}
+                        <option value="{{ val }}" {% if request.GET.category == val %}selected{% endif %}>{{ label }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-md-2">
+                <div class="form-check mt-2">
+                    <input type="checkbox" name="low" value="1" class="form-check-input" id="lowCheck" {% if request.GET.low == '1' %}checked{% endif %}>
+                    <label class="form-check-label" for="lowCheck">Low stock only</label>
+                </div>
+            </div>
+            <div class="col-md-2">
+                <div class="form-check mt-2">
+                    <input type="checkbox" name="cancelled" value="1" class="form-check-input" id="cancelledCheck" {% if show_cancelled %}checked{% endif %}>
+                    <label class="form-check-label" for="cancelledCheck">Show cancelled {% if cancelled_count %}<span class="badge bg-secondary">{{ cancelled_count }}</span>{% endif %}</label>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <button type="submit" class="btn btn-primary w-100"><i class="fas fa-filter"></i> Filter</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-header"><i class="fas fa-table"></i> Materials {% if show_cancelled %}<span class="badge bg-warning text-dark ms-2">Showing cancelled</span>{% endif %}</div>
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table table-hover mb-0">
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Category</th>
+                        <th>Quantity</th>
+                        <th>Unit</th>
+                        <th>Unit Cost (KES)</th>
+                        <th>Total Value (KES)</th>
+                        <th>Reorder Level</th>
+                        <th>Status</th>
+                        <th class="text-end">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for mat in materials %}
+                    <tr class="{% if mat.is_low_stock %}low-stock{% endif %} {% if not mat.is_active %}cancelled{% endif %}">
+                        <td><strong>{{ mat.name }}</strong></td>
+                        <td><span class="badge bg-info">{{ mat.get_category_display }}</span></td>
+                        <td class="{% if mat.is_low_stock %}stock-level{% endif %}">{{ mat.quantity|floatformat:2 }}</td>
+                        <td>{{ mat.get_unit_display }}</td>
+                        <td>{{ mat.unit_cost|floatformat:2 }}</td>
+                        <td>{{ mat.total_value|floatformat:2 }}</td>
+                        <td>{{ mat.reorder_level|floatformat:2 }}</td>
+                        <td>{% if mat.is_active %}<span class="badge bg-success">Active</span>{% else %}<span class="badge bg-secondary">Cancelled</span>{% endif %}</td>
+                        <td class="text-end">
+                            <div class="btn-group btn-group-sm">
+                                {% if user.role != 'store_keeper' %}
+                                <a href="{% url 'inventory:material_update' mat.pk %}" class="btn btn-outline-primary" title="Edit"><i class="fas fa-pen"></i></a>
+                                {% endif %}
+                                {% if mat.is_active %}
+                                <a href="{% url 'inventory:material_cancel' mat.pk %}" class="btn btn-outline-warning" title="Cancel" onclick="return confirm('Cancel {{ mat.name }}?')"><i class="fas fa-ban"></i></a>
+                                {% else %}
+                                <a href="{% url 'inventory:material_restore' mat.pk %}" class="btn btn-outline-success" title="Restore"><i class="fas fa-undo"></i></a>
+                                {% endif %}
+                            </div>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="9" class="text-center py-4 text-muted">No materials found.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+{% if is_paginated %}
+<nav class="mt-3">
+    <ul class="pagination justify-content-center">
+        {% if page_obj.has_previous %}
+            <li class="page-item"><a class="page-link" href="?page=1">&laquo; First</a></li>
+            <li class="page-item"><a class="page-link" href="?page={{ page_obj.previous_page_number }}">Previous</a></li>
+        {% endif %}
+        <li class="page-item active"><span class="page-link">Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}</span></li>
+        {% if page_obj.has_next %}
+            <li class="page-item"><a class="page-link" href="?page={{ page_obj.next_page_number }}">Next</a></li>
+            <li class="page-item"><a class="page-link" href="?page={{ page_obj.paginator.num_pages }}">Last &raquo;</a></li>
+        {% endif %}
+    </ul>
+</nav>
+{% endif %}
+{% endblock %}

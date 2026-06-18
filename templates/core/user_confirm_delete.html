@@ -1,0 +1,22 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}{{ title }}{% endblock %}
+{% block content %}
+<div class="d-flex justify-content-center">
+    <div class="card shadow-sm" style="max-width: 500px; width: 100%;">
+        <div class="card-body text-center py-5">
+            <i class="fas fa-exclamation-triangle text-danger" style="font-size: 3rem;"></i>
+            <h4 class="mt-3">Confirm Deletion</h4>
+            <p class="text-muted">Are you sure you want to delete user <strong>"{{ user_obj.username }}"</strong>?</p>
+            <p class="text-muted small">This action cannot be undone.</p>
+            <form method="post">
+                {% csrf_token %}
+                <div class="d-flex gap-2 justify-content-center">
+                    <button type="submit" class="btn btn-danger"><i class="fas fa-trash"></i> Yes, Delete</button>
+                    <a href="{% url 'core:user_list' %}" class="btn btn-outline-secondary">Cancel</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

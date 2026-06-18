@@ -1,0 +1,43 @@
+version: '3.8'
+
+services:
+  db:
+    image: mysql:8.0
+    environment:
+      MYSQL_DATABASE: construction_db
+      MYSQL_USER: construction_user
+      MYSQL_PASSWORD: construction_pass
+      MYSQL_ROOT_PASSWORD: rootpass
+    ports:
+      - "3307:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      timeout: 20s
+      retries: 10
+
+  web:
+    build: .
+    ports:
+      - "8000:8000"
+    environment:
+      DB_NAME: construction_db
+      DB_USER: construction_user
+      DB_PASSWORD: construction_pass
+      DB_HOST: db
+      DB_PORT: 3306
+      SECRET_KEY: django-insecure-change-me-in-production
+      DEBUG: "False"
+      ALLOWED_HOSTS: localhost,127.0.0.1
+    depends_on:
+      db:
+        condition: service_healthy
+    volumes:
+      - media_volume:/app/media
+      - static_volume:/app/staticfiles
+
+volumes:
+  mysql_data:
+  media_volume:
+  static_volume:

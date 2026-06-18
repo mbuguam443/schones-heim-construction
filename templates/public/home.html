@@ -1,0 +1,147 @@
+{% extends 'public/base.html' %}
+{% load static %}
+{% block nav_home %}active{% endblock %}
+{% block title %}Home{% endblock %}
+
+{% block content %}
+
+<section class="hero-section" style="background: linear-gradient(135deg, rgba(26,60,110,0.55) 0%, rgba(15,42,78,0.7) 100%), url('{% static 'homepage.png' %}') center/cover no-repeat; padding: 120px 0;">
+  <div class="container position-relative" style="z-index:1;">
+    <div class="row align-items-center">
+      <div class="col-lg-7">
+        <h1 class="hero-title">Building Dreams,<br>Constructing Realities</h1>
+        <p class="hero-subtitle mt-3 mb-4">Schones Heim Builders is a premier construction and general contracting company dedicated to delivering excellence in every project we undertake.</p>
+        <div class="hero-btn">
+          <a href="{% url 'core:contact' %}" class="btn btn-light btn-lg me-3"><i class="fas fa-phone me-2"></i>Get a Quote</a>
+          <a href="{% url 'core:services' %}" class="btn btn-outline-light btn-lg">Our Services</a>
+        </div>
+      </div>
+      <div class="col-lg-5 text-center mt-4 mt-lg-0">
+        <img src="{% static 'homepage.png' %}" alt="Schones Heim Builders" style="max-width:100%; border-radius:16px; box-shadow:0 8px 30px rgba(0,0,0,0.3);">
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="py-5">
+  <div class="container">
+    <div class="row text-center g-4">
+      <div class="col-md-3 col-6">
+        <div class="stat-number">{{ stats.projects_completed }}+</div>
+        <div class="stat-label">Projects Completed</div>
+      </div>
+      <div class="col-md-3 col-6">
+        <div class="stat-number">{{ stats.years_established }}+</div>
+        <div class="stat-label">Years Experience</div>
+      </div>
+      <div class="col-md-3 col-6">
+        <div class="stat-number">{{ stats.happy_clients }}+</div>
+        <div class="stat-label">Happy Clients</div>
+      </div>
+      <div class="col-md-3 col-6">
+        <div class="stat-number">{{ stats.professionals }}+</div>
+        <div class="stat-label">Professionals</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="py-5 bg-light">
+  <div class="container">
+    <div class="text-center mb-5">
+      <h2 class="section-title">Our Services</h2>
+      <p class="section-subtitle">Comprehensive construction solutions tailored to your needs</p>
+    </div>
+    <div class="row g-4">
+      <div class="col-md-4">
+        <div class="card service-card text-center">
+          <div class="card-body">
+            <div class="service-icon"><i class="fas fa-drafting-compass"></i></div>
+            <h5>Design & Planning</h5>
+            <p class="text-muted small">Professional architectural design, structural engineering, and project planning services.</p>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="card service-card text-center">
+          <div class="card-body">
+            <div class="service-icon"><i class="fas fa-hard-hat"></i></div>
+            <h5>General Contracting</h5>
+            <p class="text-muted small">Full-service general contracting for residential, commercial, and industrial projects.</p>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="card service-card text-center">
+          <div class="card-body">
+            <div class="service-icon"><i class="fas fa-tools"></i></div>
+            <h5>Renovations</h5>
+            <p class="text-muted small">Interior and exterior renovations, remodels, and fit-outs for existing structures.</p>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="card service-card text-center">
+          <div class="card-body">
+            <div class="service-icon"><i class="fas fa-water"></i></div>
+            <h5>Plumbing & Electrical</h5>
+            <p class="text-muted small">Complete plumbing, electrical installation, and MEP works for all building types.</p>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="card service-card text-center">
+          <div class="card-body">
+            <div class="service-icon"><i class="fas fa-paint-roller"></i></div>
+            <h5>Finishing Works</h5>
+            <p class="text-muted small">Tiling, painting, flooring, cabinetry, and all interior finishing services.</p>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="card service-card text-center">
+          <div class="card-body">
+            <div class="service-icon"><i class="fas fa-road"></i></div>
+            <h5>Infrastructure</h5>
+            <p class="text-muted small">Roads, drainage, water supply systems, and civil infrastructure development.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+{% if projects %}
+<section class="py-5">
+  <div class="container">
+    <div class="text-center mb-5">
+      <h2 class="section-title">Our Projects</h2>
+      <p class="section-subtitle">Showcasing our commitment to quality and excellence</p>
+    </div>
+    <div class="row g-4">
+      {% for p in projects %}
+      <div class="col-md-4">
+        <div class="card project-card">
+          <div class="card-body">
+            <span class="badge bg-primary-custom mb-2">{{ p.get_status_display }}</span>
+            <h5>{{ p.name }}</h5>
+            <p class="text-muted small mb-1"><i class="fas fa-map-marker-alt me-1"></i>{{ p.location|default:'Nairobi' }}</p>
+            <p class="text-muted small mb-0">{{ p.description|truncatewords:20 }}</p>
+          </div>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+{% endif %}
+
+<section class="py-5 bg-primary-custom text-white text-center">
+  <div class="container">
+    <h2 class="fw-bold mb-3">Ready to Start Your Project?</h2>
+    <p class="mb-4 opacity-75" style="font-size:1.1rem;">Get in touch with us for a free consultation and quotation.</p>
+    <a href="{% url 'core:contact' %}" class="btn btn-light btn-lg"><i class="fas fa-envelope me-2"></i>Contact Us Today</a>
+  </div>
+</section>
+
+{% endblock %}

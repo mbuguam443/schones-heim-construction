@@ -1,0 +1,69 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}Documents - SCHONES HEIM BUILDERS{% endblock %}
+{% block page_title %}Documents{% endblock %}
+{% block extra_css %}
+<style>
+  .cancelled td { text-decoration: line-through; opacity: 0.6; }
+</style>
+{% endblock %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
+  <div class="d-flex gap-2 align-items-center">
+    <form method="get" class="d-flex gap-2 align-items-center">
+      <select name="category" class="form-select form-select-sm" style="width:auto;" onchange="this.form.submit()">
+        <option value="">All Categories</option>
+        {% for cat in categories %}
+        <option value="{{ cat.pk }}" {% if request.GET.category == cat.pk|stringformat:'s' %}selected{% endif %}>{{ cat.name }}</option>
+        {% endfor %}
+      </select>
+      <div class="form-check form-check-inline">
+        <input class="form-check-input" type="checkbox" id="showCancelled" {% if show_cancelled %}checked{% endif %} onchange="document.getElementById('showCancelledInput').value = this.checked ? 'true' : ''; this.form.submit()">
+        <label class="form-check-label" for="showCancelled">Show cancelled</label>
+        {% if cancelled_count %}<small class="text-muted">({{ cancelled_count }})</small>{% endif %}
+        <input type="hidden" name="show_cancelled" id="showCancelledInput" value="{% if show_cancelled %}true{% endif %}">
+      </div>
+    </form>
+  </div>
+  <div class="d-flex gap-2">
+    <a href="{% url 'documents:document_categories' %}" class="btn btn-sm btn-shb-outline"><i class="fas fa-tags"></i> Categories</a>
+    {% if can_edit %}<a href="{% url 'documents:document_upload' %}" class="btn btn-sm btn-shb"><i class="fas fa-upload"></i> Upload</a>{% endif %}
+  </div>
+</div>
+<div class="card">
+  <div class="card-body p-0">
+    <div class="table-responsive">
+      <table class="table table-hover mb-0">
+        <thead>
+          <tr><th>Title</th><th>Category</th><th>Project</th><th>Version</th><th>Uploaded By</th><th>Date</th><th>Actions</th></tr>
+        </thead>
+        <tbody>
+          {% for doc in documents %}
+          <tr{% if not doc.is_active %} class="cancelled"{% endif %}>
+            <td class="fw-semibold">{{ doc.title }}</td>
+            <td><span class="badge bg-primary-soft" style="background:#e8eef6;color:#1a3c6e;">{{ doc.category.name }}</span></td>
+            <td>{{ doc.project|default:'--' }}</td>
+            <td><code>{{ doc.version }}</code></td>
+            <td>{{ doc.uploaded_by|default:'--' }}</td>
+            <td><small class="text-muted">{{ doc.created_at|date:'d M Y' }}</small></td>
+            <td>
+              <a href="{% url 'documents:document_download' doc.pk %}" class="btn btn-sm btn-outline-success" title="Download"><i class="fas fa-download"></i></a>
+              {% if can_edit %}
+              <a href="{% url 'documents:document_update' doc.pk %}" class="btn btn-sm btn-outline-primary" title="Edit"><i class="fas fa-pen"></i></a>
+              {% if doc.is_active %}
+              <a href="{% url 'documents:document_cancel' doc.pk %}" class="btn btn-sm btn-outline-warning" title="Cancel"><i class="fas fa-ban"></i></a>
+              {% else %}
+              <a href="{% url 'documents:document_restore' doc.pk %}" class="btn btn-sm btn-outline-success" title="Restore"><i class="fas fa-undo"></i></a>
+              {% endif %}
+              {% endif %}
+            </td>
+          </tr>
+          {% empty %}
+          <tr><td colspan="7" class="text-center text-muted py-4">No documents found.</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+{% endblock %}

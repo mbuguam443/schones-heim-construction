@@ -1,0 +1,75 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}Equipment - SCHONES HEIM BUILDERS{% endblock %}
+{% block page_title %}Equipment{% endblock %}
+{% block extra_css %}
+<style>
+  .cancelled td { text-decoration: line-through; opacity: 0.6; }
+  .status-Available { background: #28a745; }
+  .status-In-Use { background: #0d6efd; }
+  .status-Under-Maintenance { background: #fd7e14; }
+</style>
+{% endblock %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+  <div>
+    <input type="text" class="form-control form-control-sm search-box d-inline-block" id="tableSearch" placeholder="Search equipment...">
+    <div class="form-check form-check-inline ms-2 d-inline-block">
+      <input class="form-check-input" type="checkbox" id="showCancelled" {% if show_cancelled %}checked{% endif %} onchange="window.location.href='{% url 'equipment:equipment_list' %}?show_cancelled=' + this.checked">
+      <label class="form-check-label" for="showCancelled">Show cancelled</label>
+      {% if cancelled_count %}<small class="text-muted">({{ cancelled_count }})</small>{% endif %}
+    </div>
+  </div>
+  <a href="{% url 'equipment:equipment_create' %}" class="btn btn-shb btn-sm"><i class="fas fa-plus"></i> Add Equipment</a>
+</div>
+<div class="card">
+  <div class="card-body p-0">
+    <div class="table-responsive">
+      <table class="table table-hover mb-0" id="equipmentTable">
+        <thead>
+          <tr>
+            <th>Name</th>
+            <th>Category</th>
+            <th>Registration</th>
+            <th>Status</th>
+            <th>Purchase Date</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for item in equipment_list %}
+          <tr{% if not item.is_active %} class="cancelled"{% endif %}>
+            <td><a href="{% url 'equipment:equipment_detail' item.pk %}" class="text-decoration-none fw-semibold">{{ item.name }}</a></td>
+            <td>{{ item.category }}</td>
+            <td><code>{{ item.registration_number }}</code></td>
+            <td><span class="badge rounded-pill status-{{ item.status|cut:' ' }}">{{ item.status }}</span></td>
+            <td>{{ item.purchase_date|default:'--' }}</td>
+            <td>
+              <a href="{% url 'equipment:equipment_detail' item.pk %}" class="btn btn-sm btn-outline-secondary" title="View"><i class="fas fa-eye"></i></a>
+              <a href="{% url 'equipment:equipment_update' item.pk %}" class="btn btn-sm btn-outline-primary" title="Edit"><i class="fas fa-pen"></i></a>
+              {% if item.is_active %}
+              <a href="{% url 'equipment:equipment_cancel' item.pk %}" class="btn btn-sm btn-outline-warning" title="Cancel"><i class="fas fa-ban"></i></a>
+              {% else %}
+              <a href="{% url 'equipment:equipment_restore' item.pk %}" class="btn btn-sm btn-outline-success" title="Restore"><i class="fas fa-undo"></i></a>
+              {% endif %}
+            </td>
+          </tr>
+          {% empty %}
+          <tr><td colspan="6" class="text-center text-muted py-4">No equipment found.</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+{% endblock %}
+{% block extra_js %}
+<script>
+  document.getElementById('tableSearch')?.addEventListener('keyup', function() {
+    var value = this.value.toLowerCase();
+    document.querySelectorAll('#equipmentTable tbody tr').forEach(function(row) {
+      row.style.display = row.textContent.toLowerCase().includes(value) ? '' : 'none';
+    });
+  });
+</script>
+{% endblock %}

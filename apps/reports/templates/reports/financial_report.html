@@ -1,0 +1,262 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}Financial Report - {{ site_name }}{% endblock %}
+{% block extra_css %}
+<style>
+  .summary-card {
+    border: none;
+    border-radius: 12px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.06);
+    height: 100%;
+  }
+  .summary-card .card-body { padding: 1.2rem; }
+  .summary-value {
+    font-size: 1.6rem;
+    font-weight: 700;
+    color: #1a3c6e;
+    line-height: 1.2;
+  }
+  .summary-label {
+    font-size: 0.8rem;
+    color: #6c757d;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+  .summary-icon {
+    width: 44px;
+    height: 44px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.2rem;
+    color: #fff;
+  }
+  .chart-container { position: relative; height: 300px; }
+  .report-table th {
+    background: #1a3c6e !important;
+    color: #fff !important;
+    font-weight: 600;
+    font-size: 0.85rem;
+    padding: 10px 12px;
+    border: 1px solid #1a3c6e;
+    white-space: nowrap;
+  }
+  .report-table td {
+    padding: 8px 12px;
+    border: 1px solid #dee2e6;
+    font-size: 0.85rem;
+    vertical-align: middle;
+  }
+  .report-table tbody tr:hover { background: #f0f4f8; }
+  @media print {
+    .report-table th { background: #1a3c6e !important; color: #fff !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    .card { box-shadow: none !important; border: 1px solid #ddd !important; }
+  }
+</style>
+{% endblock %}
+{% block content %}
+{% include 'includes/breadcrumb.html' with items='Reports,Financial Report' %}
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+  <h4 class="mb-0" style="color: #1a3c6e; font-weight: 700;">
+    <i class="fas fa-chart-line me-2"></i>Financial Report
+  </h4>
+  <div class="d-flex gap-2">
+    <a href="{% url 'reports:export_pdf' 'financial' %}" class="btn btn-danger btn-sm">
+      <i class="fas fa-file-pdf me-1"></i>Export PDF
+    </a>
+    <a href="{% url 'reports:export_excel' 'financial' %}" class="btn btn-success btn-sm">
+      <i class="fas fa-file-excel me-1"></i>Export Excel
+    </a>
+  </div>
+</div>
+
+<div class="card mb-4">
+  <div class="card-body">
+    {% include 'reports/report_filter.html' with form=form %}
+  </div>
+</div>
+
+<div class="row g-3 mb-4">
+  <div class="col-xl-3 col-lg-4 col-md-6">
+    <div class="card summary-card">
+      <div class="card-body d-flex align-items-center gap-3">
+        <div class="summary-icon" style="background: #1a3c6e;"><i class="fas fa-file-invoice-dollar"></i></div>
+        <div>
+          <div class="summary-value">KES {{ total_revenue|floatformat:'0' }}</div>
+          <div class="summary-label">Total Revenue</div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="col-xl-3 col-lg-4 col-md-6">
+    <div class="card summary-card">
+      <div class="card-body d-flex align-items-center gap-3">
+        <div class="summary-icon" style="background: #28a745;"><i class="fas fa-check-circle"></i></div>
+        <div>
+          <div class="summary-value">KES {{ total_collected|floatformat:'0' }}</div>
+          <div class="summary-label">Total Collected</div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="col-xl-3 col-lg-4 col-md-6">
+    <div class="card summary-card">
+      <div class="card-body d-flex align-items-center gap-3">
+        <div class="summary-icon" style="background: {% if total_outstanding > 0 %}#dc3545{% else %}#28a745{% endif %};">
+          <i class="fas fa-exclamation-triangle"></i>
+        </div>
+        <div>
+          <div class="summary-value">KES {{ total_outstanding|floatformat:'0' }}</div>
+          <div class="summary-label">Outstanding</div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="col-xl-3 col-lg-4 col-md-6">
+    <div class="card summary-card">
+      <div class="card-body">
+        <div class="row g-1 text-center">
+          <div class="col-4">
+            <div class="small text-muted">Paid</div>
+            <div class="fw-bold text-success">{{ invoices_paid }}</div>
+          </div>
+          <div class="col-4">
+            <div class="small text-muted">Pending</div>
+            <div class="fw-bold text-warning">{{ invoices_pending }}</div>
+          </div>
+          <div class="col-4">
+            <div class="small text-muted">Overdue</div>
+            <div class="fw-bold text-danger">{{ invoices_overdue }}</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="row g-4 mb-4">
+  <div class="col-xl-8">
+    <div class="card">
+      <div class="card-header">
+        <i class="fas fa-chart-bar me-2"></i>Monthly Revenue Trends
+      </div>
+      <div class="card-body">
+        <div class="chart-container"><canvas id="revenueChart"></canvas></div>
+      </div>
+    </div>
+  </div>
+  <div class="col-xl-4">
+    <div class="card">
+      <div class="card-header">
+        <i class="fas fa-chart-pie me-2"></i>Invoice Status
+      </div>
+      <div class="card-body">
+        <div class="chart-container"><canvas id="statusChart"></canvas></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="card">
+  <div class="card-header d-flex justify-content-between align-items-center">
+    <span><i class="fas fa-list me-2"></i>Invoice Details</span>
+    <span class="badge bg-light text-dark">{{ invoices|length }} record(s)</span>
+  </div>
+  <div class="card-body p-0">
+    <div class="table-responsive">
+      <table class="table report-table mb-0">
+        <thead>
+          <tr>
+            <th>Invoice #</th>
+            <th>Project</th>
+            <th>Client</th>
+            <th>Date</th>
+            <th class="text-end">Amount</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for inv in invoices %}
+          <tr>
+            <td class="fw-semibold">{{ inv.invoice_number|default:inv.id }}</td>
+            <td>{{ inv.project.name|default:'-' }}</td>
+            <td>{{ inv.client.full_name|default:'-' }}</td>
+            <td>{{ inv.date|date:'d/m/Y'|default:'-' }}</td>
+            <td class="text-end">KES {{ inv.grand_total|floatformat:'2' }}</td>
+            <td>
+              {% if inv.status == 'Paid' %}
+                <span class="badge bg-success">Paid</span>
+              {% elif inv.status == 'Pending' %}
+                <span class="badge bg-warning text-dark">Pending</span>
+              {% elif inv.status == 'Overdue' %}
+                <span class="badge bg-danger">Overdue</span>
+              {% elif inv.status == 'Draft' %}
+                <span class="badge bg-secondary">Draft</span>
+              {% else %}
+                <span class="badge bg-info">{{ inv.get_status_display }}</span>
+              {% endif %}
+            </td>
+          </tr>
+          {% empty %}
+          <tr>
+            <td colspan="6" class="text-center text-muted py-4">No invoices found for the selected period.</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+{% endblock %}
+{% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+  var revenueCtx = document.getElementById('revenueChart').getContext('2d');
+  new Chart(revenueCtx, {
+    type: 'bar',
+    data: {
+      labels: [{% for d in monthly_data %}'{{ d.month }}',{% endfor %}],
+      datasets: [{
+        label: 'Revenue (KES)',
+        data: [{% for d in monthly_data %}{{ d.total|floatformat:'0' }},{% endfor %}],
+        backgroundColor: 'rgba(26,60,110,0.7)',
+        borderColor: '#1a3c6e',
+        borderWidth: 1,
+        borderRadius: 4,
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: { legend: { display: false } },
+      scales: {
+        y: { beginAtZero: true, ticks: { callback: function(v) { return 'KES ' + v.toLocaleString(); } } },
+        x: { grid: { display: false } }
+      }
+    }
+  });
+
+  var statusCtx = document.getElementById('statusChart').getContext('2d');
+  new Chart(statusCtx, {
+    type: 'doughnut',
+    data: {
+      labels: ['Paid', 'Pending', 'Overdue'],
+      datasets: [{
+        data: [{{ invoices_paid }}, {{ invoices_pending }}, {{ invoices_overdue }}],
+        backgroundColor: ['#28a745', '#ffc107', '#dc3545'],
+        borderWidth: 0,
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: { position: 'bottom', labels: { padding: 12, usePointStyle: true } }
+      },
+      cutout: '65%',
+    }
+  });
+</script>
+{% endblock %}

@@ -1,0 +1,113 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}Quotations{% endblock %}
+
+{% block content %}
+{% include 'includes/breadcrumb.html' with items='Quotations' %}
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+  <h4 class="mb-0" style="color: #1a3c6e; font-weight: 700;">
+    <i class="fas fa-file-invoice me-2"></i>Quotations
+  </h4>
+  <div class="d-flex gap-2">
+    {% if can_edit %}
+    <a href="{% url 'quotations:tiling' %}" class="btn btn-primary btn-sm">
+      <i class="fas fa-paint-roller me-1"></i>Tiling Quote
+    </a>
+    <a href="{% url 'quotations:create' %}" class="btn btn-success btn-sm">
+      <i class="fas fa-plus me-1"></i>New Quotation
+    </a>
+    {% endif %}
+  </div>
+</div>
+
+<div class="card mb-4">
+  <div class="card-body">
+    <form method="get" class="row g-3 align-items-end">
+      <div class="col-md-4">
+        <label class="form-label small fw-semibold">Search</label>
+        <input type="text" name="search" class="form-control" placeholder="Search by number or client..." value="{{ search }}">
+      </div>
+      <div class="col-md-3">
+        <label class="form-label small fw-semibold">Status</label>
+        <select name="status" class="form-select">
+          <option value="">All Statuses</option>
+          {% for key, val in status_choices %}
+          <option value="{{ key }}" {% if status_filter == key %}selected{% endif %}>{{ val }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <div class="col-md-2">
+        <label class="form-label small fw-semibold">&nbsp;</label>
+        <button type="submit" class="btn btn-primary w-100"><i class="fas fa-search me-1"></i>Filter</button>
+      </div>
+      <div class="col-md-2">
+        <label class="form-label small fw-semibold">&nbsp;</label>
+        <a href="{% url 'quotations:list' %}" class="btn btn-outline-secondary w-100"><i class="fas fa-undo me-1"></i>Clear</a>
+      </div>
+    </form>
+  </div>
+</div>
+
+<div class="card">
+  <div class="card-header d-flex justify-content-between align-items-center" style="background: #1a3c6e; color: #fff;">
+    <span><i class="fas fa-list me-2"></i>All Quotations</span>
+    <span class="badge bg-light text-dark">{{ quotations|length }} record(s)</span>
+  </div>
+  <div class="card-body p-0">
+    <div class="table-responsive">
+      <table class="table report-table mb-0">
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Quotation No.</th>
+            <th>Client</th>
+            <th>Date</th>
+            <th>Expiry</th>
+            <th class="text-end">Grand Total</th>
+            <th>Status</th>
+            <th>Created By</th>
+            <th class="text-end">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for qtn in quotations %}
+          <tr>
+            <td>{{ forloop.counter0|add:page_obj.start_index }}</td>
+            <td><a href="{% url 'quotations:detail' qtn.pk %}" class="fw-semibold">{{ qtn.quotation_number }}</a></td>
+            <td>{{ qtn.client.full_name }}</td>
+            <td>{{ qtn.date|date:"d/m/Y" }}</td>
+            <td>{{ qtn.expiry_date|date:"d/m/Y" }}</td>
+            <td class="text-end fw-bold">KSh {{ qtn.grand_total|floatformat:2 }}</td>
+            <td>
+              {% if qtn.status == 'Draft' %}<span class="badge bg-secondary">Draft</span>
+              {% elif qtn.status == 'Sent' %}<span class="badge bg-primary">Sent</span>
+              {% elif qtn.status == 'Accepted' %}<span class="badge bg-success">Accepted</span>
+              {% elif qtn.status == 'Rejected' %}<span class="badge bg-danger">Rejected</span>
+              {% elif qtn.status == 'Converted' %}<span class="badge bg-info">Converted</span>
+              {% endif %}
+            </td>
+            <td>{{ qtn.created_by.get_full_name|default:qtn.created_by.username }}</td>
+            <td class="text-end" style="white-space: nowrap;">
+              <a href="{% url 'quotations:detail' qtn.pk %}" class="btn btn-sm btn-outline-info" title="View"><i class="fas fa-eye"></i></a>
+              <a href="{% url 'quotations:document' qtn.pk %}" class="btn btn-sm btn-outline-warning" title="Professional View" target="_blank"><i class="fas fa-file-invoice"></i></a>
+              {% if can_edit %}
+              <a href="{% url 'quotations:update' qtn.pk %}" class="btn btn-sm btn-outline-primary" title="Edit"><i class="fas fa-pencil-alt"></i></a>
+              {% endif %}
+              <a href="{% url 'quotations:pdf' qtn.pk %}" class="btn btn-sm btn-outline-secondary" title="PDF" target="_blank"><i class="fas fa-file-pdf"></i></a>
+            </td>
+          </tr>
+          {% empty %}
+          <tr><td colspan="9" class="text-center text-muted py-4">No quotations found.</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+  {% if page_obj.paginator.num_pages > 1 %}
+  <div class="card-footer">
+    <nav>{% include 'includes/pagination.html' with page_obj=page_obj %}</nav>
+  </div>
+  {% endif %}
+</div>
+{% endblock %}

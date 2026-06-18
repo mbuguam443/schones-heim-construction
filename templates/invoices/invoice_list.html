@@ -1,0 +1,95 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}Invoices{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center page-header">
+    <h2><i class="fas fa-receipt"></i> Invoices</h2>
+    {% if can_edit %}<a href="{% url 'invoices:create' %}" class="btn btn-primary"><i class="fas fa-plus"></i> New Invoice</a>{% endif %}
+</div>
+
+<div class="card shadow-sm mb-4">
+    <div class="card-body">
+        <form method="get" class="row g-3">
+            <div class="col-md-5">
+                <input type="text" name="search" class="form-control" placeholder="Search by number or client..." value="{{ search }}">
+            </div>
+            <div class="col-md-3">
+                <select name="status" class="form-select">
+                    <option value="">All Statuses</option>
+                    {% for key, val in status_choices %}
+                    <option value="{{ key }}" {% if status_filter == key %}selected{% endif %}>{{ val }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-md-2">
+                <button type="submit" class="btn btn-outline-primary w-100"><i class="fas fa-search"></i> Filter</button>
+            </div>
+            <div class="col-md-2">
+                <a href="{% url 'invoices:list' %}" class="btn btn-outline-secondary w-100"><i class="fas fa-times-circle"></i> Clear</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div class="card shadow-sm">
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table table-hover mb-0">
+                <thead class="table-primary">
+                    <tr>
+                        <th>#</th>
+                        <th>Invoice No.</th>
+                        <th>Client</th>
+                        <th>Date</th>
+                        <th>Due Date</th>
+                        <th class="text-end">Grand Total</th>
+                        <th class="text-end">Paid</th>
+                        <th class="text-end">Balance</th>
+                        <th>Status</th>
+                        <th class="text-end">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for inv in invoices %}
+                    <tr>
+                        <td>{{ forloop.counter0|add:page_obj.start_index }}</td>
+                        <td><a href="{% url 'invoices:detail' inv.pk %}" class="fw-semibold">{{ inv.invoice_number }}</a></td>
+                        <td>{{ inv.client.full_name }}</td>
+                        <td>{{ inv.date|date:"d/m/Y" }}</td>
+                        <td>{{ inv.due_date|date:"d/m/Y" }}{% if inv.due_date < today and inv.status != 'Paid' and inv.status != 'Draft' %} <i class="fas fa-exclamation-circle text-danger" title="Overdue"></i>{% endif %}</td>
+                        <td class="text-end fw-bold">KSh {{ inv.grand_total|floatformat:2 }}</td>
+                        <td class="text-end">KSh {{ inv.amount_paid|floatformat:2 }}</td>
+                        <td class="text-end fw-bold {% if inv.balance > 0 %}text-danger{% endif %}">KSh {{ inv.balance|floatformat:2 }}</td>
+                        <td>
+                            {% if inv.status == 'Draft' %}<span class="badge bg-secondary">Draft</span>
+                            {% elif inv.status == 'Pending' %}<span class="badge bg-warning text-dark">Pending</span>
+                            {% elif inv.status == 'Paid' %}<span class="badge bg-success">Paid</span>
+                            {% elif inv.status == 'Overdue' %}<span class="badge bg-danger">Overdue</span>
+                            {% endif %}
+                        </td>
+                        <td class="text-end">
+                            <a href="{% url 'invoices:detail' inv.pk %}" class="btn btn-sm btn-outline-info" title="View"><i class="fas fa-eye"></i></a>
+                            {% if can_edit %}
+                            <a href="{% url 'invoices:update' inv.pk %}" class="btn btn-sm btn-outline-primary" title="Edit"><i class="fas fa-pen"></i></a>
+                            {% if inv.status != 'Paid' %}
+                            <a href="{% url 'invoices:record_payment' inv.pk %}" class="btn btn-sm btn-outline-success" title="Record Payment"><i class="fas fa-money-bill-wave"></i></a>
+                            {% endif %}
+                            {% endif %}
+                            <a href="{% url 'invoices:pdf' inv.pk %}" class="btn btn-sm btn-outline-secondary" title="PDF" target="_blank"><i class="fas fa-file-pdf"></i></a>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr><td colspan="10" class="text-center text-muted py-4">No invoices found.</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+    {% if page_obj.paginator.num_pages > 1 %}
+    <div class="card-footer">
+        <nav>{% include 'includes/pagination.html' with page_obj=page_obj %}</nav>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

@@ -1,0 +1,127 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}{{ employee.user.get_full_name }} - {{ site_name }}{% endblock %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center page-title">
+    <h4 class="mb-0"><i class="fas fa-user-circle"></i> {{ employee.user.get_full_name|default:employee.user.username }}</h4>
+    <div>
+        <a href="{% url 'employees:employee_update' employee.pk %}" class="btn btn-primary"><i class="fas fa-pen"></i> Edit</a>
+        <a href="{% url 'employees:employee_delete' employee.pk %}" class="btn btn-outline-danger"><i class="fas fa-trash"></i> Delete</a>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-header"><i class="fas fa-info-circle"></i> Profile</div>
+            <div class="card-body">
+                <table class="table table-sm">
+                    <tr><th>Employee ID</th><td><span class="badge bg-secondary">{{ employee.employee_id }}</span></td></tr>
+                    <tr><th>Username</th><td>{{ employee.user.username }}</td></tr>
+                    <tr><th>Email</th><td>{{ employee.user.email|default:"—" }}</td></tr>
+                    <tr><th>Phone</th><td>{{ employee.phone }}</td></tr>
+                    <tr><th>Position</th><td>{{ employee.get_position_display }}</td></tr>
+                    <tr><th>Department</th><td>{{ employee.get_department_display }}</td></tr>
+                    <tr><th>Salary (KES)</th><td>{{ employee.salary|floatformat:2 }}</td></tr>
+                    <tr><th>Employed Since</th><td>{{ employee.employment_date }}</td></tr>
+                    <tr><th>Status</th><td>{% if employee.is_active %}<span class="badge bg-success">Active</span>{% else %}<span class="badge bg-danger">Inactive</span>{% endif %}</td></tr>
+                    <tr><th>Emergency Contact</th><td>{{ employee.emergency_contact|default:"—" }}</td></tr>
+                    <tr><th>Emergency Phone</th><td>{{ employee.emergency_phone|default:"—" }}</td></tr>
+                </table>
+                {% if employee.notes %}
+                <div class="mt-2 p-3 bg-light rounded">
+                    <strong>Notes:</strong><br>{{ employee.notes|linebreaks }}
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header d-flex justify-content-between">
+                <span><i class="fas fa-calendar-check"></i> Attendance History</span>
+                <form method="get" class="d-inline-flex gap-2">
+                    <select name="month" class="form-select form-select-sm" style="width:auto;">
+                        {% for m in 123456789101112|make_list %}
+                            <option value="{{ forloop.counter }}" {% if selected_month == forloop.counter %}selected{% endif %}>{{ forloop.counter|stringformat:"02d" }}</option>
+                        {% endfor %}
+                    </select>
+                    <input type="number" name="year" class="form-control form-control-sm" style="width:80px;" value="{{ selected_year }}">
+                    <button type="submit" class="btn btn-sm btn-outline-primary">Go</button>
+                    <a href="{% url 'employees:mark_attendance' %}" class="btn btn-sm btn-primary"><i class="fas fa-plus"></i> Mark</a>
+                </form>
+            </div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-sm mb-0">
+                        <thead>
+                            <tr>
+                                <th>Date</th>
+                                <th>Check In</th>
+                                <th>Check Out</th>
+                                <th>Status</th>
+                                <th>Notes</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for a in attendance_records %}
+                            <tr>
+                                <td>{{ a.date }}</td>
+                                <td>{{ a.check_in|time:"H:i"|default:"—" }}</td>
+                                <td>{{ a.check_out|time:"H:i"|default:"—" }}</td>
+                                <td>
+                                    {% if a.status == 'present' %}<span class="attendance-present">Present</span>
+                                    {% elif a.status == 'absent' %}<span class="attendance-absent">Absent</span>
+                                    {% elif a.status == 'late' %}<span class="attendance-late">Late</span>
+                                    {% elif a.status == 'half_day' %}<span class="attendance-half-day">Half-Day</span>
+                                    {% endif %}
+                                </td>
+                                <td>{{ a.notes|truncatewords:5|default:"—" }}</td>
+                            </tr>
+                            {% empty %}
+                            <tr><td colspan="5" class="text-center py-3 text-muted">No attendance records for this period.</td></tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <div class="row mt-2">
+            <div class="col-3"><div class="card stat-card p-2"><div class="number text-success">{{ present_count }}</div><div class="label">Present</div></div></div>
+            <div class="col-3"><div class="card stat-card p-2"><div class="number text-danger">{{ absent_count }}</div><div class="label">Absent</div></div></div>
+            <div class="col-3"><div class="card stat-card p-2"><div class="number text-warning">{{ late_count }}</div><div class="label">Late</div></div></div>
+            <div class="col-3"><div class="card stat-card p-2"><div class="number text-orange">{{ half_count }}</div><div class="label">Half-Day</div></div></div>
+        </div>
+
+        <div class="card mt-3">
+            <div class="card-header d-flex justify-content-between">
+                <span><i class="fas fa-star"></i> Performance Notes</span>
+                <a href="{% url 'employees:performance_add' employee.pk %}" class="btn btn-sm btn-primary"><i class="fas fa-plus"></i> Add Note</a>
+            </div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-sm mb-0">
+                        <thead>
+                            <tr><th>Date</th><th>Note</th><th>Rating</th><th>Recorded By</th></tr>
+                        </thead>
+                        <tbody>
+                            {% for p in performance_notes %}
+                            <tr>
+                                <td>{{ p.created_at|date:"Y-m-d" }}</td>
+                                <td>{{ p.note|truncatewords:15 }}</td>
+                                <td>{% for i in "12345"|make_list %}{% if forloop.counter <= p.rating %}★{% else %}☆{% endif %}{% endfor %} ({{ p.rating }}/5)</td>
+                                <td>{{ p.recorded_by.get_full_name|default:p.recorded_by.username|default:"—" }}</td>
+                            </tr>
+                            {% empty %}
+                            <tr><td colspan="4" class="text-center py-3 text-muted">No performance notes yet.</td></tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

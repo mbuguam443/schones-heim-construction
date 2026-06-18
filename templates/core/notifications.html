@@ -1,0 +1,86 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}Notifications - {{ company_settings.company_name|default:'SCHONES HEIM BUILDERS' }}{% endblock %}
+{% block extra_css %}
+<style>
+  .notif-card { border: none; border-radius: 12px; box-shadow: 0 2px 10px rgba(0,0,0,0.06); }
+  .notif-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 15px;
+    padding: 16px 20px;
+    border-bottom: 1px solid #f0f0f0;
+    transition: background 0.15s;
+  }
+  .notif-item:last-child { border-bottom: none; }
+  .notif-item:hover { background: #f8f9fa; }
+  .notif-item.unread { background: #eef4ff; }
+  .notif-item.unread:hover { background: #e0ecff; }
+  .notif-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.1rem;
+    flex-shrink: 0;
+  }
+  .notif-icon.read { background: #e9ecef; color: #6c757d; }
+  .notif-icon.unread { background: #1a3c6e; color: #fff; }
+  .notif-content { flex: 1; min-width: 0; }
+  .notif-title { font-weight: 600; color: #333; margin-bottom: 3px; }
+  .notif-message { font-size: 0.9rem; color: #6c757d; margin-bottom: 5px; }
+  .notif-time { font-size: 0.8rem; color: #adb5bd; }
+  .notif-actions { flex-shrink: 0; }
+  .notif-actions .btn { border-radius: 20px; padding: 4px 12px; font-size: 0.8rem; }
+  .section-title {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: #1a3c6e;
+    padding: 16px 20px;
+    border-bottom: 2px solid #f0f0f0;
+  }
+</style>
+{% endblock %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+  <h4 class="mb-0" style="color: #1a3c6e; font-weight: 700;">
+    <i class="fas fa-bell me-2"></i>Notifications
+  </h4>
+  <span class="badge bg-primary rounded-pill">{{ unread_notifications_count }} unread</span>
+</div>
+
+<div class="card notif-card">
+  <div class="section-title d-flex justify-content-between align-items-center">
+    <span>All Notifications</span>
+  </div>
+  <div>
+    {% for notif in notifications %}
+    <div class="notif-item {% if not notif.is_read %}unread{% endif %}">
+      <div class="notif-icon {% if notif.is_read %}read{% else %}unread{% endif %}">
+        <i class="{% if notif.is_read %}fas fa-envelope-open{% else %}fas fa-envelope{% endif %}"></i>
+      </div>
+      <div class="notif-content">
+        <div class="notif-title">{{ notif.title }}</div>
+        <div class="notif-message">{{ notif.message|truncatewords:30 }}</div>
+        <div class="notif-time">{{ notif.created_at|date:'M d, Y H:i' }}</div>
+      </div>
+      <div class="notif-actions">
+        {% if not notif.is_read %}
+          <a href="{% url 'core:mark_notification_read' notif.pk %}" class="btn btn-sm btn-outline-primary">Mark Read</a>
+        {% endif %}
+        {% if notif.link %}
+          <a href="{{ notif.link }}" class="btn btn-sm btn-primary">View</a>
+        {% endif %}
+      </div>
+    </div>
+    {% empty %}
+    <div class="text-center py-5 text-muted">
+      <i class="fas fa-bell-slash" style="font-size: 2.5rem; display: block; margin-bottom: 10px;"></i>
+      No notifications yet.
+    </div>
+    {% endfor %}
+  </div>
+</div>
+{% endblock %}

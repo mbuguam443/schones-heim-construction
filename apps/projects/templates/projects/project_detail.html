@@ -1,0 +1,284 @@
+{% extends 'base.html' %}
+{% load crispy_forms_tags %}
+
+{% block title %}{{ project.name }} - SCHONES HEIM BUILDERS{% endblock %}
+{% block page_header %}{{ project.name }}{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-lg-8">
+        <div class="card mb-4">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <span><i class="fas fa-info-circle me-1"></i> Project Overview</span>
+                <span class="badge 
+                    {% if project.status == 'Completed' %}bg-success
+                    {% elif project.status == 'Ongoing' %}bg-primary
+                    {% elif project.status == 'Planning' %}bg-secondary
+                    {% elif project.status == 'On Hold' %}bg-warning text-dark
+                    {% elif project.status == 'Cancelled' %}bg-danger
+                    {% endif %} fs-6">{{ project.status }}</span>
+            </div>
+            <div class="card-body">
+                <div class="row g-4">
+                    <div class="col-md-6">
+                        <table class="table table-sm mb-0">
+                            <tr>
+                                <th class="text-muted" style="width:40%">Client</th>
+                                <td>
+                                    {% if project.client %}
+                                    <a href="{% url 'clients:client_detail' project.client.pk %}">
+                                        {{ project.client.full_name }}
+                                    </a>
+                                    {% else %}<span class="text-muted">—</span>{% endif %}
+                                </td>
+                            </tr>
+                            <tr>
+                                <th class="text-muted">Location</th>
+                                <td>{{ project.location|default:'—' }}</td>
+                            </tr>
+                            <tr>
+                                <th class="text-muted">Budget</th>
+                                <td class="fw-medium">KSh {{ project.budget|floatformat:2|default:'—' }}</td>
+                            </tr>
+                            <tr>
+                                <th class="text-muted">Start Date</th>
+                                <td>{{ project.start_date|date:"M d, Y"|default:'TBD' }}</td>
+                            </tr>
+                            <tr>
+                                <th class="text-muted">End Date</th>
+                                <td>{{ project.end_date|date:"M d, Y"|default:'TBD' }}</td>
+                            </tr>
+                        </table>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="text-muted small mb-1">Progress</label>
+                        <div class="d-flex align-items-center gap-3 mb-3">
+                            <div class="progress flex-grow-1" style="height:20px;border-radius:10px;">
+                                <div class="progress-bar fw-semibold" role="progressbar" style="width:{{ project.progress_percent }}%;border-radius:10px;font-size:0.75rem;" aria-valuenow="{{ project.progress_percent }}" aria-valuemin="0" aria-valuemax="100">
+                                    {{ project.progress_percent }}%
+                                </div>
+                            </div>
+                        </div>
+                        {% if can_edit %}
+                        <form method="post" action="{% url 'projects:project_progress' project.pk %}" class="d-flex gap-2 align-items-center">
+                            {% csrf_token %}
+                            {{ progress_form.progress_percent }}
+                            <button type="submit" class="btn btn-primary btn-sm"><i class="fas fa-check"></i> Update</button>
+                        </form>
+                        {% endif %}
+                    </div>
+                </div>
+                {% if project.description %}
+                <hr>
+                <h6 class="fw-semibold text-muted mb-2">Description</h6>
+                <p class="mb-0">{{ project.description|linebreaksbr }}</p>
+                {% endif %}
+                <hr>
+                <div class="d-flex gap-2 text-muted small">
+                    <span><i class="fas fa-user me-1"></i> Created by {% if project.created_by %}{{ project.created_by.get_full_name|default:project.created_by.username }}{% else %}System{% endif %}</span>
+                    <span class="mx-2">|</span>
+                    <span><i class="fas fa-clock me-1"></i> {{ project.created_at|date:"M d, Y h:i A" }}</span>
+                </div>
+            </div>
+            {% if can_edit %}
+            <div class="card-footer d-flex gap-2">
+                <a href="{% url 'projects:project_update' project.pk %}" class="btn btn-primary btn-sm"><i class="fas fa-pencil"></i> Edit</a>
+                <a href="{% url 'projects:project_delete' project.pk %}" class="btn btn-outline-danger btn-sm"><i class="fas fa-trash"></i> Delete</a>
+            </div>
+            {% endif %}
+        </div>
+
+        <div class="card mb-4">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <span><i class="fas fa-camera me-1"></i> Photo Gallery ({{ photos|length }})</span>
+                {% if can_edit %}
+                <button class="btn btn-sm btn-primary" data-bs-toggle="collapse" data-bs-target="#photoUploadForm">
+                    <i class="fas fa-upload"></i> Add Photo
+                </button>
+                {% endif %}
+            </div>
+            <div class="card-body">
+                {% if can_edit %}
+                <div class="collapse mb-3" id="photoUploadForm">
+                    <div class="border rounded p-3 bg-light">
+                        <form method="post" enctype="multipart/form-data" action="{% url 'projects:project_photo_add' project.pk %}">
+                            {% csrf_token %}
+                            {{ photo_form|crispy }}
+                            <button type="submit" class="btn btn-primary btn-sm mt-2"><i class="fas fa-upload"></i> Upload</button>
+                        </form>
+                    </div>
+                </div>
+                {% endif %}
+                {% if photos %}
+                <div class="row g-3">
+                    {% for photo in photos %}
+                    <div class="col-6 col-md-4 col-lg-3">
+                        <div class="card">
+                            <img src="{{ photo.image.url }}" alt="{{ photo.caption|default:'Project photo' }}" class="card-img-top" style="height:160px;object-fit:cover;">
+                            <div class="card-body p-2">
+                                <div class="fw-medium small">{{ photo.caption|default:'No caption' }}</div>
+                                <div class="text-muted" style="font-size:0.7rem;">
+                                    {% if photo.uploaded_by %}{{ photo.uploaded_by.get_full_name|default:photo.uploaded_by.username }}{% else %}System{% endif %} • {{ photo.uploaded_at|date:"M d, Y" }}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <p class="text-muted text-center mb-0 py-3"><i class="fas fa-images me-1"></i> No photos yet.</p>
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="card mb-4">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <span><i class="fas fa-file-alt me-1"></i> Documents ({{ documents|length }})</span>
+                {% if can_edit %}
+                <button class="btn btn-sm btn-primary" data-bs-toggle="collapse" data-bs-target="#documentUploadForm">
+                    <i class="fas fa-upload"></i> Add Document
+                </button>
+                {% endif %}
+            </div>
+            <div class="card-body">
+                {% if can_edit %}
+                <div class="collapse mb-3" id="documentUploadForm">
+                    <div class="border rounded p-3 bg-light">
+                        <form method="post" enctype="multipart/form-data" action="{% url 'projects:project_document_add' project.pk %}">
+                            {% csrf_token %}
+                            {{ document_form|crispy }}
+                            <button type="submit" class="btn btn-primary btn-sm mt-2"><i class="fas fa-upload"></i> Upload</button>
+                        </form>
+                    </div>
+                </div>
+                {% endif %}
+                {% if documents %}
+                <div class="list-group list-group-flush">
+                    {% for doc in documents %}
+                    <div class="list-group-item px-0 d-flex justify-content-between align-items-center">
+                        <div>
+                            <a href="{{ doc.file.url }}" target="_blank" class="fw-medium">
+                                <i class="fas fa-file me-2"></i> {{ doc.description|default:doc.file.name|truncatechars:60 }}
+                            </a>
+                            <br>
+                            <small class="text-muted">
+                                {% if doc.uploaded_by %}{{ doc.uploaded_by.get_full_name|default:doc.uploaded_by.username }}{% else %}System{% endif %} • {{ doc.uploaded_at|date:"M d, Y h:i A" }}
+                            </small>
+                        </div>
+                        <a href="{{ doc.file.url }}" target="_blank" class="btn btn-sm btn-outline-secondary" download>
+                            <i class="fas fa-download"></i>
+                        </a>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <p class="text-muted text-center mb-0 py-3"><i class="fas fa-folder-open me-1"></i> No documents yet.</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-4">
+        <div class="card mb-4">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <span><i class="fas fa-users me-1"></i> Team ({{ assignments|length }})</span>
+                {% if can_edit %}
+                <button class="btn btn-sm btn-primary" data-bs-toggle="collapse" data-bs-target="#assignForm">
+                    <i class="fas fa-plus"></i> Assign
+                </button>
+                {% endif %}
+            </div>
+            <div class="card-body">
+                {% if can_edit %}
+                <div class="collapse mb-3" id="assignForm">
+                    <div class="border rounded p-3 bg-light">
+                        <form method="post" action="{% url 'projects:project_assign' project.pk %}">
+                            {% csrf_token %}
+                            {{ assignment_form|crispy }}
+                            <button type="submit" class="btn btn-primary btn-sm mt-2"><i class="fas fa-user-plus"></i> Assign</button>
+                        </form>
+                    </div>
+                </div>
+                {% endif %}
+                {% if assignments %}
+                <ul class="list-group list-group-flush">
+                    {% for assignment in assignments %}
+                    <li class="list-group-item px-0 d-flex justify-content-between align-items-center">
+                        <div>
+                            <div class="fw-medium small">
+                                <i class="fas fa-user-circle me-1"></i>
+                                {% if assignment.employee %}{{ assignment.employee.get_full_name|default:assignment.employee.username }}{% else %}Unknown{% endif %}
+                            </div>
+                            <span class="badge bg-info bg-opacity-10 text-info small">
+                                {{ assignment.employee.get_role_display }}
+                            </span>
+                            <div class="text-muted" style="font-size:0.7rem;">
+                                Assigned by {% if assignment.assigned_by %}{{ assignment.assigned_by.get_full_name|default:assignment.assigned_by.username }}{% else %}System{% endif %}
+                            </div>
+                        </div>
+                        {% if can_edit %}
+                        <a href="{% url 'projects:assignment_delete' assignment.pk %}" class="btn btn-sm btn-outline-danger" onclick="return confirm('Remove this assignment?')">
+                            <i class="fas fa-times"></i>
+                        </a>
+                        {% endif %}
+                    </li>
+                    {% endfor %}
+                </ul>
+                {% else %}
+                <p class="text-muted text-center mb-0 py-3"><i class="fas fa-users me-1"></i> No team assigned.</p>
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="card mb-4">
+            <div class="card-header">
+                <i class="fas fa-history me-1"></i> Timeline
+            </div>
+            <div class="card-body">
+                <ul class="list-unstyled mb-0">
+                    <li class="d-flex gap-2 mb-3">
+                        <div class="text-center" style="width:30px;">
+                            <i class="fas fa-circle" style="font-size:0.5rem;color:var(--primary);"></i>
+                        </div>
+                        <div>
+                            <div class="fw-medium small">Project Created</div>
+                            <small class="text-muted">{{ project.created_at|date:"M d, Y h:i A" }}</small>
+                        </div>
+                    </li>
+                    {% if project.start_date %}
+                    <li class="d-flex gap-2 mb-3">
+                        <div class="text-center" style="width:30px;">
+                            <i class="fas fa-circle" style="font-size:0.5rem;color:var(--primary-light);"></i>
+                        </div>
+                        <div>
+                            <div class="fw-medium small">Start Date</div>
+                            <small class="text-muted">{{ project.start_date|date:"M d, Y" }}</small>
+                        </div>
+                    </li>
+                    {% endif %}
+                    {% if project.end_date %}
+                    <li class="d-flex gap-2 mb-3">
+                        <div class="text-center" style="width:30px;">
+                            <i class="fas fa-circle" style="font-size:0.5rem;{% if project.status == 'Completed' %}color:green{% else %}color:#ffc107{% endif %};"></i>
+                        </div>
+                        <div>
+                            <div class="fw-medium small">End Date</div>
+                            <small class="text-muted">{{ project.end_date|date:"M d, Y" }}</small>
+                        </div>
+                    </li>
+                    {% endif %}
+                    <li class="d-flex gap-2">
+                        <div class="text-center" style="width:30px;">
+                            <i class="fas fa-circle" style="font-size:0.5rem;color:#ffc107;"></i>
+                        </div>
+                        <div>
+                            <div class="fw-medium small">Last Updated</div>
+                            <small class="text-muted">{{ project.updated_at|date:"M d, Y h:i A" }}</small>
+                        </div>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

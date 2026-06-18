@@ -1,0 +1,113 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}Stock Transactions - {{ site_name }}{% endblock %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center page-title">
+    <h4 class="mb-0"><i class="fas fa-exchange-alt"></i> Stock Transactions</h4>
+    <div>
+        <a href="{% url 'inventory:stock_in' %}" class="btn btn-success"><i class="fas fa-arrow-down"></i> Stock In</a>
+        <a href="{% url 'inventory:stock_out' %}" class="btn btn-warning"><i class="fas fa-arrow-up"></i> Stock Out</a>
+    </div>
+</div>
+
+<div class="card mb-3">
+    <div class="card-body">
+        <form method="get" class="row g-2 align-items-end">
+            <div class="col-auto">
+                <select name="type" class="form-select" onchange="this.form.submit()">
+                    <option value="">All Types</option>
+                    <option value="in" {% if request.GET.type == 'in' %}selected{% endif %}>Stock In</option>
+                    <option value="out" {% if request.GET.type == 'out' %}selected{% endif %}>Stock Out</option>
+                </select>
+            </div>
+            <div class="col-auto">
+                <select name="project" class="form-select" onchange="this.form.submit()">
+                    <option value="">All Projects</option>
+                    {% for p in projects %}
+                    <option value="{{ p.pk }}" {% if request.GET.project == p.pk|stringformat:'s' %}selected{% endif %}>{{ p.name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-auto">
+                <a href="{% url 'inventory:stock_transactions' %}" class="btn btn-outline-secondary">Clear</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-header"><i class="fas fa-table"></i> Transaction History</div>
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table table-hover mb-0">
+                <thead>
+                    <tr>
+                        <th>Date</th>
+                        <th>Type</th>
+                        <th>Material</th>
+                        <th>Quantity</th>
+                        <th>Project</th>
+                        <th>Client</th>
+                        <th>Reference</th>
+                        <th>Notes</th>
+                        <th>Done By</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for t in transactions %}
+                    <tr>
+                        <td>{{ t.created_at|date:"Y-m-d H:i" }}</td>
+                        <td>
+                            {% if t.transaction_type == 'in' %}
+                                <span class="badge bg-success">IN</span>
+                            {% else %}
+                                <span class="badge bg-danger">OUT</span>
+                            {% endif %}
+                        </td>
+                        <td>{{ t.material.name }}</td>
+                        <td>{{ t.quantity|floatformat:2 }} {{ t.material.get_unit_display }}</td>
+                        <td>
+                            {% if t.project %}
+                                <a href="{% url 'projects:project_detail' t.project.pk %}">{{ t.project.name }}</a>
+                            {% else %}
+                                <span class="text-muted">—</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if t.project and t.project.client %}
+                                {{ t.project.client.full_name }}
+                            {% else %}
+                                <span class="text-muted">—</span>
+                            {% endif %}
+                        </td>
+                        <td>{{ t.reference|default:"—" }}</td>
+                        <td>{{ t.notes|truncatewords:8|default:"—" }}</td>
+                        <td>{{ t.done_by.get_full_name|default:t.done_by.username|default:"—" }}</td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="9" class="text-center py-4 text-muted">No transactions recorded.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+{% if is_paginated %}
+<nav class="mt-3">
+    <ul class="pagination justify-content-center">
+        {% if page_obj.has_previous %}
+            <li class="page-item"><a class="page-link" href="?page=1">&laquo;</a></li>
+            <li class="page-item"><a class="page-link" href="?page={{ page_obj.previous_page_number }}">&lsaquo;</a></li>
+        {% endif %}
+        <li class="page-item active"><span class="page-link">Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}</span></li>
+        {% if page_obj.has_next %}
+            <li class="page-item"><a class="page-link" href="?page={{ page_obj.next_page_number }}">&rsaquo;</a></li>
+            <li class="page-item"><a class="page-link" href="?page={{ page_obj.paginator.num_pages }}">&raquo;</a></li>
+        {% endif %}
+    </ul>
+</nav>
+{% endif %}
+{% endblock %}

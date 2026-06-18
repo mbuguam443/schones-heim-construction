@@ -1,0 +1,137 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Invoice {{ inv.invoice_number }}</title>
+    <style>
+        @page { margin: 20mm; size: A4; }
+        body { font-family: 'Helvetica', 'Arial', sans-serif; font-size: 11pt; color: #333; line-height: 1.5; margin: 0; padding: 0; }
+        .header { background: #1a3c6e; color: #fff; padding: 16px 30px; margin: -20mm -20mm 20mm -20mm; display: flex; justify-content: space-between; align-items: center; }
+        .header .left { display: flex; align-items: center; gap: 16px; }
+        .header .left img { max-height: 60px; }
+        .header .left .company { font-size: 20pt; font-weight: 700; letter-spacing: 2px; }
+        .header .left .tagline { font-size: 9pt; opacity: 0.85; }
+        .header .right { text-align: right; }
+        .header .right .invoice-label { font-size: 18pt; font-weight: 700; }
+        .company-info { margin-bottom: 20px; }
+        .company-info table { width: 100%; }
+        .company-info td { vertical-align: top; }
+        .company-info .right { text-align: right; }
+        .details-table { width: 100%; border-collapse: collapse; margin-bottom: 20px; }
+        .details-table td { padding: 5px 10px; border: 1px solid #ddd; }
+        .details-table td:first-child { background: #f0f4f8; font-weight: bold; width: 180px; }
+        .items-table { width: 100%; border-collapse: collapse; margin-bottom: 20px; }
+        .items-table th { background: #1a3c6e; color: #fff; padding: 8px 10px; text-align: left; font-size: 10pt; }
+        .items-table th.right { text-align: right; }
+        .items-table th.center { text-align: center; }
+        .items-table td { padding: 6px 10px; border-bottom: 1px solid #ddd; }
+        .items-table td.right { text-align: right; }
+        .items-table td.center { text-align: center; }
+        .items-table tr:nth-child(even) td { background: #f9f9f9; }
+        .totals { width: 300px; margin-left: auto; border-collapse: collapse; }
+        .totals td { padding: 5px 10px; }
+        .totals td:first-child { font-weight: bold; }
+        .totals .grand-total { background: #1a3c6e; color: #fff; font-size: 13pt; font-weight: bold; }
+        .payment-status { display: inline-block; padding: 3px 12px; border-radius: 3px; font-size: 10pt; font-weight: bold; }
+        .status-paid { background: #28a745; color: #fff; }
+        .status-pending { background: #ffc107; color: #000; }
+        .status-overdue { background: #dc3545; color: #fff; }
+        .status-draft { background: #6c757d; color: #fff; }
+        .footer { margin-top: 40px; border-top: 2px solid #1a3c6e; padding-top: 15px; font-size: 9pt; color: #666; }
+        .footer p { margin: 3px 0; }
+        .notes-section { margin-top: 20px; padding: 10px 15px; background: #f9f9f9; border-left: 4px solid #1a3c6e; }
+        .watermark { position: fixed; top: 50%; left: 50%; transform: translate(-50%,-50%) rotate(-30deg); pointer-events: none; z-index: 999; }
+        .watermark img { max-width: 400px; opacity: 0.08; }
+    </style>
+</head>
+<body>
+    {% if company_settings %}
+    <div class="watermark"><img src="{% static 'logo.png' %}" alt="watermark"></div>
+    {% endif %}
+
+    <div class="header">
+        <div class="left">
+            {% if company_settings %}
+            <img src="{% static 'logo.png' %}" alt="Logo">
+            {% endif %}
+            <div>
+                <div class="company">{{ company_settings.company_name|default:'SCHONES HEIM BUILDERS' }}</div>
+                <div class="tagline">Engineering & Construction</div>
+            </div>
+        </div>
+        <div class="right">
+            <div class="invoice-label">INVOICE</div>
+        </div>
+    </div>
+
+    <div class="company-info">
+        <table>
+            <tr>
+                <td>
+                    <strong>{{ company_settings.company_name|default:'SCHONES HEIM BUILDERS' }}</strong><br>
+                    {{ company_settings.address|default:'Nairobi, Kenya' }}<br>
+                    Phone: {{ company_settings.phone|default:'[Insert Phone]' }}<br>
+                    Email: {{ company_settings.email|default:'[Insert Email]' }}
+                </td>
+                <td class="right">
+                    <strong>INVOICE NO:</strong> {{ inv.invoice_number }}<br>
+                    <strong>DATE:</strong> {{ inv.date|date:"d M Y" }}<br>
+                    <strong>DUE DATE:</strong> {{ inv.due_date|date:"d M Y" }}<br>
+                    <strong>STATUS:</strong> <span class="payment-status status-{{ inv.status|lower }}">{{ inv.status|upper }}</span>
+                </td>
+            </tr>
+        </table>
+    </div>
+
+    <table class="details-table">
+        <tr><td>Bill To</td><td>{{ inv.client.full_name }}{% if inv.client.company_name %} - {{ inv.client.company_name }}{% endif %}</td></tr>
+        {% if inv.project %}
+        <tr><td>Project</td><td>{{ inv.project.name }}</td></tr>
+        {% endif %}
+        {% if inv.quotation %}
+        <tr><td>Quotation Ref</td><td>{{ inv.quotation.quotation_number }}</td></tr>
+        {% endif %}
+    </table>
+
+    <table class="items-table">
+        <thead>
+            <tr><th style="width:5%">#</th><th style="width:45%">Description</th><th class="center" style="width:10%">Qty</th><th class="center" style="width:10%">Unit</th><th class="right" style="width:15%">Unit Price</th><th class="right" style="width:15%">Total</th></tr>
+        </thead>
+        <tbody>
+            {% for item in inv.items.all %}
+            <tr>
+                <td>{{ forloop.counter }}</td>
+                <td>{{ item.description }}</td>
+                <td class="center">{{ item.quantity|floatformat:2 }}</td>
+                <td class="center">{{ item.unit }}</td>
+                <td class="right">KSh {{ item.unit_price|floatformat:2 }}</td>
+                <td class="right">KSh {{ item.total|floatformat:2 }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <table class="totals">
+        <tr><td>Subtotal:</td><td class="right">KSh {{ inv.subtotal|floatformat:2 }}</td></tr>
+        <tr><td>VAT ({{ inv.tax_percent }}%):</td><td class="right">KSh {{ inv.tax_amount|floatformat:2 }}</td></tr>
+        <tr><td>Discount:</td><td class="right">(KSh {{ inv.discount|floatformat:2 }})</td></tr>
+        <tr class="grand-total"><td>Grand Total:</td><td class="right">KSh {{ inv.grand_total|floatformat:2 }}</td></tr>
+        <tr><td>Amount Paid:</td><td class="right">KSh {{ inv.amount_paid|floatformat:2 }}</td></tr>
+        <tr style="background:#f8d7da;font-weight:bold;color:#721c24;"><td>Balance Due:</td><td class="right">KSh {{ inv.balance|floatformat:2 }}</td></tr>
+    </table>
+
+    {% if inv.notes %}
+    <div class="notes-section">
+        <strong>Notes:</strong><br>
+        {{ inv.notes|linebreaksbr }}
+    </div>
+    {% endif %}
+
+    <div class="footer">
+        <p><strong>{{ company_settings.company_name|default:'SCHONES HEIM BUILDERS' }}</strong> &mdash; Construction & General Contractors</p>
+        <p>Thank you for your business. Payment is due by {{ inv.due_date|date:"d M Y" }}.</p>
+        <p>Payment Methods: Bank Transfer ({{ company_settings.bank_name|default:'NCBA' }} - {{ company_settings.bank_account|default:'[Account]' }}) | M-Pesa ({{ company_settings.mpesa_number|default:'[Mpesa]' }})</p>
+    </div>
+</body>
+</html>

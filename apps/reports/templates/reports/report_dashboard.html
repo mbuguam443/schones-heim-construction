@@ -1,0 +1,209 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}Reports Dashboard - {{ site_name }}{% endblock %}
+{% block extra_css %}
+<style>
+  .report-card {
+    border: none;
+    border-radius: 12px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.06);
+    transition: transform 0.2s, box-shadow 0.2s;
+    cursor: pointer;
+    text-decoration: none;
+    color: inherit;
+    display: block;
+    height: 100%;
+  }
+  .report-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 25px rgba(0,0,0,0.12);
+    color: inherit;
+  }
+  .report-card .card-body { padding: 1.5rem; }
+  .report-icon {
+    width: 60px;
+    height: 60px;
+    border-radius: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.6rem;
+    color: #fff;
+    margin-bottom: 1rem;
+  }
+  .report-card .card-title {
+    font-size: 1.05rem;
+    font-weight: 700;
+    color: #1a3c6e;
+    margin-bottom: 0.5rem;
+  }
+  .report-card .card-text {
+    font-size: 0.85rem;
+    color: #6c757d;
+    line-height: 1.5;
+  }
+  .report-stat {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #1a3c6e;
+  }
+  .report-stat-label {
+    font-size: 0.75rem;
+    color: #6c757d;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+  .section-title {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: #1a3c6e;
+    margin-bottom: 1rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 2px solid #f0f0f0;
+  }
+</style>
+{% endblock %}
+{% block content %}
+{% include 'includes/breadcrumb.html' with items='Reports' %}
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+  <h4 class="mb-0" style="color: #1a3c6e; font-weight: 700;">
+    <i class="fas fa-chart-pie me-2"></i>Reports Dashboard
+  </h4>
+</div>
+
+<div class="row g-4 mb-4">
+  <div class="col-xl-3 col-lg-4 col-md-6">
+    <div class="card stat-card h-100">
+      <div class="card-body d-flex align-items-center gap-3">
+        <div class="stat-icon" style="background: #1a3c6e;"><i class="fas fa-file-invoice-dollar"></i></div>
+        <div>
+          <div class="stat-value">KES {{ total_invoiced|floatformat:'0' }}</div>
+          <div class="stat-label">Total Invoiced</div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="col-xl-3 col-lg-4 col-md-6">
+    <div class="card stat-card h-100">
+      <div class="card-body d-flex align-items-center gap-3">
+        <div class="stat-icon" style="background: #28a745;"><i class="fas fa-check-circle"></i></div>
+        <div>
+          <div class="stat-value">KES {{ total_paid|floatformat:'0' }}</div>
+          <div class="stat-label">Total Collected</div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="col-xl-3 col-lg-4 col-md-6">
+    <div class="card stat-card h-100">
+      <div class="card-body d-flex align-items-center gap-3">
+        <div class="stat-icon" style="background: #dc3545;"><i class="fas fa-exclamation-triangle"></i></div>
+        <div>
+          <div class="stat-value">KES {{ outstanding|floatformat:'0' }}</div>
+          <div class="stat-label">Outstanding</div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="col-xl-3 col-lg-4 col-md-6">
+    <div class="card stat-card h-100">
+      <div class="card-body d-flex align-items-center gap-3">
+        <div class="stat-icon" style="background: #ffc107; color: #333;"><i class="fas fa-boxes"></i></div>
+        <div>
+          <div class="stat-value">{{ low_stock }}</div>
+          <div class="stat-label">Low Stock Items</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="section-title"><i class="fas fa-file-alt me-2"></i>Report Types</div>
+<div class="row g-4">
+  <div class="col-xl-4 col-lg-4 col-md-6">
+    <a href="{% url 'reports:financial_report' %}" class="report-card card">
+      <div class="card-body">
+        <div class="report-icon" style="background: linear-gradient(135deg, #1a3c6e, #2a5a9e);">
+          <i class="fas fa-chart-line"></i>
+        </div>
+        <h5 class="card-title">Financial Report</h5>
+        <p class="card-text">Revenue, expenses, profitability analysis, invoice status breakdown, and payment collections.</p>
+        <div class="row g-2 mt-2">
+          <div class="col-6">
+            <div class="report-stat-label">Invoiced</div>
+            <div class="report-stat">KES {{ total_invoiced|floatformat:'0' }}</div>
+          </div>
+          <div class="col-6">
+            <div class="report-stat-label">Collected</div>
+            <div class="report-stat">KES {{ total_paid|floatformat:'0' }}</div>
+          </div>
+        </div>
+      </div>
+    </a>
+  </div>
+  <div class="col-xl-4 col-lg-4 col-md-6">
+    <a href="{% url 'reports:project_report' %}" class="report-card card">
+      <div class="card-body">
+        <div class="report-icon" style="background: linear-gradient(135deg, #17a2b8, #20c997);">
+          <i class="fas fa-building"></i>
+        </div>
+        <h5 class="card-title">Project Report</h5>
+        <p class="card-text">Project progress tracking, completion stats, budget vs actual, and resource utilization.</p>
+        <div class="row g-2 mt-2">
+          <div class="col-6">
+            <div class="report-stat-label">Total</div>
+            <div class="report-stat">{{ project_count }}</div>
+          </div>
+          <div class="col-6">
+            <div class="report-stat-label">Active</div>
+            <div class="report-stat text-success">{{ active_projects }}</div>
+          </div>
+        </div>
+      </div>
+    </a>
+  </div>
+  <div class="col-xl-4 col-lg-4 col-md-6">
+    <a href="{% url 'reports:inventory_report' %}" class="report-card card">
+      <div class="card-body">
+        <div class="report-icon" style="background: linear-gradient(135deg, #28a745, #20c997);">
+          <i class="fas fa-boxes"></i>
+        </div>
+        <h5 class="card-title">Inventory Report</h5>
+        <p class="card-text">Stock levels, material consumption, low stock alerts, and inventory valuation.</p>
+        <div class="row g-2 mt-2">
+          <div class="col-6">
+            <div class="report-stat-label">Low Stock</div>
+            <div class="report-stat text-danger">{{ low_stock }}</div>
+          </div>
+          <div class="col-6">
+            <div class="report-stat-label">Completed</div>
+            <div class="report-stat text-success">{{ completed_projects }}</div>
+          </div>
+        </div>
+      </div>
+    </a>
+  </div>
+  <div class="col-xl-4 col-lg-4 col-md-6">
+    <a href="{% url 'reports:employee_report' %}" class="report-card card">
+      <div class="card-body">
+        <div class="report-icon" style="background: linear-gradient(135deg, #6f42c1, #8b5cf6);">
+          <i class="fas fa-users"></i>
+        </div>
+        <h5 class="card-title">Employee Report</h5>
+        <p class="card-text">Attendance summary, productivity metrics, department-wise headcount, and payroll summaries.</p>
+        <div class="row g-2 mt-2">
+          <div class="col-6">
+            <div class="report-stat-label">Employees</div>
+            <div class="report-stat">{{ total_employees }}</div>
+          </div>
+          <div class="col-6">
+            <div class="report-stat-label">Absent Today</div>
+            <div class="report-stat text-danger">{{ pending_attendance }}</div>
+          </div>
+        </div>
+      </div>
+    </a>
+  </div>
+</div>
+{% endblock %}

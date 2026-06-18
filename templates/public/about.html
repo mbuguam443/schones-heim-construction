@@ -1,0 +1,78 @@
+{% extends 'public/base.html' %}
+{% load static %}
+{% block nav_about %}active{% endblock %}
+{% block title %}About Us{% endblock %}
+
+{% block content %}
+<section class="page-header">
+  <div class="container">
+    <h1>About Schones Heim Builders</h1>
+    <p class="mb-0 opacity-75">Engineered by purpose, led by vision</p>
+  </div>
+</section>
+
+<section class="py-5">
+  <div class="container">
+    <div class="row g-4 align-items-center">
+      <div class="col-lg-6">
+        <h2 class="section-title">Who We Are</h2>
+        <p>Schones Heim Builders is a premier construction and general contracting company based in Nairobi, Kenya. With years of industry experience, we have established ourselves as a trusted partner in the construction sector, delivering projects that stand the test of time.</p>
+        <p>Our team of skilled professionals brings together expertise in design, project management, and execution to ensure every project is completed to the highest standards of quality, safety, and sustainability.</p>
+        <p>We pride ourselves on our commitment to client satisfaction, transparent communication, and delivering value for money on every project we undertake.</p>
+        <div class="row mt-4 g-3">
+          <div class="col-4 text-center">
+            <div class="stat-number">{{ stats.projects_completed }}+</div>
+            <div class="stat-label">Projects</div>
+          </div>
+          <div class="col-4 text-center">
+            <div class="stat-number">{{ stats.happy_clients }}+</div>
+            <div class="stat-label">Clients</div>
+          </div>
+          <div class="col-4 text-center">
+            <div class="stat-number">{{ stats.years_established }}+</div>
+            <div class="stat-label">Years</div>
+          </div>
+        </div>
+      </div>
+      <div class="col-lg-6 text-center">
+        <i class="fas fa-building" style="font-size:10rem; color:#1a3c6e; opacity:0.2;"></i>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="py-5 bg-light">
+  <div class="container">
+    <h2 class="section-title text-center mb-5">Our Values</h2>
+    <div class="row g-4">
+      <div class="col-md-4">
+        <div class="card service-card text-center h-100">
+          <div class="card-body">
+            <div class="service-icon"><i class="fas fa-gem"></i></div>
+            <h5>Quality</h5>
+            <p class="text-muted small">We never compromise on quality. Every project meets rigorous standards for materials, workmanship, and finishing.</p>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="card service-card text-center h-100">
+          <div class="card-body">
+            <div class="service-icon"><i class="fas fa-handshake"></i></div>
+            <h5>Integrity</h5>
+            <p class="text-muted small">Transparent pricing, honest communication, and ethical business practices form the foundation of our operations.</p>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="card service-card text-center h-100">
+          <div class="card-body">
+            <div class="service-icon"><i class="fas fa-clock"></i></div>
+            <h5>Reliability</h5>
+            <p class="text-muted small">We deliver on time and within budget. Our project management systems ensure smooth execution from start to finish.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %}

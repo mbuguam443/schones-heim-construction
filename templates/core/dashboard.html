@@ -1,0 +1,293 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}Dashboard - {{ company_settings.company_name|default:'SCHONES HEIM BUILDERS' }}{% endblock %}
+{% block extra_css %}
+<style>
+  .stat-card {
+    border: none;
+    border-radius: 12px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.06);
+    transition: transform 0.2s, box-shadow 0.2s;
+    overflow: hidden;
+  }
+  .stat-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 6px 20px rgba(0,0,0,0.1);
+  }
+  .stat-card .card-body { padding: 20px; }
+  .stat-icon {
+    padding: 14px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    color: #fff !important;
+    flex-shrink: 0;
+    aspect-ratio: 1;
+  }
+  .stat-icon i {
+    color: #fff !important;
+  }
+  .stat-card .stat-value {
+    font-size: 1.75rem;
+    font-weight: 700;
+    color: #1a3c6e;
+    line-height: 1.2;
+  }
+  .stat-card .stat-label {
+    font-size: 0.85rem;
+    color: #6c757d;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+  .bg-primary-soft { background: #1a3c6e; }
+  .bg-success-soft { background: #28a745; }
+  .bg-warning-soft { background: #ffc107; color: #333; }
+  .bg-info-soft { background: #17a2b8; }
+  .bg-danger-soft { background: #dc3545; }
+  .bg-secondary-soft { background: #6c757d; }
+  .bg-dark-soft { background: #343a40; }
+  .chart-container { position: relative; height: 300px; width: 100%; }
+  .activity-feed { max-height: 400px; overflow-y: auto; }
+  .activity-feed::-webkit-scrollbar { width: 4px; }
+  .activity-feed::-webkit-scrollbar-thumb { background: #c0c0c0; border-radius: 4px; }
+  .section-title {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: #1a3c6e;
+    margin-bottom: 1rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 2px solid #f0f0f0;
+  }
+  .table th { border-top: none; color: #6c757d; font-weight: 600; font-size: 0.85rem; text-transform: uppercase; }
+  .badge-role { font-size: 0.75rem; padding: 0.3em 0.6em; }
+</style>
+{% endblock %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+  <h4 class="mb-0" style="color: #1a3c6e; font-weight: 700;">
+    <i class="fas fa-th-large me-2"></i>{% if is_client %}My Dashboard{% else %}Dashboard{% endif %}
+  </h4>
+  <span class="text-muted">{% now 'l, F j, Y' %}</span>
+</div>
+
+{% if is_client %}
+<div class="alert alert-info d-flex align-items-center gap-3 mb-4" style="border: none; border-radius: 12px; background: linear-gradient(135deg, #e8f0fe, #d4e4fc);">
+  <div style="font-size: 2rem;"><i class="fas fa-user-circle text-primary"></i></div>
+  <div>
+    <strong>Welcome, {{ user.get_full_name|default:user.username }}!</strong><br>
+    <span class="text-muted">View your projects, invoices, and documents from your personal portal.</span>
+  </div>
+  <div class="ms-auto">
+    <a href="{% url 'projects:project_list' %}" class="btn btn-primary btn-sm"><i class="fas fa-building me-1"></i>My Projects</a>
+    <a href="{% url 'invoices:list' %}" class="btn btn-outline-primary btn-sm"><i class="fas fa-receipt me-1"></i>My Invoices</a>
+  </div>
+</div>
+{% endif %}
+
+<div class="row g-3 mb-4">
+  <div class="col-xl-3 col-lg-4 col-md-6">
+    <div class="card stat-card h-100">
+      <div class="card-body d-flex align-items-center gap-3">
+        <div class="stat-icon bg-primary-soft"><i class="fas fa-building"></i></div>
+        <div><div class="stat-value">{{ total_projects|default:'0' }}</div><div class="stat-label">{% if is_client %}My Projects{% else %}Total Projects{% endif %}</div></div>
+      </div>
+    </div>
+  </div>
+  <div class="col-xl-3 col-lg-4 col-md-6">
+    <div class="card stat-card h-100">
+      <div class="card-body d-flex align-items-center gap-3">
+        <div class="stat-icon bg-info-soft"><i class="fas fa-sync-alt"></i></div>
+        <div><div class="stat-value">{{ active_projects|default:'0' }}</div><div class="stat-label">Active</div></div>
+      </div>
+    </div>
+  </div>
+  <div class="col-xl-3 col-lg-4 col-md-6">
+    <div class="card stat-card h-100">
+      <div class="card-body d-flex align-items-center gap-3">
+        <div class="stat-icon bg-success-soft"><i class="fas fa-check-circle"></i></div>
+        <div><div class="stat-value">{{ completed_projects|default:'0' }}</div><div class="stat-label">Completed</div></div>
+      </div>
+    </div>
+  </div>
+  {% if not is_client %}
+  <div class="col-xl-3 col-lg-4 col-md-6">
+    <div class="card stat-card h-100">
+      <div class="card-body d-flex align-items-center gap-3">
+        <div class="stat-icon bg-secondary-soft"><i class="fas fa-users"></i></div>
+        <div><div class="stat-value">{{ total_clients|default:'0' }}</div><div class="stat-label">Total Clients</div></div>
+      </div>
+    </div>
+  </div>
+  {% endif %}
+  <div class="col-xl-3 col-lg-4 col-md-6">
+    <div class="card stat-card h-100">
+      <div class="card-body d-flex align-items-center gap-3">
+        <div class="stat-icon bg-warning-soft"><i class="fas fa-receipt"></i></div>
+        <div><div class="stat-value">{{ pending_invoices|default:'0' }}</div><div class="stat-label">Pending Invoices</div></div>
+      </div>
+    </div>
+  </div>
+  {% if not is_client %}
+  <div class="col-xl-3 col-lg-4 col-md-6">
+    <div class="card stat-card h-100">
+      <div class="card-body d-flex align-items-center gap-3">
+        <div class="stat-icon bg-danger-soft"><i class="fas fa-chart-line"></i></div>
+        <div><div class="stat-value">KES {{ monthly_revenue|floatformat:'0'|default:'0' }}</div><div class="stat-label">Monthly Revenue</div></div>
+      </div>
+    </div>
+  </div>
+  <div class="col-xl-3 col-lg-4 col-md-6">
+    <div class="card stat-card h-100">
+      <div class="card-body d-flex align-items-center gap-3">
+        <div class="stat-icon bg-dark-soft"><i class="fas fa-id-badge"></i></div>
+        <div><div class="stat-value">{{ total_employees|default:'0' }}</div><div class="stat-label">Total Employees</div></div>
+      </div>
+    </div>
+  </div>
+  {% endif %}
+</div>
+
+{% if not is_client %}
+<div class="row g-4 mb-4">
+  <div class="col-xl-8">
+    <div class="card stat-card">
+      <div class="card-body">
+        <div class="section-title"><i class="fas fa-chart-bar me-2"></i>Revenue Trends</div>
+        <div class="chart-container"><canvas id="revenueChart"></canvas></div>
+      </div>
+    </div>
+  </div>
+  <div class="col-xl-4">
+    <div class="card stat-card">
+      <div class="card-body">
+        <div class="section-title"><i class="fas fa-chart-pie me-2"></i>Project Progress</div>
+        <div class="chart-container"><canvas id="projectProgressChart"></canvas></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="row g-4">
+  <div class="col-xl-8">
+    <div class="card stat-card">
+      <div class="card-body">
+        <div class="section-title d-flex justify-content-between align-items-center">
+          <span><i class="fas fa-activity me-2"></i>Recent Activity Feed</span>
+          <a href="{% url 'admin:core_activitylog_changelist' %}" class="btn btn-sm btn-outline-primary">View All</a>
+        </div>
+        <div class="activity-feed">
+          <table class="table table-hover mb-0">
+            <thead>
+              <tr>
+                <th>User</th>
+                <th>Action</th>
+                <th>Model</th>
+                <th>Date</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for log in activity_logs %}
+              <tr>
+                <td>
+                  <span class="badge badge-role bg-primary-soft">{{ log.user.get_full_name|default:log.user.username }}</span>
+                </td>
+                <td>{{ log.action }}</td>
+                <td><span class="badge bg-light text-dark">{{ log.model_name }}</span></td>
+                <td><small class="text-muted">{{ log.created_at|timesince }} ago</small></td>
+              </tr>
+              {% empty %}
+              <tr>
+                <td colspan="4" class="text-center text-muted py-3">No recent activity</td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="col-xl-4">
+    <div class="card stat-card">
+      <div class="card-body">
+        <div class="section-title"><i class="fas fa-chart-pie me-2"></i>Material Usage</div>
+        <div class="chart-container"><canvas id="materialChart"></canvas></div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endif %}
+{% endblock %}
+{% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+  var revenueCtx = document.getElementById('revenueChart').getContext('2d');
+  new Chart(revenueCtx, {
+    type: 'line',
+    data: {
+      labels: {{ revenue_labels|safe }},
+      datasets: [{
+        label: 'Revenue (KES)',
+        data: {{ revenue_data|safe }},
+        borderColor: '#1a3c6e',
+        backgroundColor: 'rgba(26,60,110,0.08)',
+        borderWidth: 3,
+        pointBackgroundColor: '#1a3c6e',
+        pointBorderColor: '#fff',
+        pointBorderWidth: 2,
+        pointRadius: 5,
+        tension: 0.35,
+        fill: true,
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: { legend: { display: false } },
+      scales: {
+        y: { beginAtZero: true, ticks: { callback: function(v) { return 'KES ' + v.toLocaleString(); } } },
+        x: { grid: { display: false } }
+      }
+    }
+  });
+
+  var progressCtx = document.getElementById('projectProgressChart').getContext('2d');
+  new Chart(progressCtx, {
+    type: 'bar',
+    data: {
+      labels: ['Total', 'Active', 'Completed'],
+      datasets: [{
+        label: 'Projects',
+        data: [{{ total_projects|default:'0' }}, {{ active_projects|default:'0' }}, {{ completed_projects|default:'0' }}],
+        backgroundColor: ['#1a3c6e', '#17a2b8', '#28a745'],
+        borderRadius: 6,
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: { legend: { display: false } },
+      scales: { y: { beginAtZero: true, ticks: { stepSize: 1 } }, x: { grid: { display: false } } }
+    }
+  });
+
+  var materialCtx = document.getElementById('materialChart').getContext('2d');
+  new Chart(materialCtx, {
+    type: 'pie',
+    data: {
+      labels: ['Cement', 'Steel', 'Timber', 'Aggregates', 'Other'],
+      datasets: [{
+        data: [35, 25, 15, 15, 10],
+        backgroundColor: ['#1a3c6e', '#17a2b8', '#28a745', '#ffc107', '#dc3545'],
+        borderWidth: 0,
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: { legend: { position: 'bottom', labels: { padding: 12, usePointStyle: true } } }
+    }
+  });
+</script>
+{% endblock %}

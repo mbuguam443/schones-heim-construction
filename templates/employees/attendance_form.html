@@ -1,0 +1,29 @@
+{% extends 'base.html' %}
+{% load crispy_forms_tags %}
+{% block title %}{{ title|default:"Mark Attendance" }} - {{ site_name }}{% endblock %}
+{% block content %}
+<div class="page-title">
+    <i class="fas fa-calendar-plus"></i> {{ title|default:"Mark Attendance" }}
+</div>
+
+<div class="card">
+    <div class="card-header"><i class="fas fa-edit"></i> Attendance Details</div>
+    <div class="card-body">
+        <form method="post" novalidate>
+            {% csrf_token %}
+            {{ form|crispy }}
+            <div class="mt-4">
+                <button type="submit" class="btn btn-primary">
+                    <i class="fas fa-check"></i> {% if is_update %}Update{% else %}Save Attendance{% endif %}
+                </button>
+                <a href="{% url 'employees:attendance_list' %}" class="btn btn-secondary">Cancel</a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}
+{% block extra_js %}
+<script>
+    flatpickr('.flatpickr-date', { dateFormat: 'Y-m-d', allowInput: true });
+</script>
+{% endblock %}

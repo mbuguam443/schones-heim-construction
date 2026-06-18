@@ -1,0 +1,52 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}Site Reports - SCHONES HEIM BUILDERS{% endblock %}
+{% block page_title %}Site Reports{% endblock %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
+  <div class="d-flex gap-2 align-items-center">
+    <form method="get" class="d-flex gap-2 align-items-center flex-wrap">
+      <select name="project" class="form-select form-select-sm" style="width:auto;">
+        <option value="">All Projects</option>
+        {% for pid, pname in projects %}
+        <option value="{{ pid }}" {% if request.GET.project == pid|stringformat:'s' %}selected{% endif %}>{{ pname }}</option>
+        {% endfor %}
+      </select>
+      <input type="date" name="date_from" class="form-control form-control-sm" style="width:auto;" value="{{ request.GET.date_from }}">
+      <input type="date" name="date_to" class="form-control form-control-sm" style="width:auto;" value="{{ request.GET.date_to }}">
+      <button type="submit" class="btn btn-sm btn-shb"><i class="fas fa-filter"></i> Filter</button>
+    </form>
+  </div>
+  <a href="{% url 'site_reports:report_create' %}" class="btn btn-shb btn-sm"><i class="fas fa-plus"></i> New Report</a>
+</div>
+<div class="card">
+  <div class="card-body p-0">
+    <div class="table-responsive">
+      <table class="table table-hover mb-0">
+        <thead>
+          <tr><th>Date</th><th>Project</th><th>Weather</th><th>Workers</th><th>Submitted By</th><th>Actions</th></tr>
+        </thead>
+        <tbody>
+          {% for report in reports %}
+          <tr>
+            <td>{{ report.date }}</td>
+            <td><a href="{% url 'site_reports:report_detail' report.pk %}" class="text-decoration-none">{{ report.project }}</a></td>
+            <td>{{ report.weather|default:'--' }}</td>
+            <td>{{ report.workers_present }}</td>
+            <td>{{ report.submitted_by|default:'--' }}</td>
+            <td>
+              <a href="{% url 'site_reports:report_detail' report.pk %}" class="btn btn-sm btn-outline-secondary" title="View"><i class="fas fa-eye"></i></a>
+              <a href="{% url 'site_reports:report_update' report.pk %}" class="btn btn-sm btn-outline-primary" title="Edit"><i class="fas fa-pen"></i></a>
+              <a href="{% url 'site_reports:report_export_pdf' report.pk %}" class="btn btn-sm btn-outline-info" title="Export PDF"><i class="fas fa-file-pdf"></i></a>
+              <a href="{% url 'site_reports:report_delete' report.pk %}" class="btn btn-sm btn-outline-danger" title="Delete"><i class="fas fa-trash"></i></a>
+            </td>
+          </tr>
+          {% empty %}
+          <tr><td colspan="6" class="text-center text-muted py-4">No site reports found.</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,30 @@
+{% extends 'base.html' %}
+{% load crispy_forms_tags %}
+
+{% block title %}{% if client %}Edit{% else %}New{% endif %} Client - SCHONES HEIM BUILDERS{% endblock %}
+{% block page_header %}{% if client %}Edit Client{% else %}New Client{% endif %}{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-lg-8">
+        <div class="card">
+            <div class="card-header">
+                <i class="fas fa-{% if client %}pencil{% else %}plus-circle{% endif %} me-1"></i>
+                {% if client %}Edit{% else %}Create{% endif %} Client
+            </div>
+            <div class="card-body">
+                <form method="post">
+                    {% csrf_token %}
+                    {{ form|crispy }}
+                    <div class="d-flex gap-2 mt-4">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-check"></i> {% if client %}Update{% else %}Save{% endif %}
+                        </button>
+                        <a href="{% url 'clients:client_list' %}" class="btn btn-outline-secondary">Cancel</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,139 @@
+{% extends 'base.html' %}
+{% load static crispy_forms_tags %}
+{% block title %}Employees - {{ site_name }}{% endblock %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center page-title">
+    <h4 class="mb-0"><i class="fas fa-users"></i> Employees</h4>
+    <a href="{% url 'employees:employee_create' %}" class="btn btn-primary"><i class="fas fa-plus"></i> Add Employee</a>
+</div>
+
+<div class="row mb-3">
+    <div class="col-md-3">
+        <div class="card stat-card">
+            <i class="fas fa-id-badge"></i>
+            <div class="number">{{ total_count }}</div>
+            <div class="label">Total Employees</div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card stat-card">
+            <i class="fas fa-check-circle text-success"></i>
+            <div class="number">{{ active_count }}</div>
+            <div class="label">Active</div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card stat-card">
+            <i class="fas fa-times-circle text-danger"></i>
+            <div class="number">{{ total_count|add:"-active_count" }}</div>
+            <div class="label">Inactive</div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card stat-card">
+            <i class="fas fa-truck text-warning"></i>
+            <div class="number">{{ departments|length }}</div>
+            <div class="label">Departments</div>
+        </div>
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-header"><i class="fas fa-search"></i> Search & Filter</div>
+    <div class="card-body">
+        <form method="get" class="row g-3">
+            <div class="col-md-5">
+                <input type="text" name="q" class="form-control" placeholder="Search by name, ID, phone, position..." value="{{ request.GET.q }}">
+            </div>
+            <div class="col-md-3">
+                <select name="department" class="form-select">
+                    <option value="">All Departments</option>
+                    {% for val, label in departments %}
+                        <option value="{{ val }}" {% if request.GET.department == val %}selected{% endif %}>{{ label }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-md-2">
+                <select name="status" class="form-select">
+                    <option value="">All</option>
+                    <option value="active" {% if request.GET.status == 'active' %}selected{% endif %}>Active</option>
+                    <option value="inactive" {% if request.GET.status == 'inactive' %}selected{% endif %}>Inactive</option>
+                </select>
+            </div>
+            <div class="col-md-2">
+                <button type="submit" class="btn btn-primary w-100"><i class="fas fa-filter"></i> Filter</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-header"><i class="fas fa-table"></i> Employee Records</div>
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table table-hover mb-0">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Name</th>
+                        <th>Phone</th>
+                        <th>Position</th>
+                        <th>Department</th>
+                        <th>Salary (KES)</th>
+                        <th>Status</th>
+                        <th class="text-end">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for emp in employees %}
+                    <tr>
+                        <td><span class="badge bg-secondary">{{ emp.employee_id }}</span></td>
+                        <td>
+                            <a href="{% url 'employees:employee_detail' emp.pk %}">
+                                {{ emp.user.get_full_name|default:emp.user.username }}
+                            </a>
+                        </td>
+                        <td>{{ emp.phone }}</td>
+                        <td>{{ emp.get_position_display }}</td>
+                        <td>{{ emp.get_department_display }}</td>
+                        <td>{{ emp.salary|floatformat:2 }}</td>
+                        <td>
+                            {% if emp.is_active %}
+                                <span class="badge bg-success">Active</span>
+                            {% else %}
+                                <span class="badge bg-danger">Inactive</span>
+                            {% endif %}
+                        </td>
+                        <td class="text-end">
+                            <a href="{% url 'employees:employee_detail' emp.pk %}" class="btn btn-sm btn-outline-info" title="View"><i class="fas fa-eye"></i></a>
+                            <a href="{% url 'employees:employee_update' emp.pk %}" class="btn btn-sm btn-outline-primary" title="Edit"><i class="fas fa-pen"></i></a>
+                            <a href="{% url 'employees:employee_delete' emp.pk %}" class="btn btn-sm btn-outline-danger" title="Delete"><i class="fas fa-trash"></i></a>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="8" class="text-center py-4 text-muted">No employees found.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+{% if is_paginated %}
+<nav class="mt-3">
+    <ul class="pagination justify-content-center">
+        {% if page_obj.has_previous %}
+            <li class="page-item"><a class="page-link" href="?page=1">&laquo; First</a></li>
+            <li class="page-item"><a class="page-link" href="?page={{ page_obj.previous_page_number }}">Previous</a></li>
+        {% endif %}
+        <li class="page-item active"><span class="page-link">Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}</span></li>
+        {% if page_obj.has_next %}
+            <li class="page-item"><a class="page-link" href="?page={{ page_obj.next_page_number }}">Next</a></li>
+            <li class="page-item"><a class="page-link" href="?page={{ page_obj.paginator.num_pages }}">Last &raquo;</a></li>
+        {% endif %}
+    </ul>
+</nav>
+{% endif %}
+{% endblock %}

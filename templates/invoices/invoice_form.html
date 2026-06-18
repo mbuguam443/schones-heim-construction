@@ -1,0 +1,157 @@
+{% extends 'base.html' %}
+{% load static crispy_forms_tags %}
+{% block title %}{{ object|yesno:"Update,Create" }} Invoice{% endblock %}
+
+{% block extra_css %}
+<style>
+    .formset-row td { vertical-align: middle; }
+    .formset-row .delete-row { color: #dc3545; cursor: pointer; }
+    .item-total { font-weight: 600; }
+    #items-table input[readonly] { background: #f8f9fa; cursor: default; }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h2><i class="fas fa-receipt"></i> {{ object|yesno:"Update,Create" }} Invoice</h2>
+</div>
+
+{% include 'includes/project_context_banner.html' %}
+
+<div class="row">
+    <div class="col-lg-8">
+        <div class="card shadow-sm mb-4">
+            <div class="card-header bg-primary text-white"><h5 class="mb-0">Invoice Details</h5></div>
+            <div class="card-body">
+                <form method="post" id="invoiceForm">
+                    {% csrf_token %}
+                    {{ form|crispy }}
+
+                    <hr><h5 class="text-primary">Line Items</h5>
+                    {{ items.management_form }}
+                    <div class="table-responsive">
+                        <table class="table table-bordered" id="items-table">
+                            <thead class="table-primary">
+                                <tr>
+                                    <th style="width:40%">Description</th>
+                                    <th style="width:10%">Qty</th>
+                                    <th style="width:10%">Unit</th>
+                                    <th style="width:15%">Unit Price (KSh)</th>
+                                    <th style="width:15%">Total (KSh)</th>
+                                    <th style="width:10%"></th>
+                                </tr>
+                            </thead>
+                            <tbody id="items-tbody">
+                                {% for item in items %}
+                                <tr class="formset-row">
+                                    <td>{{ item.id }}{{ item.description }}</td>
+                                    <td>{{ item.quantity }}</td>
+                                    <td>{{ item.unit }}</td>
+                                    <td>{{ item.unit_price }}</td>
+                                    <td>{{ item.total }}</td>
+                                    <td class="text-center">{{ item.DELETE }}<label for="{{ item.DELETE.id_for_label }}" class="delete-row" title="Remove"><i class="fas fa-trash"></i></label></td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                            <tfoot>
+                                <tr>
+                                    <td colspan="6">
+                                        <button type="button" class="btn btn-sm btn-outline-success" id="add-item"><i class="fas fa-plus-circle"></i> Add Item</button>
+                                    </td>
+                                </tr>
+                                <tr class="table-secondary fw-bold">
+                                    <td colspan="4" class="text-end">Subtotal:</td>
+                                    <td id="subtotal">0.00</td>
+                                    <td></td>
+                                </tr>
+                                <tr class="table-secondary fw-bold">
+                                    <td colspan="4" class="text-end">Tax ({{ form.tax_percent.value|default:16 }}%):</td>
+                                    <td id="tax-amount">0.00</td>
+                                    <td></td>
+                                </tr>
+                                <tr class="table-secondary fw-bold">
+                                    <td colspan="4" class="text-end">Discount:</td>
+                                    <td id="discount-amount">0.00</td>
+                                    <td></td>
+                                </tr>
+                                <tr class="table-primary fw-bold">
+                                    <td colspan="4" class="text-end">Grand Total:</td>
+                                    <td id="grand-total">0.00</td>
+                                    <td></td>
+                                </tr>
+                            </tfoot>
+                        </table>
+                    </div>
+
+                    <div class="d-flex gap-2 mt-3">
+                        <button type="submit" class="btn btn-primary"><i class="fas fa-save"></i> Save</button>
+                        <a href="{% url 'invoices:list' %}" class="btn btn-outline-secondary">Cancel</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    const emptyForm = `{{ items.empty_form.as_table|safe }}`;
+
+    function updateTotals() {
+        let subtotal = 0;
+        document.querySelectorAll('.formset-row').forEach(row => {
+            const qty = parseFloat(row.querySelector('.item-quantity')?.value) || 0;
+            const price = parseFloat(row.querySelector('.item-unit-price')?.value) || 0;
+            const totalEl = row.querySelector('.item-total');
+            const total = qty * price;
+            if (totalEl) totalEl.value = total.toFixed(2);
+            subtotal += total;
+        });
+        const taxPercent = parseFloat(document.querySelector('[name="tax_percent"]')?.value) || 0;
+        const discount = parseFloat(document.querySelector('[name="discount"]')?.value) || 0;
+        const tax = subtotal * taxPercent / 100;
+        const grandTotal = subtotal + tax - discount;
+        document.getElementById('subtotal').textContent = subtotal.toFixed(2);
+        document.getElementById('tax-amount').textContent = tax.toFixed(2);
+        document.getElementById('discount-amount').textContent = discount.toFixed(2);
+        document.getElementById('grand-total').textContent = grandTotal.toFixed(2);
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+        const tbody = document.getElementById('items-tbody');
+        const addBtn = document.getElementById('add-item');
+        const totalForms = document.querySelector('#id_items-TOTAL_FORMS');
+        let formIdx = parseInt(totalForms?.value) || 0;
+
+        addBtn?.addEventListener('click', function() {
+            const formHtml = emptyForm.replace(/__prefix__/g, formIdx).replace(/as_table/g, '').replace(/<tr><\/tr>/g, '');
+            const wrapper = document.createElement('tr');
+            wrapper.className = 'formset-row';
+            wrapper.innerHTML = formHtml;
+            tbody.appendChild(wrapper);
+            formIdx++;
+            if (totalForms) totalForms.value = formIdx;
+            updateTotals();
+        });
+
+        tbody.addEventListener('input', function(e) {
+            if (e.target.classList.contains('item-quantity') || e.target.classList.contains('item-unit-price')) {
+                updateTotals();
+            }
+        });
+
+        document.querySelector('[name="tax_percent"]')?.addEventListener('input', updateTotals);
+        document.querySelector('[name="discount"]')?.addEventListener('input', updateTotals);
+
+        tbody.addEventListener('change', function(e) {
+            if (e.target.type === 'checkbox' && e.target.id.includes('DELETE')) {
+                e.target.closest('tr').style.display = e.target.checked ? 'none' : '';
+                updateTotals();
+            }
+        });
+
+        updateTotals();
+    });
+</script>
+{% endblock %}
