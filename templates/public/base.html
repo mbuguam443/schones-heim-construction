@@ -4,6 +4,47 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="{% block meta_description %}Schones Heim Builders - Premier construction and general contracting company in Nairobi, Kenya. Quality residential, commercial, and industrial construction services.{% endblock %}">
+  <meta name="keywords" content="{% block meta_keywords %}construction company Kenya, building contractors Nairobi, Schones Heim Builders, general contracting, construction services Kenya, residential construction, commercial construction{% endblock %}">
+  <meta name="robots" content="index, follow">
+  <link rel="canonical" href="{% block canonical_url %}{{ request.build_absolute_uri }}{% endblock %}">
+
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="Schones Heim Builders">
+  <meta property="og:title" content="{% block og_title %}Schones Heim Builders - Premier Construction Company{% endblock %}">
+  <meta property="og:description" content="{% block og_description %}Schones Heim Builders - Premier construction and general contracting company in Nairobi, Kenya. Quality residential, commercial, and industrial construction services.{% endblock %}">
+  <meta property="og:image" content="{% block og_image %}{% static 'logo.png' %}{% endblock %}">
+  <meta property="og:url" content="{{ request.build_absolute_uri }}">
+  <meta property="og:locale" content="en_KE">
+
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="{% block twitter_title %}Schones Heim Builders - Premier Construction Company{% endblock %}">
+  <meta name="twitter:description" content="{% block twitter_description %}Schones Heim Builders - Premier construction and general contracting company in Nairobi, Kenya.{% endblock %}">
+  <meta name="twitter:image" content="{% static 'logo.png' %}">
+
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "Organization",
+    "name": "Schones Heim Builders",
+    "url": "https://{{ request.get_host }}",
+    "logo": "{% static 'logo.png' %}",
+    "description": "Premier construction and general contracting company based in Nairobi, Kenya.",
+    "contactPoint": {
+      "@type": "ContactPoint",
+      "telephone": "{{ company_settings.phone|default:'+254 711 100 306' }}",
+      "contactType": "customer service",
+      "email": "{{ company_settings.email|default:'schonesheimbuilders@gmail.com' }}"
+    },
+    "address": {
+      "@type": "PostalAddress",
+      "addressLocality": "Nairobi",
+      "addressCountry": "KE"
+    },
+    "sameAs": []
+  }
+  </script>
+
   <title>{% block title %}SCHONES HEIM BUILDERS{% endblock %} - Schones Heim Builders</title>
   <link rel="icon" type="image/png" href="{% static 'logo.png' %}">
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet">
