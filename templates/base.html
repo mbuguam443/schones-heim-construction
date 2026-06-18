@@ -395,39 +395,45 @@
 
   <script>
   (function() {
-    var bell = document.querySelector('.notification-bell');
-    var badge = bell ? bell.querySelector('.badge-count') : null;
-    if (!bell) return;
-    var prevCount = badge ? parseInt(badge.textContent, 10) : 0;
-    setInterval(function() {
+    function fetchCount(prev, cb) {
       var xhr = new XMLHttpRequest();
       xhr.open('GET', '/notifications/count/', true);
       xhr.onload = function() {
-        if (xhr.status === 200) {
-          var data = JSON.parse(xhr.responseText);
-          var c = data.count || 0;
-          if (c > 0) {
-            if (badge) { badge.textContent = c; }
-            else {
-              badge = document.createElement('span');
-              badge.className = 'badge-count';
-              badge.textContent = c;
-              bell.appendChild(badge);
-            }
-            bell.classList.add('has-unread');
-            if (c > prevCount) {
-              bell.classList.add('ringing');
-              setTimeout(function() { bell.classList.remove('ringing'); }, 2500);
-            }
-          } else {
-            if (badge) { badge.remove(); badge = null; }
-            bell.classList.remove('has-unread');
-          }
-          prevCount = c;
-        }
+        if (xhr.status === 200) cb(JSON.parse(xhr.responseText).count || 0);
       };
       xhr.send();
+    }
+    function updateBadge(c, prev) {
+      var bell = document.querySelector('.notification-bell');
+      if (!bell) return;
+      var badge = bell.querySelector('.badge-count');
+      if (c > 0) {
+        if (badge) badge.textContent = c;
+        else {
+          badge = document.createElement('span');
+          badge.className = 'badge-count';
+          badge.textContent = c;
+          bell.appendChild(badge);
+        }
+        if (c > prev) {
+          bell.classList.add('ringing');
+          setTimeout(function() { bell.classList.remove('ringing'); }, 2500);
+        }
+      } else {
+        if (badge) badge.remove();
+      }
+    }
+    var prevCount = (function() {
+      var b = document.querySelector('.notification-bell');
+      var bg = b ? b.querySelector('.badge-count') : null;
+      return bg ? parseInt(bg.textContent, 10) : 0;
+    })();
+    setInterval(function() {
+      fetchCount(prevCount, function(c) { updateBadge(c, prevCount); prevCount = c; });
     }, 30000);
+    document.addEventListener('visibilitychange', function() {
+      if (!document.hidden) fetchCount(prevCount, function(c) { updateBadge(c, prevCount); prevCount = c; });
+    });
   })();
   </script>
   {% block extra_js %}{% endblock %}
