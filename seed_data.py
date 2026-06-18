@@ -29,8 +29,8 @@ def create_company_settings():
         defaults={
             'company_name': 'SCHONES HEIM BUILDERS',
             'address': 'Nairobi, Kenya',
-            'phone': '+254 700 000 000',
-            'email': 'info@schonesheim.co.ke',
+            'phone': '+254 711 100 306',
+            'email': 'schonesheimbuilders@gmail.com',
             'kra_pin': 'P051234567Z',
             'mpesa_number': '0797770539',
             'bank_name': 'NCBA Bank',
