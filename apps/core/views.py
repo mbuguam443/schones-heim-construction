@@ -11,9 +11,13 @@ from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 from django.views.decorators.http import require_POST, require_http_methods
 
+from django.views.generic import ListView, CreateView, DetailView, UpdateView
+from django.urls import reverse_lazy
+from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
+
 from .decorators import role_required
-from .forms import CompanySettingsForm, LoginForm, UserProfileForm
-from .models import ActivityLog, CompanySettings, Notification, User
+from .forms import CompanySettingsForm, ClientInquiryForm, InquiryResponseForm, LoginForm, UserProfileForm
+from .models import ActivityLog, ClientInquiry, CompanySettings, Notification, User
 
 
 def login_view(request):
@@ -393,3 +397,93 @@ def contact_view(request):
     return render(request, 'public/contact.html', {
         'company_settings': company_settings,
     })
+
+
+# --- Client Inquiry System ---
+
+class ClientInquiryCreateView(LoginRequiredMixin, CreateView):
+    model = ClientInquiry
+    form_class = ClientInquiryForm
+    template_name = 'core/inquiry_form.html'
+    success_url = reverse_lazy('core:inquiry_list')
+
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        kwargs['user'] = self.request.user
+        return kwargs
+
+    def form_valid(self, form):
+        form.instance.client = self.request.user
+        resp = super().form_valid(form)
+        Notification.objects.create(
+            recipient=User.objects.filter(role='admin').first() or self.request.user,
+            title='New Client Inquiry',
+            message=f'{self.request.user.get_full_name()} submitted: {form.instance.subject}',
+            link='/inquiries/',
+        )
+        ActivityLog.objects.create(
+            user=self.request.user,
+            action=f'Submitted inquiry: {form.instance.subject}',
+        )
+        messages.success(self.request, 'Your inquiry has been submitted. We will respond shortly.')
+        return resp
+
+    def test_func(self):
+        return self.request.user.role == 'client'
+
+
+class ClientInquiryListView(LoginRequiredMixin, ListView):
+    model = ClientInquiry
+    template_name = 'core/inquiry_list.html'
+    context_object_name = 'inquiries'
+    paginate_by = 15
+
+    def get_queryset(self):
+        if self.request.user.role == 'client':
+            return ClientInquiry.objects.filter(client=self.request.user)
+        return ClientInquiry.objects.all()
+
+
+class ClientInquiryDetailView(LoginRequiredMixin, DetailView):
+    model = ClientInquiry
+    template_name = 'core/inquiry_detail.html'
+    context_object_name = 'inquiry'
+
+    def get_queryset(self):
+        if self.request.user.role == 'client':
+            return ClientInquiry.objects.filter(client=self.request.user)
+        return ClientInquiry.objects.all()
+
+    def get_context_data(self, **kwargs):
+        ctx = super().get_context_data(**kwargs)
+        ctx['can_respond'] = self.request.user.role != 'client'
+        ctx['response_form'] = InquiryResponseForm()
+        return ctx
+
+
+@login_required
+@require_POST
+def respond_to_inquiry(request, pk):
+    inquiry = get_object_or_404(ClientInquiry, pk=pk)
+    if request.user.role == 'client':
+        messages.error(request, 'You cannot respond to inquiries.')
+        return redirect('core:inquiry_detail', pk=pk)
+    form = InquiryResponseForm(request.POST)
+    if form.is_valid():
+        inquiry.response = form.cleaned_data['response']
+        inquiry.status = form.cleaned_data['status']
+        inquiry.responded_by = request.user
+        inquiry.responded_at = timezone.now()
+        inquiry.save()
+        Notification.objects.create(
+            recipient=inquiry.client,
+            title='Inquiry Response',
+            message=f'Your inquiry "{inquiry.subject}" has been updated: {inquiry.get_status_display()}',
+            link=f'/inquiries/{pk}/',
+        )
+        ActivityLog.objects.create(
+            user=request.user,
+            action=f'Responded to inquiry #{pk}: {inquiry.subject}',
+        )
+        messages.success(request, 'Response submitted successfully.')
+    return redirect('core:inquiry_detail', pk=pk)

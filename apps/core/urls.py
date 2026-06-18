@@ -28,4 +28,9 @@ urlpatterns = [
     path('users/<int:pk>/edit/', views.UserUpdateView.as_view(), name='user_update'),
     path('users/<int:pk>/delete/', views.UserDeleteView.as_view(), name='user_delete'),
     path('users/<int:pk>/reset-password/', views.UserPasswordResetView.as_view(), name='user_password_reset'),
+    # Client Inquiries
+    path('inquiries/', views.ClientInquiryListView.as_view(), name='inquiry_list'),
+    path('inquiries/create/', views.ClientInquiryCreateView.as_view(), name='inquiry_create'),
+    path('inquiries/<int:pk>/', views.ClientInquiryDetailView.as_view(), name='inquiry_detail'),
+    path('inquiries/<int:pk>/respond/', views.respond_to_inquiry, name='inquiry_respond'),
 ]

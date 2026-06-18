@@ -1,6 +1,6 @@
 from django import forms
 from django.contrib.auth.forms import AuthenticationForm, UserCreationForm, UserChangeForm
-from .models import CompanySettings, User
+from .models import CompanySettings, User, ClientInquiry
 from apps.clients.models import Client
 
 
@@ -107,3 +107,37 @@ class UserPasswordResetForm(forms.Form):
         if p1 and p2 and p1 != p2:
             raise forms.ValidationError('Passwords do not match.')
         return cleaned
+
+
+class ClientInquiryForm(forms.ModelForm):
+    class Meta:
+        model = ClientInquiry
+        fields = ('subject', 'message', 'project')
+        widgets = {
+            'subject': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'e.g. Question about my project'}),
+            'message': forms.Textarea(attrs={'class': 'form-control', 'rows': 5, 'placeholder': 'Describe your inquiry in detail...'}),
+            'project': forms.Select(attrs={'class': 'form-select'}),
+        }
+
+    def __init__(self, *args, **kwargs):
+        self.user = kwargs.pop('user', None)
+        super().__init__(*args, **kwargs)
+        from apps.projects.models import Project
+        if self.user and hasattr(self.user, 'client_profile') and self.user.client_profile:
+            self.fields['project'].queryset = Project.objects.filter(client=self.user.client_profile)
+            self.fields['project'].empty_label = '-- Not project-specific --'
+        else:
+            self.fields['project'].queryset = Project.objects.none()
+            self.fields['project'].empty_label = '-- No projects available --'
+
+
+class InquiryResponseForm(forms.Form):
+    response = forms.CharField(
+        widget=forms.Textarea(attrs={'class': 'form-control', 'rows': 4, 'placeholder': 'Write your response...'}),
+        label='Your Response',
+    )
+    status = forms.ChoiceField(
+        choices=[('in_progress', 'In Progress'), ('resolved', 'Resolved'), ('closed', 'Closed')],
+        widget=forms.Select(attrs={'class': 'form-select'}),
+        label='Update Status',
+    )

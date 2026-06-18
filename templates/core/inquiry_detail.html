@@ -1,0 +1,74 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}Inquiry Details{% endblock %}
+{% block content %}
+<div class="row justify-content-center">
+  <div class="col-lg-10">
+    <div class="mb-3">
+      <a href="{% url 'core:inquiry_list' %}" class="btn btn-outline-secondary btn-sm" style="border-radius:6px;">
+        <i class="fas fa-arrow-left me-1"></i>Back to Inquiries
+      </a>
+    </div>
+
+    <div class="card" style="border:none; border-radius:12px; box-shadow:0 2px 10px rgba(0,0,0,0.06);">
+      <div class="card-header d-flex justify-content-between align-items-center" style="background:#1a3c6e; color:#fff; border-radius:12px 12px 0 0; padding:20px 25px;">
+        <div>
+          <h5 class="mb-1"><i class="fas fa-question-circle me-2"></i>{{ inquiry.subject }}</h5>
+          <small class="opacity-75">
+            {% if user.role != 'client' %}{{ inquiry.client.get_full_name }} &middot; {% endif %}
+            {{ inquiry.created_at|date:"d M Y H:i" }}
+            {% if inquiry.project %} &middot; Project: {{ inquiry.project.name }}{% endif %}
+          </small>
+        </div>
+        <div>
+          {% if inquiry.status == 'open' %}
+            <span class="badge bg-warning text-dark" style="font-size:0.85rem;">Open</span>
+          {% elif inquiry.status == 'in_progress' %}
+            <span class="badge bg-info text-dark" style="font-size:0.85rem;">In Progress</span>
+          {% elif inquiry.status == 'resolved' %}
+            <span class="badge bg-success" style="font-size:0.85rem;">Resolved</span>
+          {% else %}
+            <span class="badge bg-secondary" style="font-size:0.85rem;">Closed</span>
+          {% endif %}
+        </div>
+      </div>
+
+      <div class="card-body p-4">
+        <div style="background:#f8f9fa; border-radius:8px; padding:20px; margin-bottom:20px; border-left:4px solid #1a3c6e;">
+          <small class="text-muted fw-semibold">FROM {{ inquiry.client.get_full_name|upper }}</small>
+          <p class="mb-0 mt-2" style="white-space:pre-wrap;">{{ inquiry.message }}</p>
+        </div>
+
+        {% if inquiry.response %}
+        <div style="background:#f0f8f0; border-radius:8px; padding:20px; margin-bottom:20px; border-left:4px solid #28a745;">
+          <small class="text-muted fw-semibold">RESPONSE FROM {{ inquiry.responded_by.get_full_name|upper }}</small>
+          <p class="mb-0 mt-2" style="white-space:pre-wrap;">{{ inquiry.response }}</p>
+          <small class="text-muted mt-2 d-block">{{ inquiry.responded_at|date:"d M Y H:i" }}</small>
+        </div>
+        {% endif %}
+
+        {% if can_respond %}
+        <hr>
+        <h6 class="fw-semibold mb-3" style="color:#1a3c6e;"><i class="fas fa-reply me-1"></i>Respond to Inquiry</h6>
+        <form method="post" action="{% url 'core:inquiry_respond' inquiry.pk %}">
+          {% csrf_token %}
+          <div class="mb-3">
+            <label class="form-label fw-semibold">{{ response_form.response.label }}</label>
+            {{ response_form.response }}
+          </div>
+          <div class="row mb-3">
+            <div class="col-md-4">
+              <label class="form-label fw-semibold">{{ response_form.status.label }}</label>
+              {{ response_form.status }}
+            </div>
+          </div>
+          <button type="submit" class="btn" style="background:#1a3c6e; color:#fff; border-radius:8px; padding:10px 25px; font-weight:600;">
+            <i class="fas fa-paper-plane me-1"></i>Submit Response
+          </button>
+        </form>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
