@@ -15,7 +15,7 @@
   <div class="user-area">
     {% with unread_count=user.notifications.all.count %}
     <div class="dropdown" style="position:relative;">
-      <a href="{% url 'core:notifications' %}" class="notification-bell{% if unread_count > 0 %} has-unread{% endif %}" title="Notifications">
+      <a href="{% url 'core:notifications' %}" class="notification-bell" title="Notifications">
         <i class="fas fa-bell"></i>
         {% if unread_count > 0 %}
           <span class="badge-count">{{ unread_count }}</span>

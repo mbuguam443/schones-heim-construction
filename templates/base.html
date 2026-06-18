@@ -133,8 +133,8 @@
       transition: color 0.2s;
     }
     .top-bar .notification-bell:hover { color: #1a3c6e; }
-    .top-bar .notification-bell.has-unread i {
-      animation: bell-ring 2s ease-in-out infinite;
+    .top-bar .notification-bell.ringing i {
+      animation: bell-ring 0.6s ease-in-out 4;
     }
     @keyframes bell-ring {
       0%, 30%, 60%, 100% { transform: rotate(0); }
@@ -398,25 +398,32 @@
     var bell = document.querySelector('.notification-bell');
     var badge = bell ? bell.querySelector('.badge-count') : null;
     if (!bell) return;
+    var prevCount = badge ? parseInt(badge.textContent, 10) : 0;
     setInterval(function() {
       var xhr = new XMLHttpRequest();
       xhr.open('GET', '/notifications/count/', true);
       xhr.onload = function() {
         if (xhr.status === 200) {
           var data = JSON.parse(xhr.responseText);
-          if (data.count > 0) {
-            if (badge) { badge.textContent = data.count; }
+          var c = data.count || 0;
+          if (c > 0) {
+            if (badge) { badge.textContent = c; }
             else {
-              var b = document.createElement('span');
-              b.className = 'badge-count';
-              b.textContent = data.count;
-              bell.appendChild(b);
+              badge = document.createElement('span');
+              badge.className = 'badge-count';
+              badge.textContent = c;
+              bell.appendChild(badge);
             }
             bell.classList.add('has-unread');
+            if (c > prevCount) {
+              bell.classList.add('ringing');
+              setTimeout(function() { bell.classList.remove('ringing'); }, 2500);
+            }
           } else {
-            if (badge) badge.remove();
+            if (badge) { badge.remove(); badge = null; }
             bell.classList.remove('has-unread');
           }
+          prevCount = c;
         }
       };
       xhr.send();
