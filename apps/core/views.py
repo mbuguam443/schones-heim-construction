@@ -1,16 +1,18 @@
 import json
+import os
 from datetime import datetime, timedelta
 
 from django.contrib import messages
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from django.db.models import Count, Sum
-from django.http import JsonResponse
+from django.http import JsonResponse, HttpResponse
 from django.db.models.functions import TruncMonth
 from django.shortcuts import get_object_or_404, redirect, render
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 from django.views.decorators.http import require_POST, require_http_methods
+from django.views.decorators.cache import cache_control
 
 from django.views.generic import ListView, CreateView, DetailView, UpdateView
 from django.urls import reverse_lazy
@@ -402,6 +404,38 @@ def contact_view(request):
     return render(request, 'public/contact.html', {
         'company_settings': company_settings,
     })
+
+
+@cache_control(max_age=86400)
+def robots_txt(request):
+    content = """User-agent: *
+Allow: /
+Disallow: /dashboard/
+Disallow: /login/
+Disallow: /admin/
+Disallow: /users/
+Disallow: /notifications/
+Disallow: /settings/
+Disallow: /inquiries/
+
+Sitemap: https://schones-heim-builders.co.ke/sitemap.xml
+"""
+    return HttpResponse(content, content_type='text/plain')
+
+
+@cache_control(max_age=86400)
+def sitemap_xml(request):
+    from django.contrib.staticfiles.storage import staticfiles_storage
+    sitemap_url = staticfiles_storage.url('sitemap.xml')
+    import urllib.request
+    try:
+        from django.conf import settings
+        sitemap_path = settings.STATIC_ROOT / 'sitemap.xml' if hasattr(settings.STATIC_ROOT, '__truediv__') else os.path.join(str(settings.STATIC_ROOT), 'sitemap.xml')
+        with open(sitemap_path, 'r') as f:
+            content = f.read()
+        return HttpResponse(content, content_type='application/xml')
+    except:
+        return HttpResponse('<?xml version="1.0" encoding="UTF-8"?><urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"></urlset>', content_type='application/xml')
 
 
 @login_required

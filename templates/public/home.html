@@ -2,6 +2,13 @@
 {% load static %}
 {% block nav_home %}active{% endblock %}
 {% block title %}Home{% endblock %}
+{% block meta_description %}Schones Heim Builders - Premier construction and general contracting company in Nairobi, Kenya. Quality residential, commercial, and industrial construction services. Get a free quote today.{% endblock %}
+{% block meta_keywords %}construction company Nairobi, building contractors Kenya, general contractor Nairobi, residential construction Kenya, commercial construction Nairobi, Schones Heim Builders, construction services Kenya{% endblock %}
+{% block og_title %}Schones Heim Builders - Premier Construction Company in Nairobi, Kenya{% endblock %}
+{% block og_description %}Premier construction and general contracting company in Nairobi, Kenya. 10+ projects completed. Residential, commercial & industrial construction services.{% endblock %}
+{% block og_url %}https://schones-heim-builders.co.ke/{% endblock %}
+{% block twitter_title %}Schones Heim Builders - Premier Construction Company Nairobi{% endblock %}
+{% block twitter_description %}Premier construction and general contracting company in Nairobi, Kenya. Quality residential, commercial & industrial construction.{% endblock %}
 
 {% block extra_css %}
 <style>
@@ -36,7 +43,6 @@
   .reveal-delay-4 { transition-delay: 0.4s; }
   .reveal-delay-5 { transition-delay: 0.5s; }
   .reveal-delay-6 { transition-delay: 0.6s; }
-
   .service-card {
     transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.3s;
   }
@@ -78,23 +84,23 @@
     <div class="row align-items-center">
       <div class="col-lg-7">
         <h1 class="hero-title">Building Dreams,<br>Constructing Realities</h1>
-        <p class="hero-subtitle mt-3 mb-4">Schones Heim Builders is a premier construction and general contracting company dedicated to delivering excellence in every project we undertake.</p>
+        <p class="hero-subtitle mt-3 mb-4">Schones Heim Builders is a premier construction and general contracting company dedicated to delivering excellence in every project we undertake across Kenya.</p>
         <div class="hero-btn">
-          <a href="{% url 'core:contact' %}" class="btn btn-light btn-lg me-3"><i class="fas fa-phone me-2"></i>Get a Quote</a>
+          <a href="{% url 'core:contact' %}" class="btn btn-light btn-lg me-3"><i class="fas fa-phone me-2"></i>Get a Free Quote</a>
           <a href="{% url 'core:services' %}" class="btn btn-outline-light btn-lg">Our Services</a>
         </div>
       </div>
       <div class="col-lg-5 text-center mt-4 mt-lg-0">
-        <img src="{% static 'homepage.png' %}" alt="Schones Heim Builders" style="max-width:100%; border-radius:16px; box-shadow:0 8px 30px rgba(0,0,0,0.3);">
+        <img src="{% static 'homepage.png' %}" alt="Schones Heim Builders - Premier Construction Company in Nairobi Kenya" style="max-width:100%; border-radius:16px; box-shadow:0 8px 30px rgba(0,0,0,0.3);" width="500" height="400" loading="eager">
       </div>
     </div>
   </div>
 </section>
 
-<section class="py-5" id="stats-section">
+<section class="py-5" id="stats-section" aria-label="Company Statistics">
   <div class="container">
     <div class="row text-center g-4">
-      <div class="col-md-3 col-6 reveal">
+      <div class="col-md-3 col-6 reveal" itemscope itemtype="https://schema.org/Organization">
         <div class="stat-number" data-target="{{ stats.projects_completed }}">{{ stats.projects_completed }}</div>
         <div class="stat-label">Projects Completed</div>
       </div>
@@ -114,64 +120,64 @@
   </div>
 </section>
 
-<section class="py-5 bg-light">
+<section class="py-5 bg-light" aria-label="Our Construction Services">
   <div class="container">
     <div class="text-center mb-5 reveal">
-      <h2 class="section-title">Our Services</h2>
-      <p class="section-subtitle">Comprehensive construction solutions tailored to your needs</p>
+      <h2 class="section-title">Our Construction Services</h2>
+      <p class="section-subtitle">Comprehensive construction solutions tailored to your needs in Nairobi and across Kenya</p>
     </div>
     <div class="row g-4">
-      <div class="col-md-4 reveal">
+      <div class="col-md-4 reveal" itemscope itemtype="https://schema.org/Service">
         <div class="card service-card text-center h-100">
           <div class="card-body">
-            <div class="service-icon"><i class="fas fa-drafting-compass"></i></div>
-            <h5>Design & Planning</h5>
-            <p class="text-muted small">Professional architectural design, structural engineering, and project planning services.</p>
+            <div class="service-icon"><i class="fas fa-drafting-compass" aria-hidden="true"></i></div>
+            <h3 itemprop="name">Design & Planning</h3>
+            <p class="text-muted small" itemprop="description">Professional architectural design, structural engineering, and project planning services for residential and commercial buildings.</p>
           </div>
         </div>
       </div>
-      <div class="col-md-4 reveal reveal-delay-1">
+      <div class="col-md-4 reveal reveal-delay-1" itemscope itemtype="https://schema.org/Service">
         <div class="card service-card text-center h-100">
           <div class="card-body">
-            <div class="service-icon"><i class="fas fa-hard-hat"></i></div>
-            <h5>General Contracting</h5>
-            <p class="text-muted small">Full-service general contracting for residential, commercial, and industrial projects.</p>
+            <div class="service-icon"><i class="fas fa-hard-hat" aria-hidden="true"></i></div>
+            <h3 itemprop="name">General Contracting</h3>
+            <p class="text-muted small" itemprop="description">Full-service general contracting for residential, commercial, and industrial projects across Nairobi and Kenya.</p>
           </div>
         </div>
       </div>
-      <div class="col-md-4 reveal reveal-delay-2">
+      <div class="col-md-4 reveal reveal-delay-2" itemscope itemtype="https://schema.org/Service">
         <div class="card service-card text-center h-100">
           <div class="card-body">
-            <div class="service-icon"><i class="fas fa-tools"></i></div>
-            <h5>Renovations</h5>
-            <p class="text-muted small">Interior and exterior renovations, remodels, and fit-outs for existing structures.</p>
+            <div class="service-icon"><i class="fas fa-tools" aria-hidden="true"></i></div>
+            <h3 itemprop="name">Renovations & Fit-outs</h3>
+            <p class="text-muted small" itemprop="description">Interior and exterior renovations, remodels, office fit-outs, and home improvement services.</p>
           </div>
         </div>
       </div>
-      <div class="col-md-4 reveal reveal-delay-3">
+      <div class="col-md-4 reveal reveal-delay-3" itemscope itemtype="https://schema.org/Service">
         <div class="card service-card text-center h-100">
           <div class="card-body">
-            <div class="service-icon"><i class="fas fa-water"></i></div>
-            <h5>Plumbing & Electrical</h5>
-            <p class="text-muted small">Complete plumbing, electrical installation, and MEP works for all building types.</p>
+            <div class="service-icon"><i class="fas fa-water" aria-hidden="true"></i></div>
+            <h3 itemprop="name">Plumbing & Electrical</h3>
+            <p class="text-muted small" itemprop="description">Complete plumbing, electrical installation, and MEP works for all building types in Kenya.</p>
           </div>
         </div>
       </div>
-      <div class="col-md-4 reveal reveal-delay-4">
+      <div class="col-md-4 reveal reveal-delay-4" itemscope itemtype="https://schema.org/Service">
         <div class="card service-card text-center h-100">
           <div class="card-body">
-            <div class="service-icon"><i class="fas fa-paint-roller"></i></div>
-            <h5>Finishing Works</h5>
-            <p class="text-muted small">Tiling, painting, flooring, cabinetry, and all interior finishing services.</p>
+            <div class="service-icon"><i class="fas fa-paint-roller" aria-hidden="true"></i></div>
+            <h3 itemprop="name">Finishing Works</h3>
+            <p class="text-muted small" itemprop="description">Tiling, painting, flooring, cabinetry, and all interior finishing services to complete your project.</p>
           </div>
         </div>
       </div>
-      <div class="col-md-4 reveal reveal-delay-5">
+      <div class="col-md-4 reveal reveal-delay-5" itemscope itemtype="https://schema.org/Service">
         <div class="card service-card text-center h-100">
           <div class="card-body">
-            <div class="service-icon"><i class="fas fa-road"></i></div>
-            <h5>Infrastructure</h5>
-            <p class="text-muted small">Roads, drainage, water supply systems, and civil infrastructure development.</p>
+            <div class="service-icon"><i class="fas fa-road" aria-hidden="true"></i></div>
+            <h3 itemprop="name">Infrastructure</h3>
+            <p class="text-muted small" itemprop="description">Roads, drainage, water supply systems, and civil infrastructure development for communities and organizations.</p>
           </div>
         </div>
       </div>
@@ -180,21 +186,21 @@
 </section>
 
 {% if projects %}
-<section class="py-5">
+<section class="py-5" aria-label="Our Construction Projects">
   <div class="container">
     <div class="text-center mb-5 reveal">
-      <h2 class="section-title">Our Projects</h2>
-      <p class="section-subtitle">Showcasing our commitment to quality and excellence</p>
+      <h2 class="section-title">Our Recent Projects</h2>
+      <p class="section-subtitle">Showcasing our commitment to quality and excellence in construction</p>
     </div>
     <div class="row g-4">
       {% for p in projects %}
-      <div class="col-md-4 reveal {% if forloop.counter == 2 %}reveal-delay-1{% elif forloop.counter == 3 %}reveal-delay-2{% endif %}">
+      <div class="col-md-4 reveal {% if forloop.counter == 2 %}reveal-delay-1{% elif forloop.counter == 3 %}reveal-delay-2{% endif %}" itemscope itemtype="https://schema.org/Project">
         <div class="card project-card h-100">
           <div class="card-body">
             <span class="badge bg-primary-custom mb-2">{{ p.get_status_display }}</span>
-            <h5>{{ p.name }}</h5>
-            <p class="text-muted small mb-1"><i class="fas fa-map-marker-alt me-1"></i>{{ p.location|default:'Nairobi' }}</p>
-            <p class="text-muted small mb-0">{{ p.description|truncatewords:20 }}</p>
+            <h3 itemprop="name">{{ p.name }}</h3>
+            <p class="text-muted small mb-1"><i class="fas fa-map-marker-alt me-1" aria-hidden="true"></i><span itemprop="location">{{ p.location|default:'Nairobi, Kenya' }}</span></p>
+            <p class="text-muted small mb-0" itemprop="description">{{ p.description|truncatewords:20 }}</p>
           </div>
         </div>
       </div>
@@ -204,11 +210,11 @@
 </section>
 {% endif %}
 
-<section class="py-5 bg-primary-custom text-white text-center cta-section">
+<section class="py-5 bg-primary-custom text-white text-center cta-section" aria-label="Call to Action">
   <div class="container position-relative" style="z-index:1;">
     <div class="reveal">
-      <h2 class="fw-bold mb-3">Ready to Start Your Project?</h2>
-      <p class="mb-4 opacity-75" style="font-size:1.1rem;">Get in touch with us for a free consultation and quotation.</p>
+      <h2 class="fw-bold mb-3">Ready to Start Your Construction Project?</h2>
+      <p class="mb-4 opacity-75" style="font-size:1.1rem;">Get in touch with Schones Heim Builders for a free consultation and quotation. We build across Nairobi and Kenya.</p>
       <a href="{% url 'core:contact' %}" class="btn btn-light btn-lg"><i class="fas fa-envelope me-2"></i>Contact Us Today</a>
     </div>
   </div>

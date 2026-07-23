@@ -1,0 +1,11 @@
+User-agent: *
+Allow: /
+Disallow: /dashboard/
+Disallow: /login/
+Disallow: /admin/
+Disallow: /users/
+Disallow: /notifications/
+Disallow: /settings/
+Disallow: /inquiries/
+
+Sitemap: https://schones-heim-builders.co.ke/sitemap.xml

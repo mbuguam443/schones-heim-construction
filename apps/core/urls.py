@@ -5,6 +5,9 @@ from . import views
 app_name = 'core'
 
 urlpatterns = [
+    # SEO
+    path('robots.txt', views.robots_txt, name='robots_txt'),
+    path('sitemap.xml', views.sitemap_xml, name='sitemap_xml'),
     # Public pages
     path('', views.home_view, name='home'),
     path('about/', views.about_view, name='about'),

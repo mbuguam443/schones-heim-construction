@@ -5,53 +5,138 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="description" content="{% block meta_description %}Schones Heim Builders - Premier construction and general contracting company in Nairobi, Kenya. Quality residential, commercial, and industrial construction services.{% endblock %}">
-  <meta name="keywords" content="{% block meta_keywords %}construction company Kenya, building contractors Nairobi, Schones Heim Builders, general contracting, construction services Kenya, residential construction, commercial construction{% endblock %}">
-  <meta name="robots" content="index, follow">
-  <link rel="canonical" href="{% block canonical_url %}{{ request.build_absolute_uri }}{% endblock %}">
+  <meta name="keywords" content="{% block meta_keywords %}construction company Kenya, building contractors Nairobi, Schones Heim Builders, general contracting, construction services Kenya, residential construction, commercial construction, building company Nairobi, construction company near me{% endblock %}">
+  <meta name="author" content="Schones Heim Builders">
+  <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1">
+  <link rel="canonical" href="{% block canonical_url %}https://schones-heim-builders.co.ke{{ request.path }}{% endblock %}">
 
+  <!-- Open Graph / Facebook -->
   <meta property="og:type" content="website">
   <meta property="og:site_name" content="Schones Heim Builders">
-  <meta property="og:title" content="{% block og_title %}Schones Heim Builders - Premier Construction Company{% endblock %}">
-  <meta property="og:description" content="{% block og_description %}Schones Heim Builders - Premier construction and general contracting company in Nairobi, Kenya. Quality residential, commercial, and industrial construction services.{% endblock %}">
-  <meta property="og:image" content="{% block og_image %}{% static 'logo.png' %}{% endblock %}">
-  <meta property="og:url" content="{{ request.build_absolute_uri }}">
+  <meta property="og:title" content="{% block og_title %}Schones Heim Builders - Premier Construction Company in Nairobi, Kenya{% endblock %}">
+  <meta property="og:description" content="{% block og_description %}Schones Heim Builders is a premier construction and general contracting company in Nairobi, Kenya. Quality residential, commercial, and industrial construction services.{% endblock %}">
+  <meta property="og:image" content="{% block og_image %}https://schones-heim-builders.co.ke{% static 'logo.png' %}{% endblock %}">
+  <meta property="og:image:alt" content="Schones Heim Builders Logo">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:url" content="{% block og_url %}https://schones-heim-builders.co.ke{{ request.path }}{% endblock %}">
   <meta property="og:locale" content="en_KE">
 
+  <!-- Twitter Card -->
   <meta name="twitter:card" content="summary_large_image">
-  <meta name="twitter:title" content="{% block twitter_title %}Schones Heim Builders - Premier Construction Company{% endblock %}">
-  <meta name="twitter:description" content="{% block twitter_description %}Schones Heim Builders - Premier construction and general contracting company in Nairobi, Kenya.{% endblock %}">
-  <meta name="twitter:image" content="{% static 'logo.png' %}">
+  <meta name="twitter:title" content="{% block twitter_title %}Schones Heim Builders - Premier Construction Company in Nairobi{% endblock %}">
+  <meta name="twitter:description" content="{% block twitter_description %}Premier construction and general contracting company in Nairobi, Kenya. Quality residential, commercial, and industrial construction services.{% endblock %}">
+  <meta name="twitter:image" content="{% block twitter_image %}https://schones-heim-builders.co.ke{% static 'logo.png' %}{% endblock %}">
+  <meta name="twitter:image:alt" content="Schones Heim Builders">
 
+  <!-- Preconnect for faster loading -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="preconnect" href="https://cdnjs.cloudflare.com">
+  <link rel="preconnect" href="https://cdn.jsdelivr.net">
+
+  <!-- Favicon -->
+  <link rel="icon" type="image/png" href="{% static 'logo.png' %}">
+  <link rel="apple-touch-icon" href="{% static 'logo.png' %}">
+
+  <!-- Fonts & CSS -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+
+  <!-- LocalBusiness Structured Data -->
   <script type="application/ld+json">
   {
     "@context": "https://schema.org",
-    "@type": "Organization",
+    "@type": "GeneralContractor",
     "name": "Schones Heim Builders",
-    "url": "https://{{ request.get_host }}",
-    "logo": "{% static 'logo.png' %}",
-    "description": "Premier construction and general contracting company based in Nairobi, Kenya.",
-    "contactPoint": {
-      "@type": "ContactPoint",
-      "telephone": "{{ company_settings.phone|default:'+254 711 100 306' }}",
-      "contactType": "customer service",
-      "email": "{{ company_settings.email|default:'schonesheimbuilders@gmail.com' }}"
-    },
+    "alternateName": "SHB Construction",
+    "url": "https://schones-heim-builders.co.ke",
+    "logo": "https://schones-heim-builders.co.ke{% static 'logo.png' %}",
+    "image": "https://schones-heim-builders.co.ke{% static 'homepage.png' %}",
+    "description": "Premier construction and general contracting company based in Nairobi, Kenya. Specializing in residential, commercial, and industrial construction services.",
+    "telephone": "{{ company_settings.phone|default:'+254711100306' }}",
+    "email": "{{ company_settings.email|default:'schonesheimbuilders@gmail.com' }}",
     "address": {
       "@type": "PostalAddress",
+      "streetAddress": "{{ company_settings.address|default:'Nairobi' }}",
       "addressLocality": "Nairobi",
+      "addressRegion": "Nairobi County",
+      "postalCode": "00100",
       "addressCountry": "KE"
     },
-    "sameAs": []
+    "geo": {
+      "@type": "GeoCoordinates",
+      "latitude": "-1.2921",
+      "longitude": "36.8219"
+    },
+    "areaServed": [
+      {"@type": "City", "name": "Nairobi"},
+      {"@type": "City", "name": "Mombasa"},
+      {"@type": "City", "name": "Kisumu"},
+      {"@type": "City", "name": "Nakuru"},
+      {"@type": "City", "name": "Eldoret"}
+    ],
+    "serviceType": ["General Contracting", "Construction", "Renovations", "Design & Planning", "Plumbing", "Electrical Works", "Infrastructure"],
+    "foundingDate": "2018",
+    "priceRange": "$$",
+    "openingHoursSpecification": [
+      {
+        "@type": "OpeningHoursSpecification",
+        "dayOfWeek": ["Monday","Tuesday","Wednesday","Thursday","Friday"],
+        "opens": "08:00",
+        "closes": "17:00"
+      },
+      {
+        "@type": "OpeningHoursSpecification",
+        "dayOfWeek": "Saturday",
+        "opens": "08:00",
+        "closes": "13:00"
+      }
+    ],
+    "sameAs": [],
+    "contactPoint": {
+      "@type": "ContactPoint",
+      "telephone": "{{ company_settings.phone|default:'+254711100306' }}",
+      "contactType": "customer service",
+      "email": "{{ company_settings.email|default:'schonesheimbuilders@gmail.com' }}",
+      "availableLanguage": "English"
+    },
+    "hasOfferCatalog": {
+      "@type": "OfferCatalog",
+      "name": "Construction Services",
+      "itemListElement": [
+        {"@type": "Offer", "itemOffered": {"@type": "Service", "name": "General Contracting"}},
+        {"@type": "Offer", "itemOffered": {"@type": "Service", "name": "Design & Planning"}},
+        {"@type": "Offer", "itemOffered": {"@type": "Service", "name": "Renovations & Fit-outs"}},
+        {"@type": "Offer", "itemOffered": {"@type": "Service", "name": "Plumbing & Electrical"}},
+        {"@type": "Offer", "itemOffered": {"@type": "Service", "name": "Infrastructure Development"}},
+        {"@type": "Offer", "itemOffered": {"@type": "Service", "name": "Project Management"}}
+      ]
+    }
   }
   </script>
 
-  <title>{% block title %}SCHONES HEIM BUILDERS{% endblock %} - Schones Heim Builders</title>
-  <link rel="icon" type="image/png" href="{% static 'logo.png' %}">
-  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet">
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <!-- Website Structured Data -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "WebSite",
+    "name": "Schones Heim Builders",
+    "url": "https://schones-heim-builders.co.ke",
+    "potentialAction": {
+      "@type": "SearchAction",
+      "target": "https://schones-heim-builders.co.ke/?q={search_term_string}",
+      "query-input": "required name=search_term_string"
+    }
+  }
+  </script>
+
+  <title>{% block title %}Home{% endblock %} | Schones Heim Builders - Construction Company Kenya</title>
+
   <style>
     :root { --primary: #1a3c6e; --primary-light: #2a5a9e; --primary-dark: #0f2a4e; }
-    body { font-family: 'Segoe UI', Arial, sans-serif; color: #333; }
+    body { font-family: 'Inter', 'Segoe UI', Arial, sans-serif; color: #333; }
     .navbar-brand img { height: 65px; width: auto; }
     .bg-primary-custom { background-color: var(--primary) !important; }
     .btn-primary-custom { background-color: var(--primary); border-color: var(--primary); color: #fff; }
@@ -64,15 +149,15 @@
       position: relative;
       overflow: hidden;
     }
-  .hero-section::before {
-    content: '';
-    position: absolute;
-    top: -50%;
-    left: -50%;
-    width: 200%;
-    height: 200%;
-    background: radial-gradient(circle, rgba(255,255,255,0.05) 0%, transparent 70%);
-  }
+    .hero-section::before {
+      content: '';
+      position: absolute;
+      top: -50%;
+      left: -50%;
+      width: 200%;
+      height: 200%;
+      background: radial-gradient(circle, rgba(255,255,255,0.05) 0%, transparent 70%);
+    }
     .hero-title { font-size: 3rem; font-weight: 800; letter-spacing: 1px; position: relative; z-index: 1; }
     .hero-subtitle { font-size: 1.2rem; opacity: 0.9; position: relative; z-index: 1; }
     .hero-btn { position: relative; z-index: 1; }
@@ -113,28 +198,33 @@
     .contact-card { border: none; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.08); height: 100%; }
     .contact-card .card-body { padding: 2rem; }
     .contact-icon { font-size: 2rem; color: var(--primary); margin-bottom: 1rem; }
+    .breadcrumb { background: transparent; padding: 0; margin: 0; font-size: 0.85rem; }
+    .breadcrumb-item a { color: rgba(255,255,255,0.7); text-decoration: none; }
+    .breadcrumb-item a:hover { color: #fff; }
+    .breadcrumb-item.active { color: rgba(255,255,255,0.9); }
+    .breadcrumb-item + .breadcrumb-item::before { color: rgba(255,255,255,0.5); }
   </style>
   {% block extra_css %}{% endblock %}
 </head>
 <body>
-  <nav class="navbar navbar-expand-lg navbar-dark bg-primary-custom sticky-top">
+  <nav class="navbar navbar-expand-lg navbar-dark bg-primary-custom sticky-top" itemscope itemtype="https://schema.org/SiteNavigationElement">
     <div class="container">
-      <a class="navbar-brand d-flex align-items-center" href="{% url 'core:home' %}">
-        <img src="{% static 'logo.png' %}" alt="SHB" class="me-2">
+      <a class="navbar-brand d-flex align-items-center" href="{% url 'core:home' %}" itemprop="url">
+        <img src="{% static 'logo.png' %}" alt="Schones Heim Builders - Construction Company Kenya" class="me-2" width="65" height="65">
         <div>
-          <div style="font-weight:700; font-size:1.1rem; line-height:1.1;">SCHONES HEIM</div>
+          <div style="font-weight:700; font-size:1.1rem; line-height:1.1;" itemprop="name">SCHONES HEIM</div>
           <div style="font-size:0.65rem; opacity:0.8; letter-spacing:2px;">BUILDERS</div>
         </div>
       </a>
-      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#publicNav">
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#publicNav" aria-label="Toggle navigation">
         <span class="navbar-toggler-icon"></span>
       </button>
       <div class="collapse navbar-collapse" id="publicNav">
         <ul class="navbar-nav ms-auto">
-          <li class="nav-item"><a class="nav-link {% block nav_home %}{% endblock %}" href="{% url 'core:home' %}">Home</a></li>
-          <li class="nav-item"><a class="nav-link {% block nav_about %}{% endblock %}" href="{% url 'core:about' %}">About</a></li>
-          <li class="nav-item"><a class="nav-link {% block nav_services %}{% endblock %}" href="{% url 'core:services' %}">Services</a></li>
-          <li class="nav-item"><a class="nav-link {% block nav_contact %}{% endblock %}" href="{% url 'core:contact' %}">Contact</a></li>
+          <li class="nav-item"><a class="nav-link {% block nav_home %}{% endblock %}" href="{% url 'core:home' %}" itemprop="url"><span itemprop="name">Home</span></a></li>
+          <li class="nav-item"><a class="nav-link {% block nav_about %}{% endblock %}" href="{% url 'core:about' %}" itemprop="url"><span itemprop="name">About</span></a></li>
+          <li class="nav-item"><a class="nav-link {% block nav_services %}{% endblock %}" href="{% url 'core:services' %}" itemprop="url"><span itemprop="name">Services</span></a></li>
+          <li class="nav-item"><a class="nav-link {% block nav_contact %}{% endblock %}" href="{% url 'core:contact' %}" itemprop="url"><span itemprop="name">Contact</span></a></li>
           {% if user.is_authenticated %}
           <li class="nav-item ms-lg-3"><a class="btn btn-outline-light btn-sm" href="{% url 'core:dashboard' %}"><i class="fas fa-tachometer-alt me-1"></i>Dashboard</a></li>
           <li class="nav-item"><a class="btn btn-outline-light btn-sm ms-2" href="{% url 'core:logout' %}"><i class="fas fa-sign-out-alt me-1"></i>Logout</a></li>
@@ -148,70 +238,75 @@
 
   {% block content %}{% endblock %}
 
-  <footer class="pt-5 pb-4 mt-5">
+  <footer class="pt-5 pb-4 mt-5" role="contentinfo">
     <div class="container">
       <div class="row g-4">
         <div class="col-lg-4">
           <div class="d-flex align-items-center mb-3">
-            <img src="{% static 'logo.png' %}" alt="SHB" style="height:60px; width:auto;" class="me-2">
+            <img src="{% static 'logo.png' %}" alt="Schones Heim Builders Logo" style="height:60px; width:auto;" class="me-2" width="60" height="60">
             <div>
               <div style="font-weight:700; color:#fff;">SCHONES HEIM</div>
               <div style="font-size:0.6rem; opacity:0.7; letter-spacing:2px;">BUILDERS</div>
             </div>
           </div>
           <p>{{ company_settings.tagline|default:'Engineered by purpose, led by vision' }}</p>
-          <p class="small">We deliver quality construction and general contracting services across Kenya.</p>
+          <p class="small">We deliver quality construction and general contracting services across Kenya. Trusted by 15+ happy clients with 10+ projects completed.</p>
         </div>
         <div class="col-lg-2">
           <h6 class="text-white mb-3">Quick Links</h6>
-          <div class="d-flex flex-column gap-2">
-            <a href="{% url 'core:home' %}" class="small">Home</a>
-            <a href="{% url 'core:about' %}" class="small">About Us</a>
-            <a href="{% url 'core:services' %}" class="small">Services</a>
-            <a href="{% url 'core:contact' %}" class="small">Contact</a>
-          </div>
+          <nav aria-label="Footer navigation">
+            <div class="d-flex flex-column gap-2">
+              <a href="{% url 'core:home' %}" class="small">Home</a>
+              <a href="{% url 'core:about' %}" class="small">About Us</a>
+              <a href="{% url 'core:services' %}" class="small">Services</a>
+              <a href="{% url 'core:contact' %}" class="small">Contact</a>
+            </div>
+          </nav>
         </div>
         <div class="col-lg-3">
           <h6 class="text-white mb-3">Contact Info</h6>
-          <p class="small mb-1"><i class="fas fa-map-marker-alt me-2"></i>{{ company_settings.address|default:'Nairobi, Kenya' }}</p>
-          <p class="small mb-1"><i class="fas fa-phone me-2"></i>{{ company_settings.phone|default:'+254 7XX XXX XXX' }}</p>
-          <p class="small mb-1"><i class="fas fa-envelope me-2"></i>{{ company_settings.email|default:'info@schonesheim.co.ke' }}</p>
+          <address>
+            <p class="small mb-1"><i class="fas fa-map-marker-alt me-2"></i><span itemprop="address">Nairobi, Kenya</span></p>
+            <p class="small mb-1"><i class="fas fa-phone me-2"></i><a href="tel:+254711100306" itemprop="telephone">+254 711 100 306</a></p>
+            <p class="small mb-1"><i class="fas fa-envelope me-2"></i><a href="mailto:schonesheimbuilders@gmail.com" itemprop="email">schonesheimbuilders@gmail.com</a></p>
+          </address>
         </div>
         <div class="col-lg-3">
           <h6 class="text-white mb-3">Business Hours</h6>
-          <p class="small mb-1">Mon - Fri: 8:00 AM - 5:00 PM</p>
-          <p class="small mb-1">Saturday: 8:00 AM - 1:00 PM</p>
-          <p class="small mb-0">Sunday: Closed</p>
+          <p class="small mb-1"><i class="fas fa-clock me-2"></i>Mon - Fri: 8:00 AM - 5:00 PM</p>
+          <p class="small mb-1"><i class="fas fa-clock me-2"></i>Saturday: 8:00 AM - 1:00 PM</p>
+          <p class="small mb-0"><i class="fas fa-times-circle me-2"></i>Sunday: Closed</p>
         </div>
       </div>
       <hr class="my-4" style="border-color:rgba(255,255,255,0.15);">
       <div class="row">
         <div class="col text-center small">
-          &copy; {% now "Y" %} Schones Heim Builders. All rights reserved.
+          &copy; {% now "Y" %} <a href="{% url 'core:home' %}">Schones Heim Builders</a>. All rights reserved. | Premier Construction Company in Nairobi, Kenya
         </div>
       </div>
     </div>
   </footer>
 
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js" defer></script>
   {% block extra_js %}{% endblock %}
 
   <!-- Floating WhatsApp Button -->
   <div id="whatsapp-float" style="position:fixed; bottom:24px; right:24px; z-index:9999;">
     <a id="whatsapp-link"
        target="_blank"
-       rel="noopener"
-       title="Chat on WhatsApp"
+       rel="noopener noreferrer"
+       title="Chat on WhatsApp - Schones Heim Builders"
        style="width:56px; height:56px; border-radius:50%; background:#25D366; color:#fff; display:flex; align-items:center; justify-content:center; font-size:28px; box-shadow:0 4px 15px rgba(37,211,102,0.4); text-decoration:none; transition:transform 0.2s; cursor:pointer;"
        onmouseover="this.style.transform='scale(1.1)'"
        onmouseout="this.style.transform='scale(1)'">
-      <i class="fab fa-whatsapp"></i>
+      <i class="fab fa-whatsapp" aria-hidden="true"></i>
+      <span class="visually-hidden">Chat on WhatsApp</span>
     </a>
   </div>
   <script>
     (function(){
-      var phone = "{{ company_settings.phone|default:'2547XXXXXXXX' }}".replace(/[^0-9]/g, '');
-      document.getElementById('whatsapp-link').href = 'https://wa.me/' + phone + '?text=Hello%20Schones%20Heim%20Builders!%20I%27d%20like%20to%20inquire%20about%20your%20services.';
+      var phone = "{{ company_settings.phone|default:'254711100306' }}".replace(/[^0-9]/g, '');
+      document.getElementById('whatsapp-link').href = 'https://wa.me/' + phone + '?text=Hello%20Schones%20Heim%20Builders!%20I%27d%20like%20to%20inquire%20about%20your%20construction%20services.';
     })();
   </script>
 

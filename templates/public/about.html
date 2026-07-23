@@ -2,26 +2,38 @@
 {% load static %}
 {% block nav_about %}active{% endblock %}
 {% block title %}About Us{% endblock %}
+{% block meta_description %}Learn about Schones Heim Builders - a premier construction and general contracting company in Nairobi, Kenya. Our team of professionals delivers quality construction services with integrity and reliability.{% endblock %}
+{% block meta_keywords %}about Schones Heim Builders, construction company Nairobi, building contractor Kenya, construction team Kenya, construction company about{% endblock %}
+{% block og_title %}About Schones Heim Builders - Premier Construction Company Kenya{% endblock %}
+{% block og_description %}Learn about Schones Heim Builders - premier construction company in Nairobi, Kenya. Over 8 years experience, 10+ projects, 15+ happy clients.{% endblock %}
+{% block og_url %}https://schones-heim-builders.co.ke/about/{% endblock %}
+{% block twitter_title %}About Schones Heim Builders - Construction Company Kenya{% endblock %}
+{% block twitter_description %}Premier construction and general contracting company in Nairobi, Kenya. Over 8 years experience with 10+ completed projects.{% endblock %}
 
 {% block content %}
-<section class="page-header">
+<section class="page-header" aria-label="About Us Header">
   <div class="container">
+    <nav aria-label="breadcrumb">
+      <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="{% url 'core:home' %}">Home</a></li>
+        <li class="breadcrumb-item active" aria-current="page">About Us</li>
+      </ol>
+    </nav>
     <h1>About Schones Heim Builders</h1>
     <p class="mb-0 opacity-75">Engineered by purpose, led by vision</p>
     <p class="mb-0 fst-italic mt-2">"Where all construction matters"</p>
-    <p class="mb-0 opacity-50 small">— construction matters —</p>
   </div>
 </section>
 
-<section class="py-5">
+<section class="py-5" aria-label="Who We Are">
   <div class="container">
     <div class="row g-4 align-items-center">
       <div class="col-lg-6">
         <h2 class="section-title">Who We Are</h2>
-        <p>Schones Heim Builders is a premier construction and general contracting company based in Nairobi, Kenya. With years of industry experience, we have established ourselves as a trusted partner in the construction sector, delivering projects that stand the test of time.</p>
+        <p>Schones Heim Builders is a premier construction and general contracting company based in Nairobi, Kenya. Founded in 2018, we have established ourselves as a trusted partner in the construction sector, delivering projects that stand the test of time.</p>
         <p>Our team of skilled professionals brings together expertise in design, project management, and execution to ensure every project is completed to the highest standards of quality, safety, and sustainability.</p>
-        <p>We pride ourselves on our commitment to client satisfaction, transparent communication, and delivering value for money on every project we undertake.</p>
-        <div class="row mt-4 g-3">
+        <p>We pride ourselves on our commitment to client satisfaction, transparent communication, and delivering value for money on every project we undertake across Nairobi and Kenya.</p>
+        <div class="row mt-4 g-3" itemscope itemtype="https://schema.org/Organization">
           <div class="col-4 text-center">
             <div class="stat-number">{{ stats.projects_completed }}+</div>
             <div class="stat-label">Projects</div>
@@ -37,40 +49,40 @@
         </div>
       </div>
       <div class="col-lg-6 text-center">
-        <img src="{% static 'engineerImage.png' %}" alt="Engineer" style="max-width:90%; border-radius:16px; box-shadow:0 8px 30px rgba(0,0,0,0.12);">
+        <img src="{% static 'engineerImage.png' %}" alt="Schones Heim Builders - Construction Engineers and Professionals in Nairobi Kenya" style="max-width:90%; border-radius:16px; box-shadow:0 8px 30px rgba(0,0,0,0.12);" width="500" height="500" loading="lazy">
       </div>
     </div>
   </div>
 </section>
 
-<section class="py-5 bg-light">
+<section class="py-5 bg-light" aria-label="Our Core Values">
   <div class="container">
-    <h2 class="section-title text-center mb-5">Our Values</h2>
+    <h2 class="section-title text-center mb-5">Our Core Values</h2>
     <div class="row g-4">
-      <div class="col-md-4">
+      <div class="col-md-4" itemscope itemtype="https://schema.org/ PropertyValue">
         <div class="card service-card text-center h-100">
           <div class="card-body">
-            <div class="service-icon"><i class="fas fa-gem"></i></div>
-            <h5>Quality</h5>
-            <p class="text-muted small">We never compromise on quality. Every project meets rigorous standards for materials, workmanship, and finishing.</p>
+            <div class="service-icon"><i class="fas fa-gem" aria-hidden="true"></i></div>
+            <h3 itemprop="name">Quality</h3>
+            <p class="text-muted small" itemprop="value">We never compromise on quality. Every project meets rigorous standards for materials, workmanship, and finishing.</p>
           </div>
         </div>
       </div>
-      <div class="col-md-4">
+      <div class="col-md-4" itemscope itemtype="https://schema.org/PropertyValue">
         <div class="card service-card text-center h-100">
           <div class="card-body">
-            <div class="service-icon"><i class="fas fa-handshake"></i></div>
-            <h5>Integrity</h5>
-            <p class="text-muted small">Transparent pricing, honest communication, and ethical business practices form the foundation of our operations.</p>
+            <div class="service-icon"><i class="fas fa-handshake" aria-hidden="true"></i></div>
+            <h3 itemprop="name">Integrity</h3>
+            <p class="text-muted small" itemprop="value">Transparent pricing, honest communication, and ethical business practices form the foundation of our operations.</p>
           </div>
         </div>
       </div>
-      <div class="col-md-4">
+      <div class="col-md-4" itemscope itemtype="https://schema.org/PropertyValue">
         <div class="card service-card text-center h-100">
           <div class="card-body">
-            <div class="service-icon"><i class="fas fa-clock"></i></div>
-            <h5>Reliability</h5>
-            <p class="text-muted small">We deliver on time and within budget. Our project management systems ensure smooth execution from start to finish.</p>
+            <div class="service-icon"><i class="fas fa-clock" aria-hidden="true"></i></div>
+            <h3 itemprop="name">Reliability</h3>
+            <p class="text-muted small" itemprop="value">We deliver on time and within budget. Our project management systems ensure smooth execution from start to finish.</p>
           </div>
         </div>
       </div>
