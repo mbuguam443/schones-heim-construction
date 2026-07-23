@@ -99,6 +99,21 @@ def main():
     run(f"{sys.executable} manage.py migrate")
     run(f"{sys.executable} manage.py collectstatic --noinput")
 
+    # Fix .env if placeholder domain is still there
+    print("\n[Fix] Checking .env for placeholder domain...")
+    if os.path.exists(".env"):
+        with open(".env", "r") as f:
+            content = f.read()
+        if "yourdomain.com" in content:
+            content = content.replace("yourdomain.com", "*")
+            content = content.replace("ALLOWED_HOSTS=*\n*", "ALLOWED_HOSTS=*")
+            content = content.replace("CSRF_TRUSTED_ORIGINS=https://*", "CSRF_TRUSTED_ORIGINS=*")
+            with open(".env", "w") as f:
+                f.write(content)
+            print("  Fixed: replaced placeholder domain with *")
+        else:
+            print("  .env looks good.")
+
     # Cleanup
     shutil.rmtree(TEMP_DIR, ignore_errors=True)
 
