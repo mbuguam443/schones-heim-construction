@@ -71,8 +71,22 @@ def main():
 
     # Step 4: Copy updated files
     print("\n[4/6] Updating files...")
-    KEEP_FILES = [".env", "media", "staticfiles"]
+    KEEP_FILES = [".env", "media"]
     DIRS_TO_UPDATE = ["apps", "config", "templates", "static"]
+    
+    # Clean old caches first
+    for d in ["staticfiles", "__pycache__"]:
+        if os.path.exists(d):
+            shutil.rmtree(d)
+            print(f"  Cleaned: {d}/")
+    for root, dirs, files in os.walk("."):
+        for dirname in dirs:
+            if dirname == "__pycache__":
+                shutil.rmtree(os.path.join(root, dirname))
+    for root, dirs, files in os.walk("."):
+        for f in files:
+            if f.endswith(".pyc"):
+                os.remove(os.path.join(root, f))
     
     for dirname in DIRS_TO_UPDATE:
         src = os.path.join(extracted, dirname)
