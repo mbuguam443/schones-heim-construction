@@ -105,12 +105,11 @@ def main():
         with open(".env", "r") as f:
             content = f.read()
         if "yourdomain.com" in content:
-            content = content.replace("yourdomain.com", "*")
-            content = content.replace("ALLOWED_HOSTS=*\n*", "ALLOWED_HOSTS=*")
-            content = content.replace("CSRF_TRUSTED_ORIGINS=https://*", "CSRF_TRUSTED_ORIGINS=*")
+            content = content.replace("yourdomain.com", "schones-heim-builders.co.ke")
+            content = content.replace("www.yourdomain.com", "www.schones-heim-builders.co.ke")
             with open(".env", "w") as f:
                 f.write(content)
-            print("  Fixed: replaced placeholder domain with *")
+            print("  Fixed: replaced placeholder with schones-heim-builders.co.ke")
         else:
             print("  .env looks good.")
 
