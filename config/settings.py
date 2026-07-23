@@ -113,13 +113,6 @@ STATIC_ROOT = BASE_DIR / 'staticfiles'
 MEDIA_URL = 'media/'
 MEDIA_ROOT = BASE_DIR / 'media'
 
-# WhiteNoise settings for static file serving
-STORAGES = {
-    'staticfiles': {
-        'BACKEND': 'whitenoise.storage.StaticFilesStorage',
-    },
-}
-
 CRISPY_ALLOWED_TEMPLATE_PACKS = 'bootstrap5'
 CRISPY_TEMPLATE_PACK = 'bootstrap5'
 

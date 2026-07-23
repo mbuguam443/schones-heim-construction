@@ -39,6 +39,10 @@ def main():
 
     # Step 4: Collect static files
     print("\n[4/5] Collecting static files...")
+    import shutil
+    if os.path.exists('staticfiles'):
+        shutil.rmtree('staticfiles')
+        print("  Cleared old staticfiles cache")
     run(f"{sys.executable} manage.py collectstatic --noinput")
 
     # Step 5: Create superuser if not exists
