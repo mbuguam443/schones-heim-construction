@@ -83,7 +83,7 @@ def main():
             shutil.copytree(src, dst)
             print(f"  Updated: {dirname}/")
     
-    FILES_TO_UPDATE = ["manage.py", "passenger_wsgi.py", "requirements.txt", "seed_data.py", "update.py", "setup.py"]
+    FILES_TO_UPDATE = ["manage.py", "passenger_wsgi.py", "requirements.txt", "seed_data.py", "setup.py"]
     for filename in FILES_TO_UPDATE:
         src = os.path.join(extracted, filename)
         if os.path.exists(src):
