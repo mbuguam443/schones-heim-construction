@@ -7,7 +7,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = config('SECRET_KEY', default='django-insecure-dev-key-change-in-production')
 DEBUG = config('DEBUG', default=True, cast=bool)
 ALLOWED_HOSTS = config('ALLOWED_HOSTS', default='schones-heim-builders.co.ke,www.schones-heim-builders.co.ke,*', cast=Csv())
-CSRF_TRUSTED_ORIGINS = config('CSRF_TRUSTED_ORIGINS', default='', cast=Csv())
+CSRF_TRUSTED_ORIGINS = config('CSRF_TRUSTED_ORIGINS', default='https://schones-heim-builders.co.ke,https://www.schones-heim-builders.co.ke', cast=Csv())
 
 # Safety: if placeholder domain is still in ALLOWED_HOSTS, allow all
 if 'yourdomain.com' in ALLOWED_HOSTS:
@@ -116,7 +116,7 @@ MEDIA_ROOT = BASE_DIR / 'media'
 # WhiteNoise settings for static file serving
 STORAGES = {
     'staticfiles': {
-        'BACKEND': 'whitenoise.storage.CompressedManifestStaticFilesStorage',
+        'BACKEND': 'whitenoise.storage.StaticFilesStorage',
     },
 }
 
