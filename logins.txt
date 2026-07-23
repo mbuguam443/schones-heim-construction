@@ -1,0 +1,31 @@
+SCHONES HEIM BUILDERS - Login Credentials
+=========================================
+URL: https://schones-heim-construction.onrender.com
+
+All passwords default to: <username>123!  (e.g. admin123!, pm123!, client1123!)
+Exception: admin password is Admin123!, storekeeper is Store123!
+
+Username          Name                 Role              Phone
+-------          ----                 ----              -----
+admin             System Admin         Admin             +254700000001
+pm                John Mbugua          Project Manager   +254700000002
+accountant        Jane Wanjiku         Accountant        +254700000003
+supervisor        Peter Kamau          Site Supervisor   +254700000004
+storekeeper       David Mwangi         Store Keeper      +254700000012
+employee1         James Ochieng        Employee          +254700000006
+employee2         Sarah Akinyi         Employee          +254700000007
+client1           Mary Njoki           Client            +254700000005
+client2           Grace Wambui         Client            +254700000008
+client3           Peter Kamau          Client            +254700000009
+client4           Faith Nyambura       Client            +254700000010
+client5           Samuel Ochieng       Client            +254700000011
+
+Password reference:
+  admin       -> Admin123!
+  pm          -> Pm123!
+  accountant  -> Acc123!
+  supervisor  -> Sup123!
+  storekeeper -> Store123!
+  employee1   -> Employee123!
+  employee2   -> Employee123!
+  client1-5   -> Client123!
