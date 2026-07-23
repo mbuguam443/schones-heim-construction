@@ -1,6 +1,10 @@
 import os
 import sys
 
+# PyMySQL compatibility (acts as MySQLdb)
+import pymysql
+pymysql.install_as_MySQLdb()
+
 # Set Django settings module
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'config.settings')
 
