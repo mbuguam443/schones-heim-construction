@@ -1,14 +1,17 @@
-# Pass all requests not otherwise handled to Django
-<IfModule mod_rewrite.c>
-    RewriteEngine On
-    RewriteBase /
-    RewriteRule ^index\.html$ - [L]
-    RewriteCond %{REQUEST_FILENAME} !-f
-    RewriteCond %{REQUEST_FILENAME} !-d
-    RewriteRule . /index.html [L]
+# Serve media files directly via Apache
+RewriteRule ^media/(.+)$ /home/wlsihszp/djangoapp/media/$1 [L]
+
+# Serve static files directly  
+RewriteRule ^static/(.+)$ /home/wlsihszp/djangoapp/staticfiles/$1 [L]
+
+# Security headers
+<IfModule mod_headers.c>
+    Header set X-Content-Type-Options "nosniff"
+    Header set X-Frame-Options "SAMEORIGIN"
+    Header set X-XSS-Protection "1; mode=block"
 </IfModule>
 
-# Serve static files directly
+# Cache static assets
 <IfModule mod_expires.c>
     ExpiresActive On
     ExpiresByType text/css "access plus 1 year"
@@ -19,11 +22,4 @@
     ExpiresByType image/gif "access plus 1 year"
     ExpiresByType image/svg+xml "access plus 1 year"
     ExpiresByType application/pdf "access plus 1 month"
-</IfModule>
-
-# Security headers
-<IfModule mod_headers.c>
-    Header set X-Content-Type-Options "nosniff"
-    Header set X-Frame-Options "SAMEORIGIN"
-    Header set X-XSS-Protection "1; mode=block"
 </IfModule>

@@ -20,3 +20,11 @@ urlpatterns = [
 
 if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+else:
+    from django.views.static import serve as media_serve
+    import re
+    def protected_media(request, path):
+        return media_serve(request, path, document_root=str(settings.MEDIA_ROOT))
+    urlpatterns += [
+        path('media/<path:path>', protected_media, name='media'),
+    ]
