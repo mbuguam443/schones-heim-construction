@@ -101,3 +101,21 @@ class ClientInquiry(models.Model):
 
     def __str__(self):
         return f"{self.client.get_full_name()} - {self.subject[:50]}"
+
+
+class ProjectHouse(models.Model):
+    title = models.CharField(max_length=200)
+    description = models.TextField(blank=True)
+    image = models.ImageField(upload_to='project-houses/')
+    order = models.PositiveIntegerField(default=0, help_text='Display order (lower = first)')
+    is_active = models.BooleanField(default=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        ordering = ['order', '-created_at']
+        verbose_name = 'Project House'
+        verbose_name_plural = 'Project Houses'
+
+    def __str__(self):
+        return self.title

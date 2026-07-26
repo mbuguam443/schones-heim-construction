@@ -1,6 +1,6 @@
 from django import forms
 from django.contrib.auth.forms import AuthenticationForm, UserCreationForm, UserChangeForm
-from .models import CompanySettings, User, ClientInquiry
+from .models import CompanySettings, User, ClientInquiry, ProjectHouse
 from apps.clients.models import Client
 
 
@@ -141,3 +141,15 @@ class InquiryResponseForm(forms.Form):
         widget=forms.Select(attrs={'class': 'form-select'}),
         label='Update Status',
     )
+
+
+class ProjectHouseForm(forms.ModelForm):
+    class Meta:
+        model = ProjectHouse
+        fields = ['title', 'description', 'image', 'order', 'is_active']
+        widgets = {
+            'title': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Project house title'}),
+            'description': forms.Textarea(attrs={'class': 'form-control', 'rows': 3, 'placeholder': 'Description of this project house...'}),
+            'image': forms.FileInput(attrs={'class': 'form-control'}),
+            'order': forms.NumberInput(attrs={'class': 'form-control', 'placeholder': '0'}),
+        }

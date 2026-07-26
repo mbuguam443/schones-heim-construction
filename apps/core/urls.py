@@ -38,4 +38,9 @@ urlpatterns = [
     path('inquiries/create/', views.ClientInquiryCreateView.as_view(), name='inquiry_create'),
     path('inquiries/<int:pk>/', views.ClientInquiryDetailView.as_view(), name='inquiry_detail'),
     path('inquiries/<int:pk>/respond/', views.respond_to_inquiry, name='inquiry_respond'),
+    # Project Houses (Admin)
+    path('project-houses/', views.ProjectHouseListView.as_view(), name='projecthouse_list'),
+    path('project-houses/create/', views.ProjectHouseCreateView.as_view(), name='projecthouse_create'),
+    path('project-houses/<int:pk>/edit/', views.ProjectHouseUpdateView.as_view(), name='projecthouse_update'),
+    path('project-houses/<int:pk>/delete/', views.ProjectHouseDeleteView.as_view(), name='projecthouse_delete'),
 ]

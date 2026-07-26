@@ -64,10 +64,6 @@
   .reveal-delay-1 { transition-delay: 0.1s; }
   .reveal-delay-2 { transition-delay: 0.2s; }
   .reveal-delay-3 { transition-delay: 0.3s; }
-  .filter-btn.active {
-    background-color: var(--primary) !important;
-    color: #fff !important;
-  }
 </style>
 {% endblock %}
 
@@ -85,7 +81,7 @@
   </div>
 </section>
 
-{% if project_images %}
+{% if project_houses %}
 <section class="py-5" aria-label="Project Gallery">
   <div class="container">
     <div class="text-center mb-5 reveal">
@@ -93,13 +89,13 @@
       <p class="section-subtitle">Visual showcase of our construction work and completed projects</p>
     </div>
     <div class="row g-4">
-      {% for img in project_images %}
+      {% for house in project_houses %}
       <div class="col-md-4 col-6 reveal {% if forloop.counter0|divisibleby:3 %}reveal-delay-1{% elif forloop.counter0|divisibleby:3 == 1 %}reveal-delay-2{% endif %}">
-        <div class="project-gallery-item" data-bs-toggle="modal" data-bs-target="#imageModal" onclick="showImage('{% static 'project-houses/' %}{{ img }}', '{{ img }}')">
-          <img src="{% static 'project-houses/' %}{{ img }}" alt="Schones Heim Builders Project House - Construction in Nairobi Kenya" loading="lazy" width="400" height="280">
+        <div class="project-gallery-item" data-bs-toggle="modal" data-bs-target="#imageModal" onclick="showImage('{{ house.image.url }}', '{{ house.title|escapejs }}', '{{ house.description|escapejs }}')">
+          <img src="{{ house.image.url }}" alt="{{ house.title }} - Schones Heim Builders Construction Kenya" loading="lazy" width="400" height="280">
           <div class="project-overlay">
-            <h5 class="mb-1">Project House {{ forloop.counter }}</h5>
-            <p class="small mb-0">Click to enlarge</p>
+            <h5 class="mb-1">{{ house.title }}</h5>
+            <p class="small mb-0">Click to view details</p>
           </div>
         </div>
       </div>
@@ -109,15 +105,16 @@
 </section>
 
 <!-- Image Modal -->
-<div class="modal fade" id="imageModal" tabindex="-1" aria-label="Enlarged project image" aria-hidden="true">
+<div class="modal fade" id="imageModal" tabindex="-1" aria-label="Project house details" aria-hidden="true">
   <div class="modal-dialog modal-lg modal-dialog-centered">
-    <div class="modal-content bg-dark">
-      <div class="modal-header border-0">
-        <h5 class="modal-title text-white" id="imageModalLabel">Project House</h5>
-        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="imageModalLabel">Project House</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
       <div class="modal-body text-center">
-        <img id="modalImage" src="" alt="Enlarged project house image" class="modal-img img-fluid">
+        <img id="modalImage" src="" alt="Project house image" class="modal-img img-fluid mb-3">
+        <p id="modalDescription" class="text-muted text-start mt-3"></p>
       </div>
     </div>
   </div>
@@ -161,9 +158,10 @@
 
 {% block extra_js %}
 <script>
-function showImage(src, title) {
+function showImage(src, title, description) {
   document.getElementById('modalImage').src = src;
   document.getElementById('imageModalLabel').textContent = title;
+  document.getElementById('modalDescription').textContent = description || '';
 }
 
 document.querySelectorAll('.reveal').forEach(function(el) {

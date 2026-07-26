@@ -20,7 +20,7 @@ from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 
 from .decorators import role_required
 from .forms import CompanySettingsForm, ClientInquiryForm, InquiryResponseForm, LoginForm, UserProfileForm
-from .models import ActivityLog, ClientInquiry, CompanySettings, Notification, User
+from .models import ActivityLog, ClientInquiry, CompanySettings, Notification, User, ProjectHouse
 
 
 def login_view(request):
@@ -344,6 +344,49 @@ class UserPasswordResetView(LoginRequiredMixin, AdminOnlyMixin, FormView):
 
 
 #
+# Project House CRUD (Admin)
+#
+
+class ProjectHouseListView(LoginRequiredMixin, AdminOnlyMixin, ListView):
+    model = ProjectHouse
+    template_name = 'core/projecthouse_list.html'
+    context_object_name = 'houses'
+    paginate_by = 20
+
+
+class ProjectHouseCreateView(LoginRequiredMixin, AdminOnlyMixin, CreateView):
+    model = ProjectHouse
+    form_class = __import__('apps.core.forms', fromlist=['ProjectHouseForm']).ProjectHouseForm
+    template_name = 'core/projecthouse_form.html'
+    success_url = reverse_lazy('core:projecthouse_list')
+
+    def form_valid(self, form):
+        messages.success(self.request, 'Project house created successfully.')
+        return super().form_valid(form)
+
+
+class ProjectHouseUpdateView(LoginRequiredMixin, AdminOnlyMixin, UpdateView):
+    model = ProjectHouse
+    form_class = __import__('apps.core.forms', fromlist=['ProjectHouseForm']).ProjectHouseForm
+    template_name = 'core/projecthouse_form.html'
+    success_url = reverse_lazy('core:projecthouse_list')
+
+    def form_valid(self, form):
+        messages.success(self.request, 'Project house updated successfully.')
+        return super().form_valid(form)
+
+
+class ProjectHouseDeleteView(LoginRequiredMixin, AdminOnlyMixin, DeleteView):
+    model = ProjectHouse
+    template_name = 'core/projecthouse_confirm_delete.html'
+    success_url = reverse_lazy('core:projecthouse_list')
+
+    def form_valid(self, form):
+        messages.success(self.request, 'Project house deleted successfully.')
+        return super().form_valid(form)
+
+
+#
 # Public / Landing pages
 #
 
@@ -367,20 +410,11 @@ def home_view(request):
 def projects_view(request):
     from apps.projects.models import Project as AllProjects
     all_projects = AllProjects.objects.all().order_by('-id')
+    project_houses = ProjectHouse.objects.filter(is_active=True)
     company_settings = CompanySettings.objects.first()
-    import os
-    from django.conf import settings
-    images_dir = os.path.join(str(settings.STATIC_ROOT), 'project-houses')
-    if not os.path.exists(images_dir):
-        images_dir = os.path.join(str(settings.BASE_DIR), 'static', 'project-houses')
-    project_images = []
-    if os.path.exists(images_dir):
-        for f in sorted(os.listdir(images_dir)):
-            if f.lower().endswith(('.jpg', '.jpeg', '.png', '.webp')):
-                project_images.append(f)
     return render(request, 'public/projects.html', {
         'projects': all_projects,
-        'project_images': project_images,
+        'project_houses': project_houses,
         'company_settings': company_settings,
     })
 
