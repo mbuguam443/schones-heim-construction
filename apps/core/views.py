@@ -366,7 +366,7 @@ def home_view(request):
 
 def projects_view(request):
     from apps.projects.models import Project as AllProjects
-    all_projects = AllProjects.objects.filter(is_active=True).order_by('-id')
+    all_projects = AllProjects.objects.all().order_by('-id')
     company_settings = CompanySettings.objects.first()
     import os
     from django.conf import settings
