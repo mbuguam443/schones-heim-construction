@@ -1,0 +1,181 @@
+{% extends 'public/base.html' %}
+{% load static %}
+{% block nav_projects %}active{% endblock %}
+{% block title %}Our Projects{% endblock %}
+{% block meta_description %}View our completed and ongoing construction projects by Schones Heim Builders in Nairobi, Kenya. Browse our portfolio of residential, commercial, and industrial construction projects.{% endblock %}
+{% block meta_keywords %}construction projects Nairobi, building projects Kenya, construction portfolio, Schones Heim Builders projects, completed projects Kenya, ongoing construction projects{% endblock %}
+{% block og_title %}Construction Projects Portfolio | Schones Heim Builders Nairobi{% endblock %}
+{% block og_description %}Browse our portfolio of completed and ongoing construction projects in Nairobi, Kenya. Residential, commercial & industrial buildings.{% endblock %}
+{% block og_url %}https://schones-heim-builders.co.ke/projects/{% endblock %}
+{% block twitter_title %}Construction Projects Portfolio Nairobi | Schones Heim Builders{% endblock %}
+{% block twitter_description %}Browse our portfolio of completed and ongoing construction projects in Nairobi, Kenya.{% endblock %}
+
+{% block extra_css %}
+<style>
+  .project-gallery-item {
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    cursor: pointer;
+    position: relative;
+  }
+  .project-gallery-item:hover {
+    transform: translateY(-5px) scale(1.02);
+    box-shadow: 0 8px 30px rgba(0,0,0,0.15);
+  }
+  .project-gallery-item img {
+    width: 100%;
+    height: 280px;
+    object-fit: cover;
+    transition: transform 0.4s ease;
+  }
+  .project-gallery-item:hover img {
+    transform: scale(1.05);
+  }
+  .project-overlay {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: linear-gradient(transparent, rgba(0,0,0,0.7));
+    padding: 20px;
+    color: #fff;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+  }
+  .project-gallery-item:hover .project-overlay {
+    opacity: 1;
+  }
+  .modal-img {
+    max-height: 80vh;
+    object-fit: contain;
+    border-radius: 8px;
+  }
+  .reveal {
+    opacity: 0;
+    transform: translateY(30px);
+    transition: opacity 0.7s ease-out, transform 0.7s ease-out;
+  }
+  .reveal.visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  .reveal-delay-1 { transition-delay: 0.1s; }
+  .reveal-delay-2 { transition-delay: 0.2s; }
+  .reveal-delay-3 { transition-delay: 0.3s; }
+  .filter-btn.active {
+    background-color: var(--primary) !important;
+    color: #fff !important;
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<section class="page-header" aria-label="Projects Header">
+  <div class="container">
+    <nav aria-label="breadcrumb">
+      <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="{% url 'core:home' %}">Home</a></li>
+        <li class="breadcrumb-item active" aria-current="page">Projects</li>
+      </ol>
+    </nav>
+    <h1>Our Construction Projects</h1>
+    <p class="mb-0 opacity-75">Browse our portfolio of completed and ongoing projects across Kenya</p>
+  </div>
+</section>
+
+{% if project_images %}
+<section class="py-5" aria-label="Project Gallery">
+  <div class="container">
+    <div class="text-center mb-5 reveal">
+      <h2 class="section-title">Project Houses Gallery</h2>
+      <p class="section-subtitle">Visual showcase of our construction work and completed projects</p>
+    </div>
+    <div class="row g-4">
+      {% for img in project_images %}
+      <div class="col-md-4 col-6 reveal {% if forloop.counter0|divisibleby:3 %}reveal-delay-1{% elif forloop.counter0|divisibleby:3 == 1 %}reveal-delay-2{% endif %}">
+        <div class="project-gallery-item" data-bs-toggle="modal" data-bs-target="#imageModal" onclick="showImage('{% static 'project-houses/' %}{{ img }}', '{{ img }}')">
+          <img src="{% static 'project-houses/' %}{{ img }}" alt="Schones Heim Builders Project House - Construction in Nairobi Kenya" loading="lazy" width="400" height="280">
+          <div class="project-overlay">
+            <h5 class="mb-1">Project House {{ forloop.counter }}</h5>
+            <p class="small mb-0">Click to enlarge</p>
+          </div>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+
+<!-- Image Modal -->
+<div class="modal fade" id="imageModal" tabindex="-1" aria-label="Enlarged project image" aria-hidden="true">
+  <div class="modal-dialog modal-lg modal-dialog-centered">
+    <div class="modal-content bg-dark">
+      <div class="modal-header border-0">
+        <h5 class="modal-title text-white" id="imageModalLabel">Project House</h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body text-center">
+        <img id="modalImage" src="" alt="Enlarged project house image" class="modal-img img-fluid">
+      </div>
+    </div>
+  </div>
+</div>
+{% endif %}
+
+{% if projects %}
+<section class="py-5 bg-light" aria-label="Project Database">
+  <div class="container">
+    <div class="text-center mb-5 reveal">
+      <h2 class="section-title">Project Details</h2>
+      <p class="section-subtitle">Our active construction projects from our management system</p>
+    </div>
+    <div class="row g-4">
+      {% for p in projects %}
+      <div class="col-md-4 reveal">
+        <div class="card service-card h-100">
+          <div class="card-body">
+            <span class="badge bg-primary-custom mb-2">{{ p.get_status_display }}</span>
+            <h3>{{ p.name }}</h3>
+            <p class="text-muted small mb-1"><i class="fas fa-map-marker-alt me-1"></i>{{ p.location|default:'Nairobi, Kenya' }}</p>
+            <p class="text-muted small mb-2"><i class="fas fa-calendar me-1"></i>{{ p.get_status_display }}</p>
+            <p class="text-muted small mb-0">{{ p.description|truncatewords:25 }}</p>
+          </div>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+{% endif %}
+
+<section class="py-5 bg-primary-custom text-white text-center" aria-label="Start Your Project">
+  <div class="container">
+    <h2 class="fw-bold mb-3">Have a Project in Mind?</h2>
+    <p class="mb-4 opacity-75">Contact Schones Heim Builders for a free consultation. We build across Nairobi and Kenya.</p>
+    <a href="{% url 'core:contact' %}" class="btn btn-light btn-lg"><i class="fas fa-envelope me-2"></i>Get a Free Quote</a>
+  </div>
+</section>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+function showImage(src, title) {
+  document.getElementById('modalImage').src = src;
+  document.getElementById('imageModalLabel').textContent = title;
+}
+
+document.querySelectorAll('.reveal').forEach(function(el) {
+  var observer = new IntersectionObserver(function(entries) {
+    entries.forEach(function(entry) {
+      if (entry.isIntersecting) {
+        entry.target.classList.add('visible');
+        observer.unobserve(entry.target);
+      }
+    });
+  }, { threshold: 0.15 });
+  observer.observe(el);
+});
+</script>
+{% endblock %}

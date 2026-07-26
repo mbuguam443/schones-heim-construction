@@ -364,6 +364,27 @@ def home_view(request):
     })
 
 
+def projects_view(request):
+    from apps.projects.models import Project as AllProjects
+    all_projects = AllProjects.objects.filter(is_active=True).order_by('-id')
+    company_settings = CompanySettings.objects.first()
+    import os
+    from django.conf import settings
+    images_dir = os.path.join(str(settings.STATIC_ROOT), 'project-houses')
+    if not os.path.exists(images_dir):
+        images_dir = os.path.join(str(settings.BASE_DIR), 'static', 'project-houses')
+    project_images = []
+    if os.path.exists(images_dir):
+        for f in sorted(os.listdir(images_dir)):
+            if f.lower().endswith(('.jpg', '.jpeg', '.png', '.webp')):
+                project_images.append(f)
+    return render(request, 'public/projects.html', {
+        'projects': all_projects,
+        'project_images': project_images,
+        'company_settings': company_settings,
+    })
+
+
 def about_view(request):
     company_settings = CompanySettings.objects.first()
     from apps.projects.models import Project as AllProjects

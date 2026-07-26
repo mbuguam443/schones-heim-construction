@@ -223,6 +223,7 @@
         <ul class="navbar-nav ms-auto">
           <li class="nav-item"><a class="nav-link {% block nav_home %}{% endblock %}" href="{% url 'core:home' %}" itemprop="url"><span itemprop="name">Home</span></a></li>
           <li class="nav-item"><a class="nav-link {% block nav_about %}{% endblock %}" href="{% url 'core:about' %}" itemprop="url"><span itemprop="name">About</span></a></li>
+          <li class="nav-item"><a class="nav-link {% block nav_projects %}{% endblock %}" href="{% url 'core:projects' %}" itemprop="url"><span itemprop="name">Projects</span></a></li>
           <li class="nav-item"><a class="nav-link {% block nav_services %}{% endblock %}" href="{% url 'core:services' %}" itemprop="url"><span itemprop="name">Services</span></a></li>
           <li class="nav-item"><a class="nav-link {% block nav_contact %}{% endblock %}" href="{% url 'core:contact' %}" itemprop="url"><span itemprop="name">Contact</span></a></li>
           {% if user.is_authenticated %}
@@ -258,6 +259,7 @@
             <div class="d-flex flex-column gap-2">
               <a href="{% url 'core:home' %}" class="small">Home</a>
               <a href="{% url 'core:about' %}" class="small">About Us</a>
+              <a href="{% url 'core:projects' %}" class="small">Projects</a>
               <a href="{% url 'core:services' %}" class="small">Services</a>
               <a href="{% url 'core:contact' %}" class="small">Contact</a>
             </div>
