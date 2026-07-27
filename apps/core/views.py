@@ -453,7 +453,7 @@ def contact_view(request):
         ActivityLog.objects.create(
             user=None,
             action=f'Contact form submission: {name} ({email}) - {subject}',
-            description=f'From: {name}\nEmail: {email}\nPhone: {phone}\nSubject: {subject}\nMessage: {message}',
+            details=f'From: {name}\nEmail: {email}\nPhone: {phone}\nSubject: {subject}\nMessage: {message}',
         )
         messages.success(request, 'Thank you for your message! We will get back to you within 24 hours.')
         return redirect('core:contact')
