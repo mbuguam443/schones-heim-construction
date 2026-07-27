@@ -43,4 +43,9 @@ urlpatterns = [
     path('project-houses/create/', views.ProjectHouseCreateView.as_view(), name='projecthouse_create'),
     path('project-houses/<int:pk>/edit/', views.ProjectHouseUpdateView.as_view(), name='projecthouse_update'),
     path('project-houses/<int:pk>/delete/', views.ProjectHouseDeleteView.as_view(), name='projecthouse_delete'),
+    # Contact Messages
+    path('contact-messages/', views.ContactSubmissionListView.as_view(), name='contactsubmission_list'),
+    path('contact-messages/<int:pk>/', views.ContactSubmissionDetailView.as_view(), name='contactsubmission_detail'),
+    path('contact-messages/<int:pk>/update/', views.contact_submission_update, name='contactsubmission_update'),
+    path('contact-messages/<int:pk>/delete/', views.contact_submission_delete, name='contactsubmission_delete'),
 ]

@@ -20,7 +20,7 @@ from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 
 from .decorators import role_required
 from .forms import CompanySettingsForm, ClientInquiryForm, InquiryResponseForm, LoginForm, UserProfileForm
-from .models import ActivityLog, ClientInquiry, CompanySettings, Notification, User, ProjectHouse
+from .models import ActivityLog, ClientInquiry, CompanySettings, ContactSubmission, Notification, User, ProjectHouse
 
 
 def login_view(request):
@@ -450,10 +450,13 @@ def contact_view(request):
         phone = request.POST.get('phone', '')
         subject = request.POST.get('subject', '')
         message = request.POST.get('message', '')
-        ActivityLog.objects.create(
-            user=None,
-            action=f'Contact form submission: {name} ({email}) - {subject}',
-            details=f'From: {name}\nEmail: {email}\nPhone: {phone}\nSubject: {subject}\nMessage: {message}',
+        from .models import ContactSubmission
+        ContactSubmission.objects.create(
+            name=name,
+            email=email,
+            phone=phone,
+            subject=subject,
+            message=message,
         )
         messages.success(request, 'Thank you for your message! We will get back to you within 24 hours.')
         return redirect('core:contact')
@@ -587,3 +590,59 @@ def respond_to_inquiry(request, pk):
         )
         messages.success(request, 'Response submitted successfully.')
     return redirect('core:inquiry_detail', pk=pk)
+
+
+class ContactSubmissionListView(LoginRequiredMixin, ListView):
+    model = ContactSubmission
+    template_name = 'core/contactsubmission_list.html'
+    context_object_name = 'submissions'
+    paginate_by = 20
+
+    def get_queryset(self):
+        qs = ContactSubmission.objects.all()
+        status_filter = self.request.GET.get('status')
+        if status_filter:
+            qs = qs.filter(status=status_filter)
+        return qs
+
+    def get_context_data(self, **kwargs):
+        ctx = super().get_context_data(**kwargs)
+        ctx['new_count'] = ContactSubmission.objects.filter(status='new').count()
+        ctx['current_status'] = self.request.GET.get('status', '')
+        return ctx
+
+
+class ContactSubmissionDetailView(LoginRequiredMixin, DetailView):
+    model = ContactSubmission
+    template_name = 'core/contactsubmission_detail.html'
+    context_object_name = 'submission'
+
+    def get(self, request, *args, **kwargs):
+        obj = self.get_object()
+        if obj.status == 'new':
+            obj.status = 'read'
+            obj.save(update_fields=['status'])
+        return super().get(request, *args, **kwargs)
+
+
+@login_required
+@require_POST
+def contact_submission_update(request, pk):
+    sub = get_object_or_404(ContactSubmission, pk=pk)
+    new_status = request.POST.get('status', sub.status)
+    notes = request.POST.get('notes', sub.notes)
+    if new_status in dict(ContactSubmission.Status.choices):
+        sub.status = new_status
+    sub.notes = notes
+    sub.save(update_fields=['status', 'notes', 'updated_at'])
+    messages.success(request, 'Submission updated.')
+    return redirect('core:contactsubmission_detail', pk=pk)
+
+
+@login_required
+@require_POST
+def contact_submission_delete(request, pk):
+    sub = get_object_or_404(ContactSubmission, pk=pk)
+    sub.delete()
+    messages.success(request, 'Submission deleted.')
+    return redirect('core:contactsubmission_list')
