@@ -106,7 +106,7 @@ class ClientInquiry(models.Model):
 class ProjectHouse(models.Model):
     title = models.CharField(max_length=200)
     description = models.TextField(blank=True)
-    image = models.ImageField(upload_to='project-houses/')
+    image = models.CharField(max_length=200, help_text='Image filename in static/project-houses/ (e.g. project-house-1.jpg)')
     order = models.PositiveIntegerField(default=0, help_text='Display order (lower = first)')
     is_active = models.BooleanField(default=True)
     created_at = models.DateTimeField(auto_now_add=True)
@@ -119,3 +119,7 @@ class ProjectHouse(models.Model):
 
     def __str__(self):
         return self.title
+
+    def get_image_url(self):
+        from django.templatetags.static import static
+        return static(f'project-houses/{self.image}')

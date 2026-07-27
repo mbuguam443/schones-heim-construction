@@ -13,7 +13,6 @@ import django
 django.setup()
 
 from apps.core.models import ProjectHouse
-from django.core.files import File
 
 IMAGES_DIR = os.path.join('static', 'project-houses')
 
@@ -77,22 +76,20 @@ def main():
         title = TITLES[i] if i < len(TITLES) else f"Project House {i+1}"
         desc = DESCRIPTIONS[i] if i < len(DESCRIPTIONS) else f"Construction project by Schones Heim Builders."
         
-        img_path = os.path.join(IMAGES_DIR, img_file)
-        
         if ProjectHouse.objects.filter(title=title).exists():
             print(f"  Skipping (exists): {title}")
             continue
         
-        with open(img_path, 'rb') as f:
-            house = ProjectHouse(
-                title=title,
-                description=desc,
-                order=i+1,
-                is_active=True,
-            )
-            house.image.save(img_file, File(f), save=True)
-            print(f"  Created: {title}")
-            count += 1
+        house = ProjectHouse(
+            title=title,
+            description=desc,
+            image=img_file,
+            order=i+1,
+            is_active=True,
+        )
+        house.save()
+        print(f"  Created: {title} -> {img_file}")
+        count += 1
     
     print(f"\n=== Done! Created {count} project houses ===\n")
 

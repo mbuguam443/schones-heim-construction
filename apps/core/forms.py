@@ -150,6 +150,6 @@ class ProjectHouseForm(forms.ModelForm):
         widgets = {
             'title': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Project house title'}),
             'description': forms.Textarea(attrs={'class': 'form-control', 'rows': 3, 'placeholder': 'Description of this project house...'}),
-            'image': forms.FileInput(attrs={'class': 'form-control'}),
+            'image': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'e.g. project-house-1.jpg'}),
             'order': forms.NumberInput(attrs={'class': 'form-control', 'placeholder': '0'}),
         }

@@ -91,8 +91,8 @@
     <div class="row g-4">
       {% for house in project_houses %}
       <div class="col-md-4 col-6 reveal {% if forloop.counter0|divisibleby:3 %}reveal-delay-1{% elif forloop.counter0|divisibleby:3 == 1 %}reveal-delay-2{% endif %}">
-        <div class="project-gallery-item" data-bs-toggle="modal" data-bs-target="#imageModal" onclick="showImage('{{ house.image.url }}', '{{ house.title|escapejs }}', '{{ house.description|escapejs }}')">
-          <img src="{{ house.image.url }}" alt="{{ house.title }} - Schones Heim Builders Construction Kenya" loading="lazy" width="400" height="280">
+        <div class="project-gallery-item" data-bs-toggle="modal" data-bs-target="#imageModal" onclick="showImage('{{ house.get_image_url }}', '{{ house.title|escapejs }}', '{{ house.description|escapejs }}')">
+          <img src="{{ house.get_image_url }}" alt="{{ house.title }} - Schones Heim Builders Construction Kenya" loading="lazy" width="400" height="280">
           <div class="project-overlay">
             <h5 class="mb-1">{{ house.title }}</h5>
             <p class="small mb-0">Click to view details</p>
