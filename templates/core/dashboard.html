@@ -191,7 +191,7 @@
               {% for log in activity_logs %}
               <tr>
                 <td>
-                  <span class="badge badge-role bg-primary-soft">{{ log.user.get_full_name|default:log.user.username }}</span>
+                  <span class="badge badge-role bg-primary-soft">{% if log.user %}{{ log.user.get_full_name|default:log.user.username }}{% else %}System{% endif %}</span>
                 </td>
                 <td>{{ log.action }}</td>
                 <td><span class="badge bg-light text-dark">{{ log.model_name }}</span></td>
