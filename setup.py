@@ -42,7 +42,14 @@ def main():
     run(f"{sys.executable} manage.py migrate")
 
     print("\n[3/7] Seeding database...")
-    run(f"{sys.executable} seed_data.py")
+    import django
+    django.setup()
+    from apps.core.models import User
+    if User.objects.filter(is_superuser=False).exclude(username='admin').count() > 5:
+        print("  Database already has data. Skipping seed to prevent overwriting.")
+        print("  If you need to re-seed, run: python seed_data.py manually.")
+    else:
+        run(f"{sys.executable} seed_data.py")
 
     print("\n[4/7] Collecting static files...")
     run(f"{sys.executable} manage.py collectstatic --noinput")
@@ -52,8 +59,6 @@ def main():
         run(f"{sys.executable} seed_projecthouses.py")
 
     print("\n[6/7] Creating admin user...")
-    import django
-    django.setup()
     from apps.core.models import User
     if not User.objects.filter(username='admin').exists():
         User.objects.create_superuser('admin', 'schonesheimbuilders@gmail.com', 'Admin123!')
