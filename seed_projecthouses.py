@@ -13,6 +13,7 @@ import django
 django.setup()
 
 from apps.core.models import ProjectHouse
+from django.core.files import File
 
 IMAGES_DIR = os.path.join('static', 'project-houses')
 
@@ -50,7 +51,7 @@ DESCRIPTIONS = [
     "A luxury penthouse with panoramic city views, private terrace, modern kitchen, and premium fittings in Kilimani.",
     "A spacious family home featuring 4 bedrooms, open-plan living, DSQ, and ample parking in the leafy Lavington neighborhood.",
     "A multi-story commercial building with modern office spaces, backup power, and prime CBD location.",
-    "A premium office complex featuring flexible floor plates, conference facilities, and ample parking in Upper Hill.",
+    "A premium office complex featuring flexible floor plans, conference facilities, and ample parking in Upper Hill.",
     "A mixed-use development combining retail and residential units with modern architectural design in Langata.",
     "A secure gated community development featuring 20 family homes with shared amenities in Kitengela.",
     "A stunning beach house with ocean views, open-plan living, and direct beach access in the coastal Diani area.",
@@ -76,20 +77,22 @@ def main():
         title = TITLES[i] if i < len(TITLES) else f"Project House {i+1}"
         desc = DESCRIPTIONS[i] if i < len(DESCRIPTIONS) else f"Construction project by Schones Heim Builders."
         
+        img_path = os.path.join(IMAGES_DIR, img_file)
+        
         if ProjectHouse.objects.filter(title=title).exists():
             print(f"  Skipping (exists): {title}")
             continue
         
-        house = ProjectHouse(
-            title=title,
-            description=desc,
-            image=img_file,
-            order=i+1,
-            is_active=True,
-        )
-        house.save()
-        print(f"  Created: {title} -> {img_file}")
-        count += 1
+        with open(img_path, 'rb') as f:
+            house = ProjectHouse(
+                title=title,
+                description=desc,
+                order=i+1,
+                is_active=True,
+            )
+            house.image.save(img_file, File(f), save=True)
+            print(f"  Created: {title}")
+            count += 1
     
     print(f"\n=== Done! Created {count} project houses ===\n")
 

@@ -416,7 +416,6 @@ def projects_view(request):
         'projects': all_projects,
         'project_houses': project_houses,
         'company_settings': company_settings,
-        'use_static_images': True,
     })
 
 
