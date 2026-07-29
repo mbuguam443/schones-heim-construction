@@ -37,7 +37,7 @@
                         <td>{{ forloop.counter }}</td>
                         <td>
                             {% if h.image %}
-                            <img src="{{ h.image.url }}" alt="{{ h.title }}" class="rounded" style="width: 60px; height: 45px; object-fit: cover;">
+                            <img src="{{ h.get_image_url }}" alt="{{ h.title }}" class="rounded" style="width: 60px; height: 45px; object-fit: cover;">
                             {% else %}
                             <span class="text-muted"><i class="fas fa-image"></i></span>
                             {% endif %}

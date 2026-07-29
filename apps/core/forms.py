@@ -150,6 +150,19 @@ class ProjectHouseForm(forms.ModelForm):
         widgets = {
             'title': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Project house title'}),
             'description': forms.Textarea(attrs={'class': 'form-control', 'rows': 3, 'placeholder': 'Description of this project house...'}),
-            'image': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'e.g. project-house-1.jpg'}),
+            'image': forms.Select(attrs={'class': 'form-select'}),
             'order': forms.NumberInput(attrs={'class': 'form-control', 'placeholder': '0'}),
         }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        import os
+        images_dir = os.path.join('static', 'project-houses')
+        choices = []
+        if os.path.exists(images_dir):
+            for f in sorted(os.listdir(images_dir)):
+                if f.lower().endswith(('.jpg', '.jpeg', '.png', '.webp')):
+                    choices.append((f, f))
+        if not choices:
+            choices = [('', 'No images found - upload to static/project-houses/')]
+        self.fields['image'].widget = forms.Select(choices=choices, attrs={'class': 'form-select'})
