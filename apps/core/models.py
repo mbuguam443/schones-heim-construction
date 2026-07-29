@@ -104,17 +104,8 @@ class ClientInquiry(models.Model):
 
 
 class ProjectHouse(models.Model):
-    class Category(models.TextChoices):
-        RESIDENTIAL = 'Residential', 'Residential'
-        COMMERCIAL = 'Commercial', 'Commercial'
-        MIXED_USE = 'Mixed Use', 'Mixed Use'
-        INSTITUTIONAL = 'Institutional', 'Institutional'
-        INDUSTRIAL = 'Industrial', 'Industrial'
-        OTHER = 'Other', 'Other'
-
     title = models.CharField(max_length=200)
     description = models.TextField(blank=True)
-    category = models.CharField(max_length=20, choices=Category.choices, default=Category.OTHER)
     image = models.ImageField(upload_to='project-houses/')
     order = models.PositiveIntegerField(default=0, help_text='Display order (lower = first)')
     is_active = models.BooleanField(default=True)
@@ -122,7 +113,7 @@ class ProjectHouse(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
 
     class Meta:
-        ordering = ['category', 'order', '-created_at']
+        ordering = ['title', 'order', '-created_at']
         verbose_name = 'Project House'
         verbose_name_plural = 'Project Houses'
 

@@ -89,11 +89,11 @@
       <p class="section-subtitle">Visual showcase of our construction work and completed projects</p>
     </div>
 
-    {% regroup project_houses by category as category_list %}
-    {% for group in category_list %}
+    {% regroup project_houses by title as title_list %}
+    {% for group in title_list %}
     <div class="mb-5">
       <h3 class="mb-4" style="color:#1a3c6e; font-weight:700; border-bottom:3px solid #1a3c6e; padding-bottom:10px;">
-        <i class="fas fa-folder-open me-2"></i>{{ group.grouper }} Projects
+        <i class="fas fa-folder-open me-2"></i>{{ group.grouper }}
       </h3>
       <div class="row g-4">
         {% for house in group.list %}
@@ -102,7 +102,7 @@
             <img src="{{ house.image.url }}" alt="{{ house.title }} - Schones Heim Builders Construction Kenya" loading="lazy" width="400" height="280">
             <div class="project-overlay">
               <h5 class="mb-1">{{ house.title }}</h5>
-              <p class="small mb-0">Click to view details</p>
+              <p class="small mb-0">{{ house.description|truncatewords:8 }}</p>
             </div>
           </div>
         </div>

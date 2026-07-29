@@ -146,11 +146,10 @@ class InquiryResponseForm(forms.Form):
 class ProjectHouseForm(forms.ModelForm):
     class Meta:
         model = ProjectHouse
-        fields = ['title', 'description', 'category', 'image', 'order', 'is_active']
+        fields = ['title', 'description', 'image', 'order', 'is_active']
         widgets = {
             'title': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Project house title'}),
             'description': forms.Textarea(attrs={'class': 'form-control', 'rows': 3, 'placeholder': 'Description of this project house...'}),
-            'category': forms.Select(attrs={'class': 'form-select'}),
             'image': forms.FileInput(attrs={'class': 'form-control'}),
             'order': forms.NumberInput(attrs={'class': 'form-control', 'placeholder': '0'}),
         }
