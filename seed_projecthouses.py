@@ -12,7 +12,7 @@ django.setup()
 from apps.core.models import ProjectHouse
 from django.core.files import File
 
-BASE = os.path.join('static', 'project-houses')
+BASE = os.path.join('media', 'project-houses')
 
 def main():
     print("\n=== Seeding Project Houses ===\n")
