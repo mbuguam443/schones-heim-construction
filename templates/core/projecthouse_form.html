@@ -45,6 +45,16 @@
                         {{ form.description }}
                         {% for err in form.description.errors %}<div class="text-danger small mt-1">{{ err }}</div>{% endfor %}
                     </div>
+                    <div class="col-md-6">
+                        <label class="form-label">Category</label>
+                        {{ form.category }}
+                        {% for err in form.category.errors %}<div class="text-danger small mt-1">{{ err }}</div>{% endfor %}
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label">Order Number <small class="text-muted">(lower = first)</small></label>
+                        {{ form.order }}
+                        {% for err in form.order.errors %}<div class="text-danger small mt-1">{{ err }}</div>{% endfor %}
+                    </div>
                     <div class="col-md-12">
                         <label class="form-label">Image</label>
                         {% if object and object.image %}
@@ -55,11 +65,6 @@
                         {% endif %}
                         {{ form.image }}
                         {% for err in form.image.errors %}<div class="text-danger small mt-1">{{ err }}</div>{% endfor %}
-                    </div>
-                    <div class="col-md-6">
-                        <label class="form-label">Order Number</label>
-                        {{ form.order }}
-                        {% for err in form.order.errors %}<div class="text-danger small mt-1">{{ err }}</div>{% endfor %}
                     </div>
                     <div class="col-md-6">
                         <label class="form-label">&nbsp;</label>

@@ -25,6 +25,7 @@
                         <th>#</th>
                         <th>Image</th>
                         <th>Title</th>
+                        <th>Category</th>
                         <th>Description</th>
                         <th>Order</th>
                         <th>Status</th>
@@ -43,6 +44,7 @@
                             {% endif %}
                         </td>
                         <td class="fw-semibold">{{ h.title }}</td>
+                        <td><span class="badge bg-secondary">{{ h.category }}</span></td>
                         <td>{{ h.description|truncatewords:10 }}</td>
                         <td>{{ h.order }}</td>
                         <td>

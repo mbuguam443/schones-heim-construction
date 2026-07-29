@@ -18,28 +18,17 @@ from django.core.files import File
 IMAGES_DIR = os.path.join('static', 'project-houses')
 
 TITLES = [
-    "Residential Home - Karen",
-    "Modern Apartment Block - Westlands",
-    "Executive Villa - Runda",
-    "Townhouse Complex - Kileleshwa",
-    "Estate Housing - South B",
-    "Luxury Penthouse - Kilimani",
-    "Family Home - Lavington",
-    "Commercial Building - CBD",
-    "Office Complex - Upper Hill",
-    "Mixed Use Development - Langata",
-    "Gated Community - Kitengela",
-    "Beach House - Diani",
-    "Country Home - Naivasha",
-    "Serviced Apartments - Parklands",
-    "Warehouse - Industrial Area",
-    "School Building - Kasarani",
-    "Church Complex - Embakasi",
-    "Medical Center - Eastleigh",
-    "Shopping Plaza - Thika Road",
-    "Hotel & Resort - Nanyuki",
-    "Sports Complex - Kasarani",
-    "Student Hostel - University Area",
+    "Residential Home - Karen", "Modern Apartment Block - Westlands",
+    "Executive Villa - Runda", "Townhouse Complex - Kileleshwa",
+    "Estate Housing - South B", "Luxury Penthouse - Kilimani",
+    "Family Home - Lavington", "Commercial Building - CBD",
+    "Office Complex - Upper Hill", "Mixed Use Development - Langata",
+    "Gated Community - Kitengela", "Beach House - Diani",
+    "Country Home - Naivasha", "Serviced Apartments - Parklands",
+    "Warehouse - Industrial Area", "School Building - Kasarani",
+    "Church Complex - Embakasi", "Medical Center - Eastleigh",
+    "Shopping Plaza - Thika Road", "Hotel & Resort - Nanyuki",
+    "Sports Complex - Kasarani", "Student Hostel - University Area",
 ]
 
 DESCRIPTIONS = [
@@ -67,6 +56,22 @@ DESCRIPTIONS = [
     "A student hostel featuring study rooms, shared kitchens, laundry, and high-speed internet near the university area.",
 ]
 
+def get_category(title):
+    title_lower = title.lower()
+    if any(w in title_lower for w in ['residential', 'home', 'villa', 'townhouse', 'estate', 'family', 'penthouse', 'apartment']):
+        return 'Residential'
+    elif any(w in title_lower for w in ['commercial', 'office', 'shopping', 'warehouse']):
+        return 'Commercial'
+    elif any(w in title_lower for w in ['mixed', 'serviced']):
+        return 'Mixed Use'
+    elif any(w in title_lower for w in ['school', 'church', 'medical', 'student', 'sports']):
+        return 'Institutional'
+    elif any(w in title_lower for w in ['hotel', 'resort', 'beach', 'country']):
+        return 'Other'
+    elif any(w in title_lower for w in ['gated']):
+        return 'Residential'
+    return 'Other'
+
 def main():
     print("\n=== Seeding Project Houses ===\n")
     
@@ -76,6 +81,7 @@ def main():
     for i, img_file in enumerate(images):
         title = TITLES[i] if i < len(TITLES) else f"Project House {i+1}"
         desc = DESCRIPTIONS[i] if i < len(DESCRIPTIONS) else f"Construction project by Schones Heim Builders."
+        category = get_category(title)
         
         img_path = os.path.join(IMAGES_DIR, img_file)
         
@@ -87,11 +93,12 @@ def main():
             house = ProjectHouse(
                 title=title,
                 description=desc,
+                category=category,
                 order=i+1,
                 is_active=True,
             )
             house.image.save(img_file, File(f), save=True)
-            print(f"  Created: {title}")
+            print(f"  Created: {title} [{category}]")
             count += 1
     
     print(f"\n=== Done! Created {count} project houses ===\n")
