@@ -26,9 +26,10 @@ class ProjectAssignmentForm(forms.ModelForm):
 class ProjectPhotoForm(forms.ModelForm):
     class Meta:
         model = ProjectPhoto
-        fields = ('project', 'image', 'caption')
+        fields = ('project', 'image', 'caption', 'description')
         widgets = {
             'caption': forms.TextInput(attrs={'placeholder': 'Optional caption...'}),
+            'description': forms.Textarea(attrs={'rows': 2, 'placeholder': 'Description of this photo (e.g. foundation stage)...'}),
         }
 
 

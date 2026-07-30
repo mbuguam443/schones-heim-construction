@@ -66,6 +66,7 @@ class ProjectPhoto(models.Model):
     project = models.ForeignKey(Project, on_delete=models.CASCADE, related_name='photos')
     image = models.ImageField(upload_to=project_photo_path)
     caption = models.CharField(max_length=200, blank=True)
+    description = models.TextField(blank=True, help_text='Detailed description of this photo (e.g. what stage of construction)')
     is_cover = models.BooleanField(default=False, help_text='Show this photo as the project cover on the portfolio')
     sort_order = models.PositiveIntegerField(default=0, help_text='Display order (lower = first, after cover)')
     uploaded_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True)

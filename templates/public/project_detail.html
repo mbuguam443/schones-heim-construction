@@ -84,9 +84,12 @@
         <div class="row g-3">
           {% for photo in photos %}
           <div class="col-md-4 col-6 reveal {% cycle 'reveal-delay-1' 'reveal-delay-2' 'reveal-delay-3' %}">
-            <img src="{{ photo.image.url }}" alt="{{ photo.caption|default:project.name }}" class="gallery-img" loading="lazy" data-bs-toggle="modal" data-bs-target="#imageModal" onclick="openModal('{{ photo.image.url }}', '{{ photo.caption|escapejs }}')">
+            <img src="{{ photo.image.url }}" alt="{{ photo.caption|default:project.name }}" class="gallery-img" loading="lazy" data-bs-toggle="modal" data-bs-target="#imageModal" onclick="openModal('{{ photo.image.url }}', '{{ photo.caption|escapejs }}', '{{ photo.description|escapejs }}')">
             {% if photo.caption %}
-            <p class="text-muted small mt-1 mb-0 text-center">{{ photo.caption }}</p>
+            <p class="fw-medium small mt-1 mb-0 text-center">{{ photo.caption }}</p>
+            {% endif %}
+            {% if photo.description %}
+            <p class="text-muted small mb-0 text-center">{{ photo.description|truncatewords:15 }}</p>
             {% endif %}
           </div>
           {% endfor %}
@@ -168,6 +171,7 @@
       </div>
       <div class="modal-body text-center">
         <img id="modalImage" src="" alt="Project photo" class="modal-img img-fluid">
+        <p id="modalDescription" class="text-muted text-start mt-3"></p>
       </div>
     </div>
   </div>
@@ -176,9 +180,10 @@
 
 {% block extra_js %}
 <script>
-function openModal(src, caption) {
+function openModal(src, caption, description) {
   document.getElementById('modalImage').src = src;
   document.getElementById('imageModalLabel').textContent = caption || 'Project Photo';
+  document.getElementById('modalDescription').textContent = description || '';
 }
 
 document.querySelectorAll('.reveal').forEach(function(el) {

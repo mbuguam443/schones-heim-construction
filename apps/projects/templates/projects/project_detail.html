@@ -130,6 +130,9 @@
                              </div>
                              <div class="card-body p-2">
                                  <div class="fw-medium small">{{ photo.caption|default:'No caption' }}</div>
+                                 {% if photo.description %}
+                                 <div class="text-muted" style="font-size:0.7rem;">{{ photo.description|truncatewords:20 }}</div>
+                                 {% endif %}
                                  <div class="text-muted" style="font-size:0.7rem;">
                                      {% if photo.uploaded_by %}{{ photo.uploaded_by.get_full_name|default:photo.uploaded_by.username }}{% else %}System{% endif %} • {{ photo.uploaded_at|date:"M d, Y" }}
                                  </div>
