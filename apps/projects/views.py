@@ -2,8 +2,10 @@ from django.contrib.auth import get_user_model
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.urls import reverse_lazy, reverse
 from django.views.generic import ListView, CreateView, DetailView, UpdateView, DeleteView
-from django.http import JsonResponse, HttpResponseRedirect
+from django.contrib import messages
+from django.http import JsonResponse, HttpResponseRedirect, HttpResponseForbidden
 from django.db.models import Q
+from django.views.decorators.http import require_POST
 from .models import Project, ProjectAssignment, ProjectPhoto, ProjectDocument
 from .forms import ProjectForm, ProjectAssignmentForm, ProjectPhotoForm, ProjectDocumentForm, ProjectProgressForm
 
@@ -172,3 +174,15 @@ class ProjectDocumentCreateView(LoginRequiredMixin, AdminOrPMMixin, CreateView):
 
     def get_success_url(self):
         return reverse('projects:project_detail', kwargs={'pk': self.kwargs['pk']})
+
+
+@require_POST
+def set_photo_cover(request, pk, photo_pk):
+    if not is_admin_or_pm(request.user):
+        return HttpResponseForbidden()
+    ProjectPhoto.objects.filter(project_id=pk).update(is_cover=False)
+    photo = get_object_or_404(ProjectPhoto, pk=photo_pk, project_id=pk)
+    photo.is_cover = True
+    photo.save(update_fields=['is_cover'])
+    messages.success(request, 'Cover photo updated.')
+    return HttpResponseRedirect(reverse('projects:project_detail', kwargs={'pk': pk}))

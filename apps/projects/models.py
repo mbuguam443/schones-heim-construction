@@ -66,11 +66,12 @@ class ProjectPhoto(models.Model):
     project = models.ForeignKey(Project, on_delete=models.CASCADE, related_name='photos')
     image = models.ImageField(upload_to=project_photo_path)
     caption = models.CharField(max_length=200, blank=True)
+    is_cover = models.BooleanField(default=False, help_text='Show this photo as the project cover on the portfolio')
     uploaded_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True)
     uploaded_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:
-        ordering = ['-uploaded_at']
+        ordering = ['-is_cover', '-uploaded_at']
 
     def __str__(self):
         return f"Photo: {self.caption or self.project.name}"

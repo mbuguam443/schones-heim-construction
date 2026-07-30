@@ -111,19 +111,31 @@
                 {% endif %}
                 {% if photos %}
                 <div class="row g-3">
-                    {% for photo in photos %}
-                    <div class="col-6 col-md-4 col-lg-3">
-                        <div class="card">
-                            <img src="{{ photo.image.url }}" alt="{{ photo.caption|default:'Project photo' }}" class="card-img-top" style="height:160px;object-fit:cover;">
-                            <div class="card-body p-2">
-                                <div class="fw-medium small">{{ photo.caption|default:'No caption' }}</div>
-                                <div class="text-muted" style="font-size:0.7rem;">
-                                    {% if photo.uploaded_by %}{{ photo.uploaded_by.get_full_name|default:photo.uploaded_by.username }}{% else %}System{% endif %} • {{ photo.uploaded_at|date:"M d, Y" }}
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    {% endfor %}
+                     {% for photo in photos %}
+                     <div class="col-6 col-md-4 col-lg-3">
+                         <div class="card">
+                             <img src="{{ photo.image.url }}" alt="{{ photo.caption|default:'Project photo' }}" class="card-img-top" style="height:160px;object-fit:cover;">
+                             <div class="card-body p-2">
+                                 <div class="fw-medium small">{{ photo.caption|default:'No caption' }}</div>
+                                 <div class="text-muted" style="font-size:0.7rem;">
+                                     {% if photo.uploaded_by %}{{ photo.uploaded_by.get_full_name|default:photo.uploaded_by.username }}{% else %}System{% endif %} • {{ photo.uploaded_at|date:"M d, Y" }}
+                                 </div>
+                                 {% if can_edit %}
+                                 <div class="mt-1">
+                                     {% if photo.is_cover %}
+                                     <span class="badge bg-success"><i class="fas fa-star me-1"></i>Cover Photo</span>
+                                     {% else %}
+                                     <form method="post" action="{% url 'projects:set_photo_cover' project.pk photo.pk %}" style="display:inline;">
+                                         {% csrf_token %}
+                                         <button type="submit" class="btn btn-sm btn-outline-primary w-100">Set as Cover</button>
+                                     </form>
+                                     {% endif %}
+                                 </div>
+                                 {% endif %}
+                             </div>
+                         </div>
+                     </div>
+                     {% endfor %}
                 </div>
                 {% else %}
                 <p class="text-muted text-center mb-0 py-3"><i class="fas fa-images me-1"></i> No photos yet.</p>
