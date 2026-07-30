@@ -114,22 +114,31 @@
                      {% for photo in photos %}
                      <div class="col-6 col-md-4 col-lg-3">
                          <div class="card">
-                             <img src="{{ photo.image.url }}" alt="{{ photo.caption|default:'Project photo' }}" class="card-img-top" style="height:160px;object-fit:cover;">
+                             <div style="position:relative;">
+                                 <img src="{{ photo.image.url }}" alt="{{ photo.caption|default:'Project photo' }}" class="card-img-top" style="height:160px;object-fit:cover;">
+                                 {% if can_edit %}
+                                 <div style="position:absolute;top:5px;left:5px;display:flex;gap:3px;">
+                                     <form method="post" action="{% url 'projects:reorder_photo' project.pk photo.pk 'up' %}">{% csrf_token %}<button type="submit" class="btn btn-sm btn-dark" style="padding:2px 8px;" title="Move up"><i class="fas fa-chevron-up"></i></button></form>
+                                     <form method="post" action="{% url 'projects:reorder_photo' project.pk photo.pk 'down' %}">{% csrf_token %}<button type="submit" class="btn btn-sm btn-dark" style="padding:2px 8px;" title="Move down"><i class="fas fa-chevron-down"></i></button></form>
+                                 </div>
+                                 {% endif %}
+                                 {% if photo.is_cover %}
+                                 <div style="position:absolute;top:5px;right:5px;">
+                                     <span class="badge bg-success"><i class="fas fa-star"></i></span>
+                                 </div>
+                                 {% endif %}
+                             </div>
                              <div class="card-body p-2">
                                  <div class="fw-medium small">{{ photo.caption|default:'No caption' }}</div>
                                  <div class="text-muted" style="font-size:0.7rem;">
                                      {% if photo.uploaded_by %}{{ photo.uploaded_by.get_full_name|default:photo.uploaded_by.username }}{% else %}System{% endif %} • {{ photo.uploaded_at|date:"M d, Y" }}
                                  </div>
-                                 {% if can_edit %}
+                                 {% if can_edit and not photo.is_cover %}
                                  <div class="mt-1">
-                                     {% if photo.is_cover %}
-                                     <span class="badge bg-success"><i class="fas fa-star me-1"></i>Cover Photo</span>
-                                     {% else %}
-                                     <form method="post" action="{% url 'projects:set_photo_cover' project.pk photo.pk %}" style="display:inline;">
+                                     <form method="post" action="{% url 'projects:set_photo_cover' project.pk photo.pk %}">
                                          {% csrf_token %}
                                          <button type="submit" class="btn btn-sm btn-outline-primary w-100">Set as Cover</button>
                                      </form>
-                                     {% endif %}
                                  </div>
                                  {% endif %}
                              </div>

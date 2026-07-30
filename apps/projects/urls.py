@@ -13,6 +13,7 @@ urlpatterns = [
     path('<int:pk>/assign/', views.ProjectAssignmentCreateView.as_view(), name='project_assign'),
     path('<int:pk>/photo/add/', views.ProjectPhotoCreateView.as_view(), name='project_photo_add'),
     path('<int:pk>/photo/<int:photo_pk>/set-cover/', views.set_photo_cover, name='set_photo_cover'),
+    path('<int:pk>/photo/<int:photo_pk>/reorder/<str:direction>/', views.reorder_photo, name='reorder_photo'),
     path('<int:pk>/document/add/', views.ProjectDocumentCreateView.as_view(), name='project_document_add'),
     path('assignment/<int:pk>/delete/', views.ProjectAssignmentDeleteView.as_view(), name='assignment_delete'),
 ]

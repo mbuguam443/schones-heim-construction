@@ -187,3 +187,22 @@ def set_photo_cover(request, pk, photo_pk):
     photo.save(update_fields=['is_cover'])
     messages.success(request, 'Cover photo updated.')
     return HttpResponseRedirect(reverse('projects:project_detail', kwargs={'pk': pk}))
+
+
+@require_POST
+def reorder_photo(request, pk, photo_pk, direction):
+    if not is_admin_or_pm(request.user):
+        return HttpResponseForbidden()
+    photo = get_object_or_404(ProjectPhoto, pk=photo_pk, project_id=pk)
+    photos = list(ProjectPhoto.objects.filter(project_id=pk).order_by('sort_order', 'uploaded_at'))
+    idx = next((i for i, p in enumerate(photos) if p.pk == photo.pk), None)
+    if idx is None:
+        return HttpResponseRedirect(reverse('projects:project_detail', kwargs={'pk': pk}))
+    swap_idx = idx - 1 if direction == 'up' else idx + 1
+    if swap_idx < 0 or swap_idx >= len(photos):
+        messages.warning(request, 'Photo is already at the edge.')
+        return HttpResponseRedirect(reverse('projects:project_detail', kwargs={'pk': pk}))
+    photos[idx].sort_order, photos[swap_idx].sort_order = photos[swap_idx].sort_order, photos[idx].sort_order
+    ProjectPhoto.objects.bulk_update(photos, ['sort_order'])
+    messages.success(request, 'Photo reordered.')
+    return HttpResponseRedirect(reverse('projects:project_detail', kwargs={'pk': pk}))
