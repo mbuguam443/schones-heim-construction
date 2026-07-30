@@ -20,7 +20,7 @@ from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 
 from .decorators import role_required
 from .forms import CompanySettingsForm, ClientInquiryForm, InquiryResponseForm, LoginForm, UserProfileForm
-from .models import ActivityLog, ClientInquiry, CompanySettings, ContactSubmission, Notification, User, ProjectHouse
+from .models import ActivityLog, ClientInquiry, CompanySettings, ContactSubmission, Notification, User
 
 
 def login_view(request):
@@ -341,49 +341,6 @@ class UserPasswordResetView(LoginRequiredMixin, AdminOnlyMixin, FormView):
         user.save(update_fields=['password'])
         messages.success(self.request, f'Password reset for "{user.username}" successfully.')
         return redirect('core:user_list')
-
-
-#
-# Project House CRUD (Admin)
-#
-
-class ProjectHouseListView(LoginRequiredMixin, AdminOnlyMixin, ListView):
-    model = ProjectHouse
-    template_name = 'core/projecthouse_list.html'
-    context_object_name = 'projecthouses'
-    paginate_by = 20
-
-
-class ProjectHouseCreateView(LoginRequiredMixin, AdminOnlyMixin, CreateView):
-    model = ProjectHouse
-    form_class = __import__('apps.core.forms', fromlist=['ProjectHouseForm']).ProjectHouseForm
-    template_name = 'core/projecthouse_form.html'
-    success_url = reverse_lazy('core:projecthouse_list')
-
-    def form_valid(self, form):
-        messages.success(self.request, 'Project house created successfully.')
-        return super().form_valid(form)
-
-
-class ProjectHouseUpdateView(LoginRequiredMixin, AdminOnlyMixin, UpdateView):
-    model = ProjectHouse
-    form_class = __import__('apps.core.forms', fromlist=['ProjectHouseForm']).ProjectHouseForm
-    template_name = 'core/projecthouse_form.html'
-    success_url = reverse_lazy('core:projecthouse_list')
-
-    def form_valid(self, form):
-        messages.success(self.request, 'Project house updated successfully.')
-        return super().form_valid(form)
-
-
-class ProjectHouseDeleteView(LoginRequiredMixin, AdminOnlyMixin, DeleteView):
-    model = ProjectHouse
-    template_name = 'core/projecthouse_confirm_delete.html'
-    success_url = reverse_lazy('core:projecthouse_list')
-
-    def form_valid(self, form):
-        messages.success(self.request, 'Project house deleted successfully.')
-        return super().form_valid(form)
 
 
 #
