@@ -12,6 +12,7 @@ urlpatterns = [
     path('', views.home_view, name='home'),
     path('about/', views.about_view, name='about'),
     path('portfolio/', views.projects_view, name='projects'),
+    path('portfolio/<int:pk>/', views.project_detail_view, name='project_detail'),
     path('services/', views.services_view, name='services'),
     path('contact/', views.contact_view, name='contact'),
     # Auth

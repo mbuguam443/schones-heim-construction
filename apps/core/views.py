@@ -409,12 +409,22 @@ def home_view(request):
 
 def projects_view(request):
     from apps.projects.models import Project as AllProjects
-    all_projects = AllProjects.objects.all().order_by('-id')
-    project_houses = ProjectHouse.objects.filter(is_active=True)
+    all_projects = AllProjects.objects.all().prefetch_related('photos').order_by('-id')
     company_settings = CompanySettings.objects.first()
     return render(request, 'public/projects.html', {
         'projects': all_projects,
-        'project_houses': project_houses,
+        'company_settings': company_settings,
+    })
+
+
+def project_detail_view(request, pk):
+    from apps.projects.models import Project
+    project = get_object_or_404(Project.objects.prefetch_related('photos'), pk=pk)
+    photos = project.photos.all()
+    company_settings = CompanySettings.objects.first()
+    return render(request, 'public/project_detail.html', {
+        'project': project,
+        'photos': photos,
         'company_settings': company_settings,
     })
 

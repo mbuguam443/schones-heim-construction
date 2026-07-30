@@ -1,0 +1,196 @@
+{% extends 'public/base.html' %}
+{% load static %}
+{% block nav_projects %}active{% endblock %}
+{% block title %}{{ project.name }} - Our Projects{% endblock %}
+{% block meta_description %}{{ project.description|truncatewords:30 }}{% endblock %}
+{% block og_title %}{{ project.name }} - Schones Heim Builders{% endblock %}
+{% block og_description %}{{ project.description|truncatewords:25 }}{% endblock %}
+{% block og_url %}https://schones-heim-builders.co.ke{% url 'core:project_detail' project.pk %}{% endblock %}
+
+{% block extra_css %}
+<style>
+  .gallery-img {
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    cursor: pointer;
+    width: 100%;
+    height: 260px;
+    object-fit: cover;
+  }
+  .gallery-img:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+  }
+  .project-info-card {
+    border-radius: 12px;
+    border: none;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+  }
+  .project-info-card .info-label {
+    font-size: 0.8rem;
+    color: #6c757d;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+  .project-info-card .info-value {
+    font-size: 1rem;
+    font-weight: 600;
+  }
+  .modal-img {
+    max-height: 80vh;
+    object-fit: contain;
+    border-radius: 8px;
+  }
+  .reveal {
+    opacity: 0;
+    transform: translateY(30px);
+    transition: opacity 0.7s ease-out, transform 0.7s ease-out;
+  }
+  .reveal.visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  .reveal-delay-1 { transition-delay: 0.1s; }
+  .reveal-delay-2 { transition-delay: 0.2s; }
+  .reveal-delay-3 { transition-delay: 0.3s; }
+</style>
+{% endblock %}
+
+{% block content %}
+<section class="page-header" aria-label="Project Detail Header">
+  <div class="container">
+    <nav aria-label="breadcrumb">
+      <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="{% url 'core:home' %}">Home</a></li>
+        <li class="breadcrumb-item"><a href="{% url 'core:projects' %}">Projects</a></li>
+        <li class="breadcrumb-item active" aria-current="page">{{ project.name }}</li>
+      </ol>
+    </nav>
+  </div>
+</section>
+
+<section class="py-5" aria-label="Project Detail">
+  <div class="container">
+    <div class="row g-4">
+      <div class="col-lg-8">
+        <h1 class="fw-bold mb-3" style="color:#1a3c6e;">{{ project.name }}</h1>
+        <span class="badge bg-primary-custom mb-3 fs-6">{{ project.get_status_display }}</span>
+        <p class="lead mb-4">{{ project.description }}</p>
+
+        {% if photos %}
+        <h3 class="mb-4" style="color:#1a3c6e; font-weight:700;">Project Gallery</h3>
+        <div class="row g-3">
+          {% for photo in photos %}
+          <div class="col-md-4 col-6 reveal {% cycle 'reveal-delay-1' 'reveal-delay-2' 'reveal-delay-3' %}">
+            <img src="{{ photo.image.url }}" alt="{{ photo.caption|default:project.name }}" class="gallery-img" loading="lazy" data-bs-toggle="modal" data-bs-target="#imageModal" onclick="openModal('{{ photo.image.url }}', '{{ photo.caption|escapejs }}')">
+            {% if photo.caption %}
+            <p class="text-muted small mt-1 mb-0 text-center">{{ photo.caption }}</p>
+            {% endif %}
+          </div>
+          {% endfor %}
+        </div>
+        {% endif %}
+      </div>
+
+      <div class="col-lg-4">
+        <div class="card project-info-card">
+          <div class="card-body">
+            <h5 class="fw-bold mb-3" style="color:#1a3c6e;"><i class="fas fa-info-circle me-2"></i>Project Info</h5>
+            <div class="mb-3">
+              <div class="info-label">Status</div>
+              <div class="info-value"><span class="badge bg-primary-custom">{{ project.get_status_display }}</span></div>
+            </div>
+            <div class="mb-3">
+              <div class="info-label">Location</div>
+              <div class="info-value"><i class="fas fa-map-marker-alt me-1 text-muted"></i>{{ project.location|default:'Nairobi, Kenya' }}</div>
+            </div>
+            {% if project.client %}
+            <div class="mb-3">
+              <div class="info-label">Client</div>
+              <div class="info-value">{{ project.client.full_name }}</div>
+            </div>
+            {% endif %}
+            {% if project.start_date %}
+            <div class="mb-3">
+              <div class="info-label">Start Date</div>
+              <div class="info-value">{{ project.start_date }}</div>
+            </div>
+            {% endif %}
+            {% if project.end_date %}
+            <div class="mb-3">
+              <div class="info-label">End Date</div>
+              <div class="info-value">{{ project.end_date }}</div>
+            </div>
+            {% endif %}
+            {% if project.budget %}
+            <div class="mb-3">
+              <div class="info-label">Budget</div>
+              <div class="info-value">KSh {{ project.budget|floatformat:2 }}</div>
+            </div>
+            {% endif %}
+            <div class="mb-0">
+              <div class="info-label">Progress</div>
+              <div class="info-value">
+                <div class="progress" style="height:10px; border-radius:5px;">
+                  <div class="progress-bar bg-success" role="progressbar" style="width:{{ project.progress_percent }}%;" aria-valuenow="{{ project.progress_percent }}" aria-valuemin="0" aria-valuemax="100"></div>
+                </div>
+                <small class="text-muted">{{ project.progress_percent }}% complete</small>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="mt-4">
+          <a href="{% url 'core:contact' %}?project={{ project.name }}" class="btn btn-primary-custom w-100"><i class="fas fa-envelope me-2"></i>Inquire About This Project</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="py-5 bg-primary-custom text-white text-center" aria-label="More Projects">
+  <div class="container">
+    <h2 class="fw-bold mb-3">Interested in Similar Work?</h2>
+    <p class="mb-4 opacity-75">Contact us to discuss your construction needs.</p>
+    <a href="{% url 'core:projects' %}" class="btn btn-light btn-lg me-2"><i class="fas fa-arrow-left me-2"></i>View All Projects</a>
+    <a href="{% url 'core:contact' %}" class="btn btn-outline-light btn-lg"><i class="fas fa-envelope me-2"></i>Get a Quote</a>
+  </div>
+</section>
+
+<div class="modal fade" id="imageModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-lg modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="imageModalLabel">Project Photo</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body text-center">
+        <img id="modalImage" src="" alt="Project photo" class="modal-img img-fluid">
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+function openModal(src, caption) {
+  document.getElementById('modalImage').src = src;
+  document.getElementById('imageModalLabel').textContent = caption || 'Project Photo';
+}
+
+document.querySelectorAll('.reveal').forEach(function(el) {
+  var observer = new IntersectionObserver(function(entries) {
+    entries.forEach(function(entry) {
+      if (entry.isIntersecting) {
+        entry.target.classList.add('visible');
+        observer.unobserve(entry.target);
+      }
+    });
+  }, { threshold: 0.15 });
+  observer.observe(el);
+});
+</script>
+{% endblock %}
