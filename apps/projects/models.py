@@ -68,6 +68,7 @@ class ProjectPhoto(models.Model):
     caption = models.CharField(max_length=200, blank=True)
     description = models.TextField(blank=True, help_text='Detailed description of this photo (e.g. what stage of construction)')
     is_cover = models.BooleanField(default=False, help_text='Show this photo as the project cover on the portfolio')
+    is_visible = models.BooleanField(default=True, help_text='Show this photo on the public portfolio page')
     sort_order = models.PositiveIntegerField(default=0, help_text='Display order (lower = first, after cover)')
     uploaded_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True)
     uploaded_at = models.DateTimeField(auto_now_add=True)

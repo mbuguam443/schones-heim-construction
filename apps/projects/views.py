@@ -206,3 +206,29 @@ def reorder_photo(request, pk, photo_pk, direction):
     ProjectPhoto.objects.bulk_update(photos, ['sort_order'])
     messages.success(request, 'Photo reordered.')
     return HttpResponseRedirect(reverse('projects:project_detail', kwargs={'pk': pk}))
+
+
+@require_POST
+def toggle_photo_visibility(request, pk, photo_pk):
+    if not is_admin_or_pm(request.user):
+        return HttpResponseForbidden()
+    photo = get_object_or_404(ProjectPhoto, pk=photo_pk, project_id=pk)
+    photo.is_visible = not photo.is_visible
+    photo.save(update_fields=['is_visible'])
+    messages.success(request, f"Photo {'shown' if photo.is_visible else 'hidden'} on public page.")
+    return HttpResponseRedirect(reverse('projects:project_detail', kwargs={'pk': pk}))
+
+
+@require_POST
+def set_photo_order(request, pk, photo_pk):
+    if not is_admin_or_pm(request.user):
+        return HttpResponseForbidden()
+    photo = get_object_or_404(ProjectPhoto, pk=photo_pk, project_id=pk)
+    try:
+        new_order = int(request.POST.get('sort_order', 0))
+        photo.sort_order = new_order
+        photo.save(update_fields=['sort_order'])
+        messages.success(request, 'Photo order updated.')
+    except (ValueError, TypeError):
+        messages.error(request, 'Invalid order number.')
+    return HttpResponseRedirect(reverse('projects:project_detail', kwargs={'pk': pk}))

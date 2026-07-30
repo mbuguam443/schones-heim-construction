@@ -115,11 +115,10 @@
                      <div class="col-6 col-md-4 col-lg-3">
                          <div class="card">
                              <div style="position:relative;">
-                                 <img src="{{ photo.image.url }}" alt="{{ photo.caption|default:'Project photo' }}" class="card-img-top" style="height:160px;object-fit:cover;">
+                                 <img src="{{ photo.image.url }}" alt="{{ photo.caption|default:'Project photo' }}" class="card-img-top" style="height:160px;object-fit:cover;{% if not photo.is_visible %}opacity:0.4;{% endif %}">
                                  {% if can_edit %}
-                                 <div style="position:absolute;top:5px;left:5px;display:flex;gap:3px;">
-                                     <form method="post" action="{% url 'projects:reorder_photo' project.pk photo.pk 'up' %}">{% csrf_token %}<button type="submit" class="btn btn-sm btn-dark" style="padding:2px 8px;" title="Move up"><i class="fas fa-chevron-up"></i></button></form>
-                                     <form method="post" action="{% url 'projects:reorder_photo' project.pk photo.pk 'down' %}">{% csrf_token %}<button type="submit" class="btn btn-sm btn-dark" style="padding:2px 8px;" title="Move down"><i class="fas fa-chevron-down"></i></button></form>
+                                 <div style="position:absolute;top:5px;left:5px;">
+                                     <form method="post" action="{% url 'projects:toggle_photo_visibility' project.pk photo.pk %}">{% csrf_token %}<button type="submit" class="btn btn-sm {% if photo.is_visible %}btn-warning{% else %}btn-secondary{% endif %}" style="padding:2px 8px;" title="{% if photo.is_visible %}Hide from public{% else %}Show on public page{% endif %}"><i class="fas {% if photo.is_visible %}fa-eye{% else %}fa-eye-slash{% endif %}"></i></button></form>
                                  </div>
                                  {% endif %}
                                  {% if photo.is_cover %}
@@ -136,12 +135,15 @@
                                  <div class="text-muted" style="font-size:0.7rem;">
                                      {% if photo.uploaded_by %}{{ photo.uploaded_by.get_full_name|default:photo.uploaded_by.username }}{% else %}System{% endif %} • {{ photo.uploaded_at|date:"M d, Y" }}
                                  </div>
-                                 {% if can_edit and not photo.is_cover %}
-                                 <div class="mt-1">
-                                     <form method="post" action="{% url 'projects:set_photo_cover' project.pk photo.pk %}">
-                                         {% csrf_token %}
-                                         <button type="submit" class="btn btn-sm btn-outline-primary w-100">Set as Cover</button>
+                                 {% if can_edit %}
+                                 <div class="mt-1 d-flex align-items-center gap-2">
+                                     <form method="post" action="{% url 'projects:set_photo_order' project.pk photo.pk %}" class="d-flex align-items-center gap-1">{% csrf_token %}
+                                         <input type="number" name="sort_order" value="{{ photo.sort_order }}" class="form-control form-control-sm" style="width:55px;" min="0">
+                                         <button type="submit" class="btn btn-sm btn-outline-secondary" title="Set order"><i class="fas fa-check"></i></button>
                                      </form>
+                                     {% if not photo.is_cover %}
+                                     <form method="post" action="{% url 'projects:set_photo_cover' project.pk photo.pk %}">{% csrf_token %}<button type="submit" class="btn btn-sm btn-outline-primary" title="Set as cover"><i class="fas fa-star"></i></button></form>
+                                     {% endif %}
                                  </div>
                                  {% endif %}
                              </div>

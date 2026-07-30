@@ -109,30 +109,6 @@
               <div class="info-label">Location</div>
               <div class="info-value"><i class="fas fa-map-marker-alt me-1 text-muted"></i>{{ project.location|default:'Nairobi, Kenya' }}</div>
             </div>
-            {% if project.client %}
-            <div class="mb-3">
-              <div class="info-label">Client</div>
-              <div class="info-value">{{ project.client.full_name }}</div>
-            </div>
-            {% endif %}
-            {% if project.start_date %}
-            <div class="mb-3">
-              <div class="info-label">Start Date</div>
-              <div class="info-value">{{ project.start_date }}</div>
-            </div>
-            {% endif %}
-            {% if project.end_date %}
-            <div class="mb-3">
-              <div class="info-label">End Date</div>
-              <div class="info-value">{{ project.end_date }}</div>
-            </div>
-            {% endif %}
-            {% if project.budget %}
-            <div class="mb-3">
-              <div class="info-label">Budget</div>
-              <div class="info-value">KSh {{ project.budget|floatformat:2 }}</div>
-            </div>
-            {% endif %}
             <div class="mb-0">
               <div class="info-label">Progress</div>
               <div class="info-value">

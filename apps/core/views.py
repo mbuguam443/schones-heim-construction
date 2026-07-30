@@ -365,8 +365,11 @@ def home_view(request):
 
 
 def projects_view(request):
-    from apps.projects.models import Project as AllProjects
-    all_projects = AllProjects.objects.all().prefetch_related('photos').order_by('-id')
+    from django.db.models import Prefetch
+    from apps.projects.models import Project as AllProjects, ProjectPhoto
+    all_projects = AllProjects.objects.all().prefetch_related(
+        Prefetch('photos', queryset=ProjectPhoto.objects.filter(is_visible=True))
+    ).order_by('-id')
     company_settings = CompanySettings.objects.first()
     return render(request, 'public/projects.html', {
         'projects': all_projects,
@@ -377,7 +380,7 @@ def projects_view(request):
 def project_detail_view(request, pk):
     from apps.projects.models import Project
     project = get_object_or_404(Project.objects.prefetch_related('photos'), pk=pk)
-    photos = project.photos.all()
+    photos = project.photos.filter(is_visible=True)
     company_settings = CompanySettings.objects.first()
     return render(request, 'public/project_detail.html', {
         'project': project,
