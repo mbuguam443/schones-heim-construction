@@ -128,7 +128,7 @@ class ProjectProgressUpdateView(LoginRequiredMixin, AdminOrPMMixin, UpdateView):
         return HttpResponseRedirect(self.get_success_url())
 
     def get_success_url(self):
-        return reverse('project_detail', kwargs={'pk': self.object.pk})
+        return reverse('projects:project_detail', kwargs={'pk': self.object.pk})
 
 
 class ProjectAssignmentCreateView(LoginRequiredMixin, AdminOrPMMixin, CreateView):
