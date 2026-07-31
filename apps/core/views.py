@@ -98,6 +98,7 @@ def dashboard_view(request):
     revenue_data = []
 
     if Invoice:
+        Invoice.update_overdue_statuses()
         pending_invoices = Invoice.objects.filter(status='Pending').count()
 
         last_6_months = []

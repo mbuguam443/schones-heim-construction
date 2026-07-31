@@ -77,6 +77,7 @@ class InvoiceListView(LoginRequiredMixin, ListView):
     paginate_by = 25
 
     def get_queryset(self):
+        Invoice.update_overdue_statuses()
         qs = Invoice.objects.select_related('client', 'created_by').all()
         qs = filter_by_active_project(self.request, qs)
         user = self.request.user
@@ -182,6 +183,7 @@ class InvoiceDetailView(LoginRequiredMixin, DetailView):
     context_object_name = 'inv'
 
     def get_object(self):
+        Invoice.update_overdue_statuses()
         obj = get_object_or_404(
             Invoice.objects.select_related('client', 'project', 'quotation', 'created_by')
             .prefetch_related('items', 'payments__recorded_by'),
@@ -255,6 +257,8 @@ def record_payment(request, pk):
                 invoice.balance = Decimal('0.00')
             else:
                 invoice.status = 'Pending'
+                if invoice.due_date and invoice.due_date < timezone.localdate():
+                    invoice.status = 'Overdue'
             invoice.save(update_fields=['amount_paid', 'balance', 'status'])
 
             messages.success(request, f'Payment of {payment.amount} recorded for {invoice.invoice_number}.')
