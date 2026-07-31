@@ -126,6 +126,11 @@
                                      <span class="badge bg-success"><i class="fas fa-star"></i></span>
                                  </div>
                                  {% endif %}
+                                 {% if can_edit %}
+                                 <div style="position:absolute;bottom:5px;right:5px;">
+                                     <form method="post" action="{% url 'projects:delete_photo' project.pk photo.pk %}" onsubmit="return confirm('Delete this photo permanently?')">{% csrf_token %}<button type="submit" class="btn btn-sm btn-danger" style="padding:2px 8px;" title="Delete photo"><i class="fas fa-trash"></i></button></form>
+                                 </div>
+                                 {% endif %}
                              </div>
                              <div class="card-body p-2">
                                  <div class="fw-medium small">{{ photo.caption|default:'No caption' }}</div>
@@ -144,7 +149,6 @@
                                      {% if not photo.is_cover %}
                                      <form method="post" action="{% url 'projects:set_photo_cover' project.pk photo.pk %}">{% csrf_token %}<button type="submit" class="btn btn-sm btn-outline-primary" title="Set as cover"><i class="fas fa-star"></i></button></form>
                                      {% endif %}
-                                     <form method="post" action="{% url 'projects:delete_photo' project.pk photo.pk %}" onsubmit="return confirm('Delete this photo permanently?')">{% csrf_token %}<button type="submit" class="btn btn-sm btn-outline-danger" title="Delete photo"><i class="fas fa-trash"></i></button></form>
                                  </div>
                                  {% endif %}
                              </div>
