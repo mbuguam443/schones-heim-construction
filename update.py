@@ -36,7 +36,7 @@ def main():
     for d in ["apps", "config", "templates", "static", "media"]:
         if os.path.exists(d):
             shutil.copytree(d, f"{BACKUP_DIR}/{d}", dirs_exist_ok=True)
-    for f in ["manage.py", "passenger_wsgi.py", "requirements.txt", "seed_data.py"]:
+    for f in ["manage.py", "passenger_wsgi.py", "requirements.txt", "seed_data.py", "migrate.py", "seed_sample.py", "update.py"]:
         if os.path.exists(f):
             shutil.copy2(f, f"{BACKUP_DIR}/{f}")
     print(f"  Backup saved to {BACKUP_DIR}/")
@@ -97,7 +97,7 @@ def main():
             shutil.copytree(src, dst)
             print(f"  Updated: {dirname}/")
     
-    FILES_TO_UPDATE = ["manage.py", "passenger_wsgi.py", "requirements.txt", "setup.py", "migrate.py", "seed_sample.py"]
+    FILES_TO_UPDATE = ["manage.py", "passenger_wsgi.py", "requirements.txt", "setup.py", "migrate.py", "seed_sample.py", "update.py"]
     for filename in FILES_TO_UPDATE:
         src = os.path.join(extracted, filename)
         if os.path.exists(src):
