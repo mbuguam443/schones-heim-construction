@@ -144,6 +144,7 @@
                                      {% if not photo.is_cover %}
                                      <form method="post" action="{% url 'projects:set_photo_cover' project.pk photo.pk %}">{% csrf_token %}<button type="submit" class="btn btn-sm btn-outline-primary" title="Set as cover"><i class="fas fa-star"></i></button></form>
                                      {% endif %}
+                                     <form method="post" action="{% url 'projects:delete_photo' project.pk photo.pk %}" onsubmit="return confirm('Delete this photo permanently?')">{% csrf_token %}<button type="submit" class="btn btn-sm btn-outline-danger" title="Delete photo"><i class="fas fa-trash"></i></button></form>
                                  </div>
                                  {% endif %}
                              </div>

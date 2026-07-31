@@ -220,6 +220,18 @@ def toggle_photo_visibility(request, pk, photo_pk):
 
 
 @require_POST
+def delete_photo(request, pk, photo_pk):
+    if not is_admin_or_pm(request.user):
+        return HttpResponseForbidden()
+    photo = get_object_or_404(ProjectPhoto, pk=photo_pk, project_id=pk)
+    if photo.image:
+        photo.image.delete(save=False)
+    photo.delete()
+    messages.success(request, 'Photo deleted.')
+    return HttpResponseRedirect(reverse('projects:project_detail', kwargs={'pk': pk}))
+
+
+@require_POST
 def set_photo_order(request, pk, photo_pk):
     if not is_admin_or_pm(request.user):
         return HttpResponseForbidden()
