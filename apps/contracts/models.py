@@ -27,6 +27,8 @@ class Contract(models.Model):
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='Draft')
     client_signature_name = models.CharField(max_length=200, blank=True, help_text='Name of the person signing on behalf of the client')
     signed_at = models.DateTimeField(null=True, blank=True)
+    owner_signature_name = models.CharField(max_length=200, blank=True, help_text='Name of the company authorised signatory')
+    owner_signed_at = models.DateTimeField(null=True, blank=True)
     notes = models.TextField(blank=True)
     created_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='contracts_created')
     created_at = models.DateTimeField(auto_now_add=True)
@@ -46,6 +48,18 @@ class Contract(models.Model):
     def balance_amount(self):
         return self.contract_amount - self.deposit_amount
 
+    @property
+    def client_signed(self):
+        return bool(self.client_signature_name)
+
+    @property
+    def owner_signed(self):
+        return bool(self.owner_signature_name)
+
+    @property
+    def fully_signed(self):
+        return self.client_signed and self.owner_signed
+
     def save(self, *args, **kwargs):
         if not self.contract_number:
             year = self.created_at.year if self.created_at else 2026
@@ -59,8 +73,20 @@ class Contract(models.Model):
             self.contract_number = f'CTR-{year}-{num:04d}'
         super().save(*args, **kwargs)
 
-    def mark_signed(self, signature_name):
+    def mark_client_signed(self, signature_name):
+        from django.utils import timezone
         self.status = 'Signed'
         self.client_signature_name = signature_name
-        self.signed_at = __import__('django.utils.timezone', fromlist=['now']).now()
+        self.signed_at = timezone.now()
         self.save(update_fields=['status', 'client_signature_name', 'signed_at'])
+
+    def mark_owner_signed(self, signature_name):
+        from django.utils import timezone
+        self.owner_signature_name = signature_name
+        self.owner_signed_at = timezone.now()
+        if self.client_signed:
+            self.status = 'Signed'
+            save_fields = ['owner_signature_name', 'owner_signed_at', 'status']
+        else:
+            save_fields = ['owner_signature_name', 'owner_signed_at']
+        self.save(update_fields=save_fields)

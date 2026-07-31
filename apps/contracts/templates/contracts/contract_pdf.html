@@ -23,6 +23,8 @@
         .sig-table { width: 100%; border-collapse: collapse; }
         .sig-table td { width: 50%; vertical-align: top; padding: 0 20px; }
         .sig-line { border-top: 1px solid #333; margin-top: 50px; padding-top: 6px; font-size: 9pt; text-align: center; }
+        .sig-status { font-size: 9pt; color: #166534; font-weight: bold; }
+        .sig-pending { font-size: 9pt; color: #b45309; }
         .footer { margin-top: 40px; border-top: 2px solid #1a3c6e; padding-top: 15px; font-size: 9pt; color: #666; }
         .footer p { margin: 3px 0; }
     </style>
@@ -97,16 +99,22 @@
             <tr>
                 <td>
                     <div class="sig-line">
-                        {% if contract.status == 'Signed' %}
-                        {{ contract.client_signature_name }}<br>Client Signatory<br>{{ contract.signed_at|date:"d M Y" }}
+                        {% if contract.client_signed %}
+                        {{ contract.client_signature_name }}<br>Client Signatory<br>{{ contract.signed_at|date:"d M Y H:i" }}
+                        <div class="sig-status">&#10003; Electronically Signed</div>
                         {% else %}
-                        Client's Signature & Date
+                        Client's Signature & Date<br><span class="sig-pending">(pending signature)</span>
                         {% endif %}
                     </div>
                 </td>
                 <td>
                     <div class="sig-line">
-                        {{ company_settings.company_name|default:'Schones Heim Builders' }}<br>Authorised Signatory<br>{% if contract.start_date %}{{ contract.start_date|date:"d M Y" }}{% else %}{{ contract.created_at|date:"d M Y" }}{% endif %}
+                        {% if contract.owner_signed %}
+                        {{ contract.owner_signature_name }}<br>{{ company_settings.company_name|default:'Schones Heim Builders' }} - Authorised Signatory<br>{{ contract.owner_signed_at|date:"d M Y H:i" }}
+                        <div class="sig-status">&#10003; Electronically Signed</div>
+                        {% else %}
+                        {{ company_settings.company_name|default:'Schones Heim Builders' }} - Authorised Signatory<br><span class="sig-pending">(pending signature)</span>
+                        {% endif %}
                     </div>
                 </td>
             </tr>
