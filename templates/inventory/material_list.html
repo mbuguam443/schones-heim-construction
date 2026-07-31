@@ -95,9 +95,13 @@
                                 <a href="{% url 'inventory:material_update' mat.pk %}" class="btn btn-outline-primary" title="Edit"><i class="fas fa-pen"></i></a>
                                 {% endif %}
                                 {% if mat.is_active %}
+                                {% if user.role != 'store_keeper' %}
                                 <a href="{% url 'inventory:material_cancel' mat.pk %}" class="btn btn-outline-warning" title="Cancel" onclick="return confirm('Cancel {{ mat.name }}?')"><i class="fas fa-ban"></i></a>
+                                {% endif %}
                                 {% else %}
+                                {% if user.role != 'store_keeper' %}
                                 <a href="{% url 'inventory:material_restore' mat.pk %}" class="btn btn-outline-success" title="Restore"><i class="fas fa-undo"></i></a>
+                                {% endif %}
                                 {% endif %}
                             </div>
                         </td>

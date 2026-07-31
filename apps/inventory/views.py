@@ -85,7 +85,7 @@ class MaterialUpdateView(LoginRequiredMixin, AdminOrPMMaterialMixin, UpdateView)
         return super().form_valid(form)
 
 
-class MaterialCancelView(LoginRequiredMixin, View):
+class MaterialCancelView(LoginRequiredMixin, AdminOrPMMaterialMixin, View):
     def post(self, request, pk):
         material = get_object_or_404(Material, pk=pk)
         material.cancel()
@@ -99,7 +99,7 @@ class MaterialCancelView(LoginRequiredMixin, View):
         return redirect('inventory:material_list')
 
 
-class MaterialRestoreView(LoginRequiredMixin, View):
+class MaterialRestoreView(LoginRequiredMixin, AdminOrPMMaterialMixin, View):
     def post(self, request, pk):
         material = get_object_or_404(Material, pk=pk)
         material.restore()
