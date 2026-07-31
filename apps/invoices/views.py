@@ -162,6 +162,11 @@ def invoice_pdf(request, pk):
         Invoice.objects.select_related('client', 'project', 'created_by').prefetch_related('items'),
         pk=pk
     )
+    user = request.user
+    if user.role == 'client':
+        profile = getattr(user, 'client_profile', None)
+        if not profile or inv.client != profile:
+            raise Http404("Invoice not found")
     from apps.core.models import CompanySettings
     company_settings = CompanySettings.objects.first()
     html = render_to_string('invoices/invoice_pdf.html', {
@@ -175,6 +180,9 @@ def invoice_pdf(request, pk):
 @transaction.atomic
 def record_payment(request, pk):
     invoice = get_object_or_404(Invoice, pk=pk)
+    if request.user.role not in ('admin', 'accountant'):
+        messages.error(request, 'You do not have permission to record payments.')
+        return redirect('invoices:detail', pk=pk)
 
     if request.method == 'POST':
         form = PaymentForm(request.POST)
@@ -206,6 +214,11 @@ def receipt_pdf(request, pk):
         Payment.objects.select_related('invoice__client', 'invoice__project', 'recorded_by'),
         pk=pk
     )
+    user = request.user
+    if user.role == 'client':
+        profile = getattr(user, 'client_profile', None)
+        if not profile or payment.invoice.client != profile:
+            raise Http404("Receipt not found")
     from apps.core.models import CompanySettings
     company_settings = CompanySettings.objects.first()
     html = render_to_string('invoices/receipt_pdf.html', {
