@@ -44,8 +44,10 @@
         .details-table .due { color: #b02a37; font-weight: 800; }
 
         .signatures { margin-top: 34px; display: flex; justify-content: space-between; gap: 40px; }
-        .sig { flex: 1; }
-        .sig .line { border-top: 1px solid #333; margin-top: 54px; padding-top: 6px; font-size: 9pt; color: #555; text-align: center; }
+        .sig { flex: 1; text-align: center; }
+        .sig-space { height: 72px; display: flex; align-items: flex-end; justify-content: center; }
+        .sig-space img { max-height: 64px; max-width: 220px; object-fit: contain; }
+        .sig .line { border-top: 1px solid #333; padding-top: 6px; font-size: 9pt; color: #555; }
 
         .footer { margin-top: 40px; border-top: 2px solid #1a3c6e; padding-top: 12px; font-size: 8.5pt; color: #666; display: flex; justify-content: space-between; }
         .footer p { margin: 2px 0; }
@@ -115,8 +117,14 @@
     </table>
 
     <div class="signatures">
-        <div class="sig"><div class="line">Received By (Client)</div></div>
-        <div class="sig"><div class="line">Authorised Signature &amp; Stamp</div></div>
+        <div class="sig">
+            <div class="sig-space"></div>
+            <div class="line">Received By (Client)</div>
+        </div>
+        <div class="sig">
+            <div class="sig-space">{% if signature_data_uri %}<img src="{{ signature_data_uri }}" alt="Authorised Signature">{% endif %}</div>
+            <div class="line">Authorised Signature &amp; Stamp</div>
+        </div>
     </div>
 
     <div class="footer">

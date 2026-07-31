@@ -25,6 +25,15 @@ def _logo_data_uri():
     return 'data:image/png;base64,' + base64.b64encode(data).decode('ascii')
 
 
+def _signature_data_uri():
+    path = Path(settings.BASE_DIR) / 'static' / 'signature.jpg'
+    try:
+        data = path.read_bytes()
+    except OSError:
+        return None
+    return 'data:image/jpeg;base64,' + base64.b64encode(data).decode('ascii')
+
+
 def _amount_in_words(amount):
     """Convert a numeric amount to words, e.g. 125000.50 -> One Hundred Twenty Five Thousand Shillings And Fifty Cents."""
     _ones = ['', 'One', 'Two', 'Three', 'Four', 'Five', 'Six', 'Seven', 'Eight', 'Nine', 'Ten',
@@ -288,6 +297,7 @@ def receipt_pdf(request, pk):
         'amount_in_words': _amount_in_words(payment.amount),
         'printed_by': user.get_full_name() or user.username,
         'logo_data_uri': _logo_data_uri(),
+        'signature_data_uri': _signature_data_uri(),
         'MEDIA_URL': settings.MEDIA_URL,
     })
     return HttpResponse(html)
