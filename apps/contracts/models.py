@@ -26,8 +26,10 @@ class Contract(models.Model):
     end_date = models.DateField(null=True, blank=True)
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='Draft')
     client_signature_name = models.CharField(max_length=200, blank=True, help_text='Name of the person signing on behalf of the client')
+    client_signature_data = models.TextField(blank=True, help_text='Handwritten signature image (data URI)')
     signed_at = models.DateTimeField(null=True, blank=True)
     owner_signature_name = models.CharField(max_length=200, blank=True, help_text='Name of the company authorised signatory')
+    owner_signature_data = models.TextField(blank=True, help_text='Handwritten signature image (data URI)')
     owner_signed_at = models.DateTimeField(null=True, blank=True)
     notes = models.TextField(blank=True)
     created_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='contracts_created')
@@ -73,20 +75,22 @@ class Contract(models.Model):
             self.contract_number = f'CTR-{year}-{num:04d}'
         super().save(*args, **kwargs)
 
-    def mark_client_signed(self, signature_name):
+    def mark_client_signed(self, signature_name, signature_data=''):
         from django.utils import timezone
         self.status = 'Signed'
         self.client_signature_name = signature_name
+        self.client_signature_data = signature_data
         self.signed_at = timezone.now()
-        self.save(update_fields=['status', 'client_signature_name', 'signed_at'])
+        self.save(update_fields=['status', 'client_signature_name', 'client_signature_data', 'signed_at'])
 
-    def mark_owner_signed(self, signature_name):
+    def mark_owner_signed(self, signature_name, signature_data=''):
         from django.utils import timezone
         self.owner_signature_name = signature_name
+        self.owner_signature_data = signature_data
         self.owner_signed_at = timezone.now()
         if self.client_signed:
             self.status = 'Signed'
-            save_fields = ['owner_signature_name', 'owner_signed_at', 'status']
+            save_fields = ['owner_signature_name', 'owner_signature_data', 'owner_signed_at', 'status']
         else:
-            save_fields = ['owner_signature_name', 'owner_signed_at']
+            save_fields = ['owner_signature_name', 'owner_signature_data', 'owner_signed_at']
         self.save(update_fields=save_fields)

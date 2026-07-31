@@ -83,11 +83,22 @@
                     <i class="fas fa-check-circle text-success me-2"></i>
                     <span><strong>{{ contract.client_signature_name }}</strong></span>
                 </div>
+                {% if contract.client_signature_data %}
+                <img src="{{ contract.client_signature_data }}" alt="Client signature" style="max-height:90px;max-width:100%;background:#fff;border:1px solid #dee2e6;border-radius:6px;padding:6px;">
+                {% endif %}
                 <p class="small text-muted mb-0">Signed on {{ contract.signed_at|date:"d M Y H:i" }}</p>
                 {% elif can_client_sign %}
                 <form method="post" action="{% url 'contracts:sign_client' contract.pk %}">
                     {% csrf_token %}
-                    {{ sign_form }}
+                    <p class="small text-muted">Draw your signature on the pad below, then click Sign.</p>
+                    <div style="position:relative;border:2px dashed #adb5bd;border-radius:8px;background:#fff;">
+                        <canvas class="sig-pad" id="sigPadClient" data-sig-hidden="sigDataClient" style="width:100%;height:180px;display:block;cursor:crosshair;border-radius:6px;"></canvas>
+                    </div>
+                    <div class="mt-1">
+                        <button type="button" class="btn btn-sm btn-outline-secondary" onclick="clearSigPad('sigPadClient')"><i class="fas fa-eraser me-1"></i>Clear</button>
+                    </div>
+                    <input type="hidden" name="signature_name" value="{{ user.get_full_name|default:user.username }}">
+                    <input type="hidden" name="signature_data" id="sigDataClient">
                     <button type="submit" class="btn btn-success mt-2 w-100"><i class="fas fa-signature"></i> Sign as Client</button>
                 </form>
                 {% else %}
@@ -104,11 +115,22 @@
                     <i class="fas fa-check-circle text-success me-2"></i>
                     <span><strong>{{ contract.owner_signature_name }}</strong></span>
                 </div>
+                {% if contract.owner_signature_data %}
+                <img src="{{ contract.owner_signature_data }}" alt="Company signature" style="max-height:90px;max-width:100%;background:#fff;border:1px solid #dee2e6;border-radius:6px;padding:6px;">
+                {% endif %}
                 <p class="small text-muted mb-0">Signed on {{ contract.owner_signed_at|date:"d M Y H:i" }}</p>
                 {% elif can_owner_sign %}
                 <form method="post" action="{% url 'contracts:sign_owner' contract.pk %}">
                     {% csrf_token %}
-                    {{ sign_form }}
+                    <p class="small text-muted">Draw the authorised signatory's signature on the pad below, then click Sign.</p>
+                    <div style="position:relative;border:2px dashed #adb5bd;border-radius:8px;background:#fff;">
+                        <canvas class="sig-pad" id="sigPadOwner" data-sig-hidden="sigDataOwner" style="width:100%;height:180px;display:block;cursor:crosshair;border-radius:6px;"></canvas>
+                    </div>
+                    <div class="mt-1">
+                        <button type="button" class="btn btn-sm btn-outline-secondary" onclick="clearSigPad('sigPadOwner')"><i class="fas fa-eraser me-1"></i>Clear</button>
+                    </div>
+                    <input type="hidden" name="signature_name" value="{{ user.get_full_name|default:user.username }}">
+                    <input type="hidden" name="signature_data" id="sigDataOwner">
                     <button type="submit" class="btn btn-success mt-2 w-100"><i class="fas fa-signature"></i> Sign as Company</button>
                 </form>
                 {% else %}
@@ -118,4 +140,81 @@
         </div>
     </div>
 </div>
+
+<script>
+(function () {
+    function initSigPad(canvas, hiddenId) {
+        var ctx = canvas.getContext('2d');
+        var drawing = false;
+        var ratio = window.devicePixelRatio || 1;
+        var w = canvas.clientWidth || 600;
+        var h = canvas.clientHeight || 180;
+        canvas.width = w * ratio;
+        canvas.height = h * ratio;
+        canvas.setAttribute('data-ratio', ratio);
+        ctx.setTransform(ratio, 0, 0, ratio, 0, 0);
+        ctx.lineWidth = 2.5;
+        ctx.lineCap = 'round';
+        ctx.lineJoin = 'round';
+        ctx.strokeStyle = '#0d2f5e';
+        ctx.fillStyle = '#fff';
+        ctx.fillRect(0, 0, w, h);
+
+        function getPos(e) {
+            var r = canvas.getBoundingClientRect();
+            return { x: e.clientX - r.left, y: e.clientY - r.top };
+        }
+        function save() {
+            document.getElementById(hiddenId).value = canvas.toDataURL('image/png');
+        }
+        canvas.addEventListener('pointerdown', function (e) {
+            e.preventDefault();
+            try { canvas.setPointerCapture(e.pointerId); } catch (err) {}
+            drawing = true;
+            var p = getPos(e);
+            ctx.beginPath();
+            ctx.moveTo(p.x, p.y);
+        });
+        canvas.addEventListener('pointermove', function (e) {
+            if (!drawing) return;
+            var p = getPos(e);
+            ctx.lineTo(p.x, p.y);
+            ctx.stroke();
+        });
+        canvas.addEventListener('pointerup', function () { drawing = false; save(); });
+        canvas.addEventListener('pointercancel', function () { drawing = false; });
+
+        var form = canvas.closest('form');
+        if (form) {
+            form.addEventListener('submit', function (e) {
+                if (!document.getElementById(hiddenId).value) {
+                    e.preventDefault();
+                    alert('Please draw your signature on the pad before signing.');
+                }
+            });
+        }
+        window['clearPad_' + canvas.id] = function () {
+            document.getElementById(hiddenId).value = '';
+            var r = parseFloat(canvas.getAttribute('data-ratio')) || 1;
+            var cw = canvas.width / r, ch = canvas.height / r;
+            ctx.setTransform(r, 0, 0, r, 0, 0);
+            ctx.fillStyle = '#fff';
+            ctx.fillRect(0, 0, cw, ch);
+            ctx.lineWidth = 2.5;
+            ctx.lineCap = 'round';
+            ctx.lineJoin = 'round';
+            ctx.strokeStyle = '#0d2f5e';
+        };
+    }
+
+    var pads = document.querySelectorAll('.sig-pad');
+    for (var i = 0; i < pads.length; i++) {
+        initSigPad(pads[i], pads[i].getAttribute('data-sig-hidden'));
+    }
+})();
+
+function clearSigPad(id) {
+    if (window['clearPad_' + id]) window['clearPad_' + id]();
+}
+</script>
 {% endblock %}

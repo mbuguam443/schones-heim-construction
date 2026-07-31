@@ -30,5 +30,7 @@ class ContractForm(forms.ModelForm):
 
 
 class ContractSignForm(forms.Form):
-    signature_name = forms.CharField(max_length=200, label='Signatory name (on behalf of client)',
-        widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Full name of signatory'}))
+    signature_name = forms.CharField(max_length=200, required=False,
+        widget=forms.HiddenInput(attrs={'class': 'signature-name-input'}))
+    signature_data = forms.CharField(required=False,
+        widget=forms.HiddenInput(attrs={'class': 'signature-data-input'}))

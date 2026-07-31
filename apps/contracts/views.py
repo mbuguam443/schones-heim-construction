@@ -125,25 +125,32 @@ def contract_sign_client(request, pk):
         messages.info(request, f'{contract.contract_number} is already signed by the client.')
         return redirect('contracts:detail', pk=pk)
     if request.method == 'POST':
-        form = ContractSignForm(request.POST)
-        if form.is_valid():
-            contract.mark_client_signed(form.cleaned_data['signature_name'])
+        signature_data = request.POST.get('signature_data', '').strip()
+        if not signature_data or not signature_data.startswith('data:image/png;base64,'):
+            messages.error(request, 'Please draw your signature on the pad before signing.')
+        else:
+            signature_name = request.POST.get('signature_name', '').strip() or user.get_full_name() or user.username
+            contract.mark_client_signed(signature_name, signature_data)
             messages.success(request, f'{contract.contract_number} signed by the client.')
     return redirect('contracts:detail', pk=pk)
 
 
 def contract_sign_owner(request, pk):
     contract = get_object_or_404(Contract, pk=pk)
-    if not can_manage_contracts(request.user):
+    user = request.user
+    if not can_manage_contracts(user):
         messages.error(request, 'You do not have permission.')
         return redirect('contracts:detail', pk=pk)
     if contract.owner_signed:
         messages.info(request, f'{contract.contract_number} is already signed by the company.')
         return redirect('contracts:detail', pk=pk)
     if request.method == 'POST':
-        form = ContractSignForm(request.POST)
-        if form.is_valid():
-            contract.mark_owner_signed(form.cleaned_data['signature_name'])
+        signature_data = request.POST.get('signature_data', '').strip()
+        if not signature_data or not signature_data.startswith('data:image/png;base64,'):
+            messages.error(request, 'Please draw your signature on the pad before signing.')
+        else:
+            signature_name = request.POST.get('signature_name', '').strip() or user.get_full_name() or user.username
+            contract.mark_owner_signed(signature_name, signature_data)
             messages.success(request, f'{contract.contract_number} signed by the company.')
     return redirect('contracts:detail', pk=pk)
 
