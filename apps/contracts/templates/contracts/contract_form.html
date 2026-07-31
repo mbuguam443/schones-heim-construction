@@ -1,0 +1,39 @@
+{% extends 'base.html' %}
+{% load static crispy_forms_tags %}
+{% block title %}{{ object|yesno:"Update,Create" }} Contract{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h2><i class="fas fa-file-signature"></i> {{ object|yesno:"Update,Create" }} Contract Agreement</h2>
+</div>
+
+<div class="row">
+    <div class="col-lg-8">
+        <div class="card shadow-sm mb-4">
+            <div class="card-header bg-primary text-white"><h5 class="mb-0">Contract Details</h5></div>
+            <div class="card-body">
+                <form method="post">
+                    {% csrf_token %}
+                    {{ form|crispy }}
+                    <button type="submit" class="btn btn-primary"><i class="fas fa-save"></i> {% if object %}Update{% else %}Create{% endif %} Contract</button>
+                    <a href="{% url 'contracts:list' %}" class="btn btn-outline-secondary">Cancel</a>
+                </form>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-4">
+        <div class="card shadow-sm">
+            <div class="card-header bg-primary text-white"><h5 class="mb-0"><i class="fas fa-info-circle"></i> Tips</h5></div>
+            <div class="card-body">
+                <ul class="small text-muted mb-0">
+                    <li class="mb-2">The contract number is auto-generated (e.g. <strong>CTR-2026-0001</strong>).</li>
+                    <li class="mb-2">Deposit is calculated as a percentage of the contract amount (default 30%).</li>
+                    <li class="mb-2">Write clear <strong>terms and conditions</strong> covering scope, timelines, payment milestones and penalties.</li>
+                    <li class="mb-2">Attach the related quotation if this contract comes from one.</li>
+                    <li class="mb-2">Mark the contract as <strong>Signed</strong> once the client's signatory signs, or use the "Mark as Signed" button on the detail page.</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

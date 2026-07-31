@@ -103,6 +103,7 @@ class Payment(models.Model):
     payment_method = models.CharField(max_length=20, choices=PAYMENT_METHODS)
     reference = models.CharField(max_length=100, blank=True)
     notes = models.TextField(blank=True)
+    receipt_number = models.CharField(max_length=20, blank=True, editable=False)
     recorded_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='payments_recorded')
     created_at = models.DateTimeField(auto_now_add=True)
 
@@ -111,3 +112,15 @@ class Payment(models.Model):
 
     def __str__(self):
         return f"{self.invoice.invoice_number} - {self.amount}"
+
+    def save(self, *args, **kwargs):
+        if not self.receipt_number:
+            from django.utils import timezone
+            year = timezone.now().year
+            last = Payment.objects.filter(receipt_number__startswith=f'RCPT-{year}-').order_by('receipt_number').last()
+            if last:
+                num = int(last.receipt_number.split('-')[-1]) + 1
+            else:
+                num = 1
+            self.receipt_number = f'RCPT-{year}-{num:04d}'
+        super().save(*args, **kwargs)

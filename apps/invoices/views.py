@@ -199,3 +199,19 @@ def record_payment(request, pk):
         form = PaymentForm(initial={'payment_date': __import__('datetime').date.today()})
 
     return render(request, 'invoices/payment_form.html', {'form': form, 'invoice': invoice})
+
+
+def receipt_pdf(request, pk):
+    payment = get_object_or_404(
+        Payment.objects.select_related('invoice__client', 'invoice__project', 'recorded_by'),
+        pk=pk
+    )
+    from apps.core.models import CompanySettings
+    company_settings = CompanySettings.objects.first()
+    html = render_to_string('invoices/receipt_pdf.html', {
+        'payment': payment,
+        'invoice': payment.invoice,
+        'company_settings': company_settings,
+        'MEDIA_URL': settings.MEDIA_URL,
+    })
+    return HttpResponse(html)

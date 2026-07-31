@@ -1,0 +1,69 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Receipt {{ payment.receipt_number }}</title>
+    <style>
+        @page { margin: 15mm; size: A4; }
+        body { font-family: 'Helvetica', 'Arial', sans-serif; font-size: 11pt; color: #333; line-height: 1.5; margin: 0; padding: 0; }
+        .header { background: #1a3c6e; color: #fff; padding: 16px 30px; margin: -15mm -15mm 15mm -15mm; display: flex; justify-content: space-between; align-items: center; }
+        .header .left { display: flex; align-items: center; gap: 16px; }
+        .header .left .company { font-size: 18pt; font-weight: 700; letter-spacing: 2px; }
+        .header .left .tagline { font-size: 9pt; opacity: 0.85; }
+        .header .right { text-align: right; }
+        .header .right .label { font-size: 18pt; font-weight: 700; }
+        .receipt-box { border: 2px solid #1a3c6e; border-radius: 8px; padding: 20px; margin-bottom: 20px; }
+        .receipt-box .amount { font-size: 20pt; font-weight: 700; color: #1a3c6e; }
+        .details-table { width: 100%; border-collapse: collapse; margin-bottom: 20px; }
+        .details-table td { padding: 6px 10px; border: 1px solid #ddd; }
+        .details-table td:first-child { background: #f0f4f8; font-weight: bold; width: 200px; }
+        .amount-word { background: #f9f9f9; border-left: 4px solid #1a3c6e; padding: 12px 15px; margin-bottom: 20px; font-style: italic; }
+        .footer { margin-top: 40px; border-top: 2px solid #1a3c6e; padding-top: 15px; font-size: 9pt; color: #666; }
+        .footer p { margin: 3px 0; }
+        .sig-line { border-top: 1px solid #333; margin-top: 50px; padding-top: 6px; font-size: 9pt; text-align: center; width: 250px; }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="left">
+            <div>
+                <div class="company">{{ company_settings.company_name|default:'SCHONES HEIM BUILDERS' }}</div>
+                <div class="tagline">Engineering & Construction</div>
+            </div>
+        </div>
+        <div class="right">
+            <div class="label">RECEIPT</div>
+        </div>
+    </div>
+
+    <div class="receipt-box">
+        <div class="text-muted">Receipt No: <strong>{{ payment.receipt_number }}</strong></div>
+        <div class="text-muted">Date: {{ payment.payment_date|date:"d M Y" }}</div>
+        <div class="text-muted mb-2">Invoice: <strong>{{ payment.invoice.invoice_number }}</strong> ({{ payment.invoice.status }})</div>
+        <div>Received with thanks from <strong>{{ payment.invoice.client.full_name }}</strong>{% if payment.invoice.client.company_name %} ({{ payment.invoice.client.company_name }}){% endif %} the sum of:</div>
+        <div class="amount">KSh {{ payment.amount|floatformat:2 }}</div>
+        <div class="amount-word">Amount in words: <strong>{{ amount_in_words|default:"" }}</strong></div>
+        <div>Being payment towards <strong>{{ payment.invoice.project.name|default:"construction works" }}</strong></div>
+    </div>
+
+    <h2 style="color:#1a3c6e; font-size:12pt; border-bottom:2px solid #1a3c6e; padding-bottom:4px;">Payment Details</h2>
+    <table class="details-table">
+        <tr><td>Payment Method</td><td>{{ payment.payment_method }}</td></tr>
+        {% if payment.reference %}<tr><td>Reference</td><td>{{ payment.reference }}</td></tr>{% endif %}
+        {% if payment.notes %}<tr><td>Notes</td><td>{{ payment.notes }}</td></tr>{% endif %}
+        <tr><td>Recorded By</td><td>{{ payment.recorded_by.get_full_name|default:payment.recorded_by.username }}</td></tr>
+        <tr><td>Invoice Balance After Payment</td><td>KSh {{ payment.invoice.balance|floatformat:2 }}</td></tr>
+    </table>
+
+    <div style="text-align:right;">
+        <div class="sig-line">Authorised Signature &amp; Stamp</div>
+    </div>
+
+    <div class="footer">
+        <p><strong>{{ company_settings.company_name|default:'SCHONES HEIM BUILDERS' }}</strong> &mdash; Engineering &amp; Construction</p>
+        <p>{{ company_settings.address }} | {{ company_settings.phone }} | {{ company_settings.email }}</p>
+        <p>Generated on {{ payment.created_at|date:"d M Y H:i" }} from Schones Heim Builders Management System</p>
+    </div>
+</body>
+</html>

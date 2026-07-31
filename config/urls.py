@@ -16,6 +16,7 @@ urlpatterns = [
     path('site-reports/', include('apps.site_reports.urls')),
     path('documents/', include('apps.documents.urls')),
     path('reports/', include('apps.reports.urls')),
+    path('contracts/', include('apps.contracts.urls')),
 ]
 
 if settings.DEBUG:

@@ -39,12 +39,15 @@
   </a>
   {% endif %}
 
-  {% if user.role == 'admin' or user.role == 'accountant' %}
+  {% if user.role == 'admin' or user.role == 'accountant' or user.role == 'project_manager' %}
   <a href="{% url 'quotations:list' %}" class="nav-link">
     <i class="fas fa-file-invoice"></i> Quotation Management
   </a>
   <a href="{% url 'invoices:list' %}" class="nav-link">
     <i class="fas fa-file-invoice-dollar"></i> Invoice Management
+  </a>
+  <a href="{% url 'contracts:list' %}" class="nav-link">
+    <i class="fas fa-file-signature"></i> Contract Agreements
   </a>
   {% elif user.role == 'client' %}
   <a href="{% url 'quotations:list' %}" class="nav-link">
@@ -52,6 +55,9 @@
   </a>
   <a href="{% url 'invoices:list' %}" class="nav-link">
     <i class="fas fa-file-invoice-dollar"></i> My Invoices
+  </a>
+  <a href="{% url 'contracts:list' %}" class="nav-link">
+    <i class="fas fa-file-signature"></i> My Contracts
   </a>
   {% endif %}
 

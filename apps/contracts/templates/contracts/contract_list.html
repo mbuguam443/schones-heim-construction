@@ -1,0 +1,97 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}Contracts{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center page-header">
+    <h2><i class="fas fa-file-signature"></i> Contract Agreements</h2>
+    {% if can_edit %}<a href="{% url 'contracts:create' %}" class="btn btn-primary"><i class="fas fa-plus"></i> New Contract</a>{% endif %}
+</div>
+
+<div class="card shadow-sm mb-4">
+    <div class="card-body">
+        <form method="get" class="row g-3">
+            <div class="col-md-5">
+                <input type="text" name="search" class="form-control" placeholder="Search by contract no, client or title..." value="{{ search }}">
+            </div>
+            <div class="col-md-3">
+                <select name="status" class="form-select">
+                    <option value="">All Statuses</option>
+                    {% for key, val in status_choices %}
+                    <option value="{{ key }}" {% if status_filter == key %}selected{% endif %}>{{ val }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-md-2">
+                <button type="submit" class="btn btn-outline-primary w-100"><i class="fas fa-search"></i> Filter</button>
+            </div>
+            <div class="col-md-2">
+                <a href="{% url 'contracts:list' %}" class="btn btn-outline-secondary w-100"><i class="fas fa-times-circle"></i> Clear</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div class="card shadow-sm">
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table table-hover mb-0">
+                <thead class="table-primary">
+                    <tr>
+                        <th>#</th>
+                        <th>Contract No.</th>
+                        <th>Title</th>
+                        <th>Client</th>
+                        <th class="text-end">Amount</th>
+                        <th>Start</th>
+                        <th>End</th>
+                        <th>Status</th>
+                        <th class="text-end">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for c in contracts %}
+                    <tr>
+                        <td>{{ forloop.counter0|add:page_obj.start_index }}</td>
+                        <td><a href="{% url 'contracts:detail' c.pk %}" class="fw-semibold">{{ c.contract_number }}</a></td>
+                        <td>{{ c.title|truncatechars:45 }}</td>
+                        <td>{{ c.client.full_name }}</td>
+                        <td class="text-end">KSh {{ c.contract_amount|floatformat:2 }}</td>
+                        <td>{{ c.start_date|date:"d/m/Y"|default:"-" }}</td>
+                        <td>{{ c.end_date|date:"d/m/Y"|default:"-" }}</td>
+                        <td>
+                            <span class="badge {% if c.status == 'Signed' %}bg-success{% elif c.status == 'Completed' %}bg-info{% elif c.status == 'Cancelled' %}bg-danger{% elif c.status == 'Sent' %}bg-warning text-dark{% else %}bg-secondary{% endif %}">{{ c.status }}</span>
+                        </td>
+                        <td class="text-end">
+                            <a href="{% url 'contracts:pdf' c.pk %}" class="btn btn-sm btn-outline-secondary" target="_blank" title="View agreement"><i class="fas fa-print"></i></a>
+                            {% if can_edit %}
+                            <a href="{% url 'contracts:update' c.pk %}" class="btn btn-sm btn-outline-primary" title="Edit"><i class="fas fa-edit"></i></a>
+                            <a href="{% url 'contracts:delete' c.pk %}" class="btn btn-sm btn-outline-danger" title="Delete"><i class="fas fa-trash"></i></a>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="9" class="text-center text-muted py-4"><i class="fas fa-file-signature me-1"></i> No contracts found.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+{% if is_paginated %}
+<nav class="mt-3">
+    <ul class="pagination pagination-sm">
+        {% if page_obj.has_previous %}
+        <li class="page-item"><a class="page-link" href="?page={{ page_obj.previous_page_number }}{% if search %}&search={{ search }}{% endif %}{% if status_filter %}&status={{ status_filter }}{% endif %}">Previous</a></li>
+        {% endif %}
+        <li class="page-item disabled"><span class="page-link">Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}</span></li>
+        {% if page_obj.has_next %}
+        <li class="page-item"><a class="page-link" href="?page={{ page_obj.next_page_number }}{% if search %}&search={{ search }}{% endif %}{% if status_filter %}&status={{ status_filter }}{% endif %}">Next</a></li>
+        {% endif %}
+    </ul>
+</nav>
+{% endif %}
+{% endblock %}
