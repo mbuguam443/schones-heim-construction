@@ -5,65 +5,129 @@
     <meta charset="UTF-8">
     <title>Receipt {{ payment.receipt_number }}</title>
     <style>
-        @page { margin: 15mm; size: A4; }
-        body { font-family: 'Helvetica', 'Arial', sans-serif; font-size: 11pt; color: #333; line-height: 1.5; margin: 0; padding: 0; }
-        .header { background: #1a3c6e; color: #fff; padding: 16px 30px; margin: -15mm -15mm 15mm -15mm; display: flex; justify-content: space-between; align-items: center; }
-        .header .left { display: flex; align-items: center; gap: 16px; }
-        .header .left .company { font-size: 18pt; font-weight: 700; letter-spacing: 2px; }
-        .header .left .tagline { font-size: 9pt; opacity: 0.85; }
-        .header .right { text-align: right; }
-        .header .right .label { font-size: 18pt; font-weight: 700; }
-        .receipt-box { border: 2px solid #1a3c6e; border-radius: 8px; padding: 20px; margin-bottom: 20px; }
-        .receipt-box .amount { font-size: 20pt; font-weight: 700; color: #1a3c6e; }
-        .details-table { width: 100%; border-collapse: collapse; margin-bottom: 20px; }
-        .details-table td { padding: 6px 10px; border: 1px solid #ddd; }
-        .details-table td:first-child { background: #f0f4f8; font-weight: bold; width: 200px; }
-        .amount-word { background: #f9f9f9; border-left: 4px solid #1a3c6e; padding: 12px 15px; margin-bottom: 20px; font-style: italic; }
-        .footer { margin-top: 40px; border-top: 2px solid #1a3c6e; padding-top: 15px; font-size: 9pt; color: #666; }
-        .footer p { margin: 3px 0; }
-        .sig-line { border-top: 1px solid #333; margin-top: 50px; padding-top: 6px; font-size: 9pt; text-align: center; width: 250px; }
+        @page { margin: 14mm; size: A4; }
+        @media print { body { -webkit-print-color-adjust: exact; print-color-adjust: exact; color-adjust: exact; } }
+        * { box-sizing: border-box; }
+        body { font-family: 'Helvetica', 'Arial', sans-serif; font-size: 10.5pt; color: #222; line-height: 1.5; margin: 0; padding: 0; }
+
+        .topbar { background: #1a3c6e; color: #fff; padding: 14px 28px; margin: -14mm -14mm 0 -14mm; display: flex; justify-content: space-between; align-items: center; }
+        .topbar .brand { display: flex; align-items: center; gap: 14px; }
+        .topbar .brand img { max-height: 52px; border-radius: 4px; }
+        .topbar .brand .company { font-size: 16pt; font-weight: 800; letter-spacing: 1.5px; line-height: 1.1; }
+        .topbar .brand .tagline { font-size: 8.5pt; opacity: 0.85; letter-spacing: 3px; text-transform: uppercase; }
+        .topbar .title { text-align: right; }
+        .topbar .title .big { font-size: 17pt; font-weight: 800; letter-spacing: 4px; }
+        .topbar .title .num { font-size: 9pt; opacity: 0.9; }
+
+        .company-row { margin-top: 14px; display: flex; justify-content: space-between; align-items: flex-start; }
+        .company-row .contact { font-size: 8.5pt; color: #555; line-height: 1.6; }
+        .company-row .contact strong { color: #1a3c6e; }
+        .kra { text-align: right; font-size: 8.5pt; color: #555; }
+
+        .meta-bar { margin-top: 14px; border: 1px solid #d5dee8; border-radius: 6px; background: #f4f7fb; padding: 10px 16px; display: flex; justify-content: space-between; font-size: 9.5pt; }
+        .meta-bar .cell strong { color: #1a3c6e; display: block; font-size: 8pt; letter-spacing: 1px; text-transform: uppercase; }
+
+        .received { margin-top: 18px; border: 1.5px solid #1a3c6e; border-radius: 8px; padding: 18px 20px; }
+        .received .thanks { font-size: 10.5pt; }
+        .received .thanks .client { font-weight: 700; }
+        .amount-line { display: flex; align-items: center; justify-content: space-between; margin-top: 12px; }
+        .amount { font-size: 22pt; font-weight: 800; color: #1a3c6e; }
+        .amount small { font-size: 10pt; color: #555; font-weight: 400; }
+        .badge-paid { background: #e6f4ea; color: #1e7e34; border: 1px solid #b7dfc3; font-weight: 700; padding: 4px 14px; border-radius: 20px; font-size: 9pt; }
+        .amount-word { margin-top: 10px; padding: 10px 14px; background: #f7f7f7; border-left: 4px solid #1a3c6e; font-style: italic; font-size: 10pt; }
+
+        .section-title { margin-top: 22px; font-size: 11pt; font-weight: 800; color: #1a3c6e; border-bottom: 2px solid #1a3c6e; padding-bottom: 4px; }
+        .details-table { width: 100%; border-collapse: collapse; margin-top: 8px; }
+        .details-table td { padding: 6px 12px; border: 1px solid #e1e6ec; font-size: 10pt; }
+        .details-table td:first-child { background: #f4f7fb; font-weight: 700; width: 220px; color: #1a3c6e; }
+        .details-table .paid { color: #1e7e34; font-weight: 800; }
+        .details-table .due { color: #b02a37; font-weight: 800; }
+
+        .signatures { margin-top: 34px; display: flex; justify-content: space-between; gap: 40px; }
+        .sig { flex: 1; }
+        .sig .line { border-top: 1px solid #333; margin-top: 54px; padding-top: 6px; font-size: 9pt; color: #555; text-align: center; }
+
+        .footer { margin-top: 40px; border-top: 2px solid #1a3c6e; padding-top: 12px; font-size: 8.5pt; color: #666; display: flex; justify-content: space-between; }
+        .footer p { margin: 2px 0; }
+        .footer .gen { text-align: right; }
+
+        .watermark { position: fixed; top: 50%; left: 50%; transform: translate(-50%,-50%) rotate(-30deg); pointer-events: none; z-index: 999; }
+        .watermark img { max-width: 380px; opacity: 0.07; }
     </style>
 </head>
 <body>
-    <div class="header">
-        <div class="left">
+    <div class="watermark"><img src="{% static 'logo.png' %}" alt="watermark"></div>
+
+    <div class="topbar">
+        <div class="brand">
+            <img src="{% static 'logo.png' %}" alt="{{ company_settings.company_name|default:'SCHONES HEIM BUILDERS' }}">
             <div>
                 <div class="company">{{ company_settings.company_name|default:'SCHONES HEIM BUILDERS' }}</div>
-                <div class="tagline">Engineering & Construction</div>
+                <div class="tagline">Engineering &amp; Construction</div>
             </div>
         </div>
-        <div class="right">
-            <div class="label">RECEIPT</div>
+        <div class="title">
+            <div class="big">OFFICIAL RECEIPT</div>
+            <div class="num">No. {{ payment.receipt_number }}</div>
         </div>
     </div>
 
-    <div class="receipt-box">
-        <div class="text-muted">Receipt No: <strong>{{ payment.receipt_number }}</strong></div>
-        <div class="text-muted">Date: {{ payment.payment_date|date:"d M Y" }}</div>
-        <div class="text-muted mb-2">Invoice: <strong>{{ payment.invoice.invoice_number }}</strong> ({{ payment.invoice.status }})</div>
-        <div>Received with thanks from <strong>{{ payment.invoice.client.full_name }}</strong>{% if payment.invoice.client.company_name %} ({{ payment.invoice.client.company_name }}){% endif %} the sum of:</div>
-        <div class="amount">KSh {{ payment.amount|floatformat:2 }}</div>
-        <div class="amount-word">Amount in words: <strong>{{ amount_in_words|default:"" }}</strong></div>
-        <div>Being payment towards <strong>{{ payment.invoice.project.name|default:"construction works" }}</strong></div>
+    <div class="company-row">
+        <div class="contact">
+            <strong>{{ company_settings.company_name|default:'SCHONES HEIM BUILDERS' }}</strong><br>
+            {{ company_settings.address|default:'Nairobi, Kenya' }}<br>
+            Phone: {{ company_settings.phone|default:'[Insert Phone]' }} &nbsp;|&nbsp; Email: {{ company_settings.email|default:'[Insert Email]' }}
+        </div>
+        <div class="kra">
+            {% if company_settings.kra_pin %}KRA PIN: <strong>{{ company_settings.kra_pin }}</strong><br>{% endif %}
+            Date: <strong>{{ payment.payment_date|date:"d M Y" }}</strong>
+        </div>
     </div>
 
-    <h2 style="color:#1a3c6e; font-size:12pt; border-bottom:2px solid #1a3c6e; padding-bottom:4px;">Payment Details</h2>
+    <div class="meta-bar">
+        <div class="cell"><strong>Receipt No.</strong>{{ payment.receipt_number }}</div>
+        <div class="cell"><strong>Invoice No.</strong>{{ payment.invoice.invoice_number }}</div>
+        <div class="cell"><strong>Project</strong>{{ payment.invoice.project.name|default:"Construction Works" }}</div>
+        <div class="cell"><strong>Invoice Status</strong>{{ payment.invoice.get_status_display|upper }}</div>
+    </div>
+
+    <div class="received">
+        <div class="thanks">
+            Received with thanks from <span class="client">{{ payment.invoice.client.full_name }}{% if payment.invoice.client.company_name %} ({{ payment.invoice.client.company_name }}){% endif %}</span>
+            the sum of:
+        </div>
+        <div class="amount-line">
+            <div class="amount">KSh {{ payment.amount|floatformat:2 }} <small>KES</small></div>
+            <div class="badge-paid">PAID</div>
+        </div>
+        <div class="amount-word">Amount in words: <strong>{{ amount_in_words|default:"" }}</strong></div>
+        <div style="margin-top:8px;">Being payment towards <strong>{{ payment.invoice.project.name|default:"construction works" }}</strong> per Invoice <strong>{{ payment.invoice.invoice_number }}</strong>.</div>
+    </div>
+
+    <div class="section-title">Payment Details</div>
     <table class="details-table">
         <tr><td>Payment Method</td><td>{{ payment.payment_method }}</td></tr>
-        {% if payment.reference %}<tr><td>Reference</td><td>{{ payment.reference }}</td></tr>{% endif %}
-        {% if payment.notes %}<tr><td>Notes</td><td>{{ payment.notes }}</td></tr>{% endif %}
+        {% if payment.reference %}<tr><td>Reference / Transaction Code</td><td>{{ payment.reference }}</td></tr>{% endif %}
+        <tr><td>Payment Date</td><td>{{ payment.payment_date|date:"d M Y" }}</td></tr>
         <tr><td>Recorded By</td><td>{{ payment.recorded_by.get_full_name|default:payment.recorded_by.username }}</td></tr>
-        <tr><td>Invoice Balance After Payment</td><td>KSh {{ payment.invoice.balance|floatformat:2 }}</td></tr>
+        {% if payment.notes %}<tr><td>Notes</td><td>{{ payment.notes }}</td></tr>{% endif %}
+        <tr><td>Invoice Balance After Payment</td><td class="{% if payment.invoice.balance > 0 %}due{% else %}paid{% endif %}">KSh {{ payment.invoice.balance|floatformat:2 }}</td></tr>
     </table>
 
-    <div style="text-align:right;">
-        <div class="sig-line">Authorised Signature &amp; Stamp</div>
+    <div class="signatures">
+        <div class="sig"><div class="line">Received By (Client)</div></div>
+        <div class="sig"><div class="line">Authorised Signature &amp; Stamp</div></div>
     </div>
 
     <div class="footer">
-        <p><strong>{{ company_settings.company_name|default:'SCHONES HEIM BUILDERS' }}</strong> &mdash; Engineering &amp; Construction</p>
-        <p>{{ company_settings.address }} | {{ company_settings.phone }} | {{ company_settings.email }}</p>
-        <p>Generated on {{ payment.created_at|date:"d M Y H:i" }} from Schones Heim Builders Management System</p>
+        <div>
+            <p><strong>{{ company_settings.company_name|default:'SCHONES HEIM BUILDERS' }}</strong> &mdash; Engineering &amp; Construction</p>
+            <p>Bank: {{ company_settings.bank_name|default:'NCBA Bank' }} ({{ company_settings.bank_account|default:'[Account]' }}) &nbsp;|&nbsp; M-Pesa: {{ company_settings.mpesa_number|default:'[Mpesa]' }}</p>
+        </div>
+        <div class="gen">
+            <p>Generated {{ payment.created_at|date:"d M Y H:i" }}</p>
+            <p>Schones Heim Builders Management System</p>
+        </div>
     </div>
 </body>
 </html>

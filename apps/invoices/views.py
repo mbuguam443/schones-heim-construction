@@ -14,6 +14,51 @@ from .forms import InvoiceForm, InvoiceItemFormSet, PaymentForm
 from decimal import Decimal
 
 
+def _amount_in_words(amount):
+    """Convert a numeric amount to words, e.g. 125000.50 -> One Hundred Twenty Five Thousand Shillings And Fifty Cents."""
+    _ones = ['', 'One', 'Two', 'Three', 'Four', 'Five', 'Six', 'Seven', 'Eight', 'Nine', 'Ten',
+             'Eleven', 'Twelve', 'Thirteen', 'Fourteen', 'Fifteen', 'Sixteen', 'Seventeen', 'Eighteen', 'Nineteen']
+    _tens = ['', '', 'Twenty', 'Thirty', 'Forty', 'Fifty', 'Sixty', 'Seventy', 'Eighty', 'Ninety']
+
+    def _two_digits(n):
+        if n < 20:
+            return _ones[n]
+        tens, rem = divmod(n, 10)
+        return _tens[tens] + ((' ' + _ones[rem]) if rem else '')
+
+    def _three_digits(n):
+        if n < 100:
+            return _two_digits(n)
+        hundreds, rem = divmod(n, 100)
+        return _ones[hundreds] + ' Hundred' + ((' and ' + _two_digits(rem)) if rem else '')
+
+    try:
+        amount = Decimal(amount)
+    except (TypeError, ValueError):
+        return ''
+    shillings = int(amount)
+    cents = int(round((amount - shillings) * 100))
+    if shillings < 0:
+        return ''
+
+    scales = [('', 0), ('Thousand', 1), ('Million', 2), ('Billion', 3)]
+    parts = []
+    num = shillings
+    scale_idx = 0
+    while num > 0 and scale_idx < len(scales):
+        num, chunk = divmod(num, 1000)
+        if chunk:
+            text = _three_digits(chunk)
+            label = scales[scale_idx][0]
+            parts.append(f"{text} {label}".strip())
+        scale_idx += 1
+    words = ' '.join(reversed(parts)) if parts else 'Zero'
+    words += ' Shillings'
+    if cents:
+        words += f' And {_two_digits(cents)} Cents'
+    return words
+
+
 class InvoiceListView(LoginRequiredMixin, ListView):
     model = Invoice
     template_name = 'invoices/invoice_list.html'
@@ -225,6 +270,7 @@ def receipt_pdf(request, pk):
         'payment': payment,
         'invoice': payment.invoice,
         'company_settings': company_settings,
+        'amount_in_words': _amount_in_words(payment.amount),
         'MEDIA_URL': settings.MEDIA_URL,
     })
     return HttpResponse(html)
