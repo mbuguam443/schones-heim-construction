@@ -26,12 +26,12 @@ def _logo_data_uri():
 
 
 def _signature_data_uri():
-    path = Path(settings.BASE_DIR) / 'static' / 'signature.jpg'
+    path = Path(settings.BASE_DIR) / 'static' / 'signature.png'
     try:
         data = path.read_bytes()
     except OSError:
         return None
-    return 'data:image/jpeg;base64,' + base64.b64encode(data).decode('ascii')
+    return 'data:image/png;base64,' + base64.b64encode(data).decode('ascii')
 
 
 def _amount_in_words(amount):
