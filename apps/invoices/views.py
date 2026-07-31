@@ -12,6 +12,17 @@ from apps.core.mixins import filter_by_active_project
 from .models import Invoice, InvoiceItem, Payment
 from .forms import InvoiceForm, InvoiceItemFormSet, PaymentForm
 from decimal import Decimal
+import base64
+from pathlib import Path
+
+
+def _logo_data_uri():
+    path = Path(settings.BASE_DIR) / 'static' / 'logo.png'
+    try:
+        data = path.read_bytes()
+    except OSError:
+        return None
+    return 'data:image/png;base64,' + base64.b64encode(data).decode('ascii')
 
 
 def _amount_in_words(amount):
@@ -272,6 +283,7 @@ def receipt_pdf(request, pk):
         'company_settings': company_settings,
         'amount_in_words': _amount_in_words(payment.amount),
         'printed_by': user.get_full_name() or user.username,
+        'logo_data_uri': _logo_data_uri(),
         'MEDIA_URL': settings.MEDIA_URL,
     })
     return HttpResponse(html)

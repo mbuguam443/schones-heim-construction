@@ -56,11 +56,11 @@
     </style>
 </head>
 <body>
-    <div class="watermark"><img src="{% static 'logo.png' %}" alt="watermark"></div>
+    <div class="watermark">{% if logo_data_uri %}<img src="{{ logo_data_uri }}" alt="watermark">{% else %}<img src="{% static 'logo.png' %}" alt="watermark">{% endif %}</div>
 
     <div class="topbar">
         <div class="brand">
-            <img src="{% static 'logo.png' %}" alt="{{ company_settings.company_name|default:'SCHONES HEIM BUILDERS' }}">
+            {% if logo_data_uri %}<img src="{{ logo_data_uri }}" alt="{{ company_settings.company_name|default:'SCHONES HEIM BUILDERS' }}">{% else %}<img src="{% static 'logo.png' %}" alt="{{ company_settings.company_name|default:'SCHONES HEIM BUILDERS' }}">{% endif %}
             <div>
                 <div class="company">{{ company_settings.company_name|default:'SCHONES HEIM BUILDERS' }}</div>
                 <div class="tagline">Engineering &amp; Construction</div>
