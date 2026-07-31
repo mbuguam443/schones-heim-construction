@@ -125,6 +125,7 @@
             <p>Bank: {{ company_settings.bank_name|default:'NCBA Bank' }} ({{ company_settings.bank_account|default:'[Account]' }}) &nbsp;|&nbsp; M-Pesa: {{ company_settings.mpesa_number|default:'[Mpesa]' }}</p>
         </div>
         <div class="gen">
+            <p>Printed by: {{ printed_by|default:'—' }}</p>
             <p>Generated {{ payment.created_at|date:"d M Y H:i" }}</p>
             <p>Schones Heim Builders Management System</p>
         </div>

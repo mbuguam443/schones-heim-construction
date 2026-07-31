@@ -271,6 +271,7 @@ def receipt_pdf(request, pk):
         'invoice': payment.invoice,
         'company_settings': company_settings,
         'amount_in_words': _amount_in_words(payment.amount),
+        'printed_by': user.get_full_name() or user.username,
         'MEDIA_URL': settings.MEDIA_URL,
     })
     return HttpResponse(html)
