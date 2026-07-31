@@ -110,7 +110,10 @@ AUTH_PASSWORD_VALIDATORS = [
 LANGUAGE_CODE = 'en-us'
 TIME_ZONE = 'Africa/Nairobi'
 USE_I18N = True
-USE_TZ = True
+# USE_TZ must be False on shared cPanel MySQL hosts:
+# the MySQL server has no time zone tables, so Django's CONVERT_TZ calls
+# fail with "Database returned an invalid datetime value".
+USE_TZ = False
 
 STATIC_URL = 'static/'
 STATICFILES_DIRS = [BASE_DIR / 'static']
