@@ -356,7 +356,7 @@ def home_view(request):
         'projects_completed': 10,
         'years_established': 5,
         'happy_clients': 15,
-        'professionals': User.objects.filter(is_active=True).count() or 20,
+        'professionals': max(User.objects.filter(is_active=True).count(), 12),
     }
     return render(request, 'public/home.html', {
         'projects': projects,
@@ -397,7 +397,7 @@ def about_view(request):
         'projects_completed': 10,
         'years_established': 5,
         'happy_clients': 15,
-        'professionals': User.objects.filter(is_active=True).count() or 20,
+        'professionals': max(User.objects.filter(is_active=True).count(), 12),
     }
     return render(request, 'public/about.html', {
         'stats': stats,
