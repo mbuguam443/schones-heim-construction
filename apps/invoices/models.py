@@ -73,7 +73,7 @@ class Invoice(models.Model):
 
     def mark_overdue(self):
         from django.utils import timezone
-        if self.balance > 0 and self.due_date and self.due_date < timezone.localdate() and self.status != 'Paid':
+        if self.balance > 0 and self.due_date and self.due_date < timezone.now().date() and self.status != 'Paid':
             self.status = 'Overdue'
             self.save(update_fields=['status'])
             return True
@@ -83,7 +83,7 @@ class Invoice(models.Model):
     def update_overdue_statuses(cls):
         """Mark every unpaid, past-due invoice as Overdue. Returns the number updated."""
         from django.utils import timezone
-        today = timezone.localdate()
+        today = timezone.now().date()
         updated = cls.objects.filter(
             status__in=['Draft', 'Pending'],
             balance__gt=0,

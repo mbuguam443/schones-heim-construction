@@ -266,7 +266,7 @@ def record_payment(request, pk):
                 invoice.balance = Decimal('0.00')
             else:
                 invoice.status = 'Pending'
-                if invoice.due_date and invoice.due_date < timezone.localdate():
+                if invoice.due_date and invoice.due_date < timezone.now().date():
                     invoice.status = 'Overdue'
             invoice.save(update_fields=['amount_paid', 'balance', 'status'])
 
