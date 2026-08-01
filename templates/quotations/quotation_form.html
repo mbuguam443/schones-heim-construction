@@ -29,6 +29,16 @@
 
                     <hr><h5 class="text-primary">Line Items</h5>
                     {{ items.management_form }}
+                    <template id="empty-item-row">
+                        <tr class="formset-row">
+                            <td>{{ items.empty_form.id }}{{ items.empty_form.description }}</td>
+                            <td>{{ items.empty_form.quantity }}</td>
+                            <td>{{ items.empty_form.unit }}</td>
+                            <td>{{ items.empty_form.unit_price }}</td>
+                            <td>{{ items.empty_form.total }}</td>
+                            <td class="text-center">{{ items.empty_form.DELETE }}<label class="delete-row" for="{{ items.empty_form.DELETE.id_for_label }}" title="Remove"><i class="fas fa-trash"></i></label></td>
+                        </tr>
+                    </template>
                     <div class="table-responsive">
                         <table class="table table-bordered" id="items-table">
                             <thead class="table-primary">
@@ -91,7 +101,7 @@
 
 {% block extra_js %}
 <script>
-    const emptyForm = `{{ items.empty_form.as_table|safe }}`;
+    const emptyForm = document.getElementById('empty-item-row').innerHTML;
 
     function updateTotals() {
         let subtotal = 0;
@@ -118,11 +128,8 @@
         let formIdx = parseInt(totalForms?.value) || 0;
 
         addBtn?.addEventListener('click', function() {
-            const formHtml = emptyForm.replace(/__prefix__/g, formIdx).replace(/as_table/g, '').replace(/<tr><\/tr>/g, '');
-            const wrapper = document.createElement('tr');
-            wrapper.className = 'formset-row';
-            wrapper.innerHTML = formHtml;
-            tbody.appendChild(wrapper);
+            const html = emptyForm.replace(/__prefix__/g, formIdx);
+            tbody.insertAdjacentHTML('beforeend', html);
             formIdx++;
             if (totalForms) totalForms.value = formIdx;
             updateTotals();
