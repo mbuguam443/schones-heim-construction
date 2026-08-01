@@ -354,7 +354,7 @@ def home_view(request):
     company_settings = CompanySettings.objects.first()
     stats = {
         'projects_completed': 10,
-        'years_established': 5,
+        'years_established': 8,
         'happy_clients': 15,
         'professionals': max(User.objects.filter(is_active=True).count(), 12),
     }
@@ -395,7 +395,7 @@ def about_view(request):
     from apps.projects.models import Project as AllProjects
     stats = {
         'projects_completed': 10,
-        'years_established': 5,
+        'years_established': 8,
         'happy_clients': 15,
         'professionals': max(User.objects.filter(is_active=True).count(), 12),
     }
