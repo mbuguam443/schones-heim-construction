@@ -239,6 +239,7 @@ def invoice_pdf(request, pk):
     html = render_to_string('invoices/invoice_pdf.html', {
         'inv': inv,
         'company_settings': company_settings,
+        'logo_data_uri': _logo_data_uri(),
         'MEDIA_URL': settings.MEDIA_URL,
     })
     return HttpResponse(html)
