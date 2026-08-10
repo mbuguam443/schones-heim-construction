@@ -1,5 +1,5 @@
 from django import forms
-from django.contrib.auth.forms import AuthenticationForm, UserCreationForm, UserChangeForm
+from django.contrib.auth.forms import AuthenticationForm, UserCreationForm, UserChangeForm, PasswordChangeForm as AuthPasswordChangeForm, PasswordResetForm as AuthPasswordResetForm, SetPasswordForm as AuthSetPasswordForm
 from .models import CompanySettings, User, ClientInquiry
 from apps.clients.models import Client
 
@@ -107,6 +107,30 @@ class UserPasswordResetForm(forms.Form):
         if p1 and p2 and p1 != p2:
             raise forms.ValidationError('Passwords do not match.')
         return cleaned
+
+
+class PasswordChangeForm(AuthPasswordChangeForm):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        for field in self.fields.values():
+            field.widget.attrs.update({'class': 'form-control'})
+
+
+class PasswordResetForm(AuthPasswordResetForm):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['email'].widget.attrs.update({
+            'class': 'form-control',
+            'placeholder': 'Enter your account email',
+            'autofocus': True,
+        })
+
+
+class SetPasswordForm(AuthSetPasswordForm):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        for field in self.fields.values():
+            field.widget.attrs.update({'class': 'form-control'})
 
 
 class ClientInquiryForm(forms.ModelForm):

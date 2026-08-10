@@ -130,3 +130,15 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 LOGIN_URL = 'core:login'
 LOGIN_REDIRECT_URL = 'dashboard'
 LOGOUT_REDIRECT_URL = 'core:login'
+
+# Email (SMTP) - used for password reset emails.
+# Configure these in .env on the server (cPanel -> Email Accounts -> SMTP details).
+EMAIL_BACKEND = config('EMAIL_BACKEND', default='django.core.mail.backends.smtp.EmailBackend')
+EMAIL_HOST = config('EMAIL_HOST', default='')
+EMAIL_PORT = config('EMAIL_PORT', default=587, cast=int)
+EMAIL_HOST_USER = config('EMAIL_HOST_USER', default='')
+EMAIL_HOST_PASSWORD = config('EMAIL_HOST_PASSWORD', default='')
+EMAIL_USE_TLS = config('EMAIL_USE_TLS', default=True, cast=bool)
+EMAIL_USE_SSL = config('EMAIL_USE_SSL', default=False, cast=bool)
+EMAIL_TIMEOUT = config('EMAIL_TIMEOUT', default=30, cast=int)
+DEFAULT_FROM_EMAIL = config('DEFAULT_FROM_EMAIL', default='SCHONES HEIM BUILDERS <no-reply@schones-heim-builders.co.ke>')

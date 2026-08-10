@@ -18,6 +18,11 @@ urlpatterns = [
     # Auth
     path('login/', views.login_view, name='login'),
     path('logout/', views.logout_view, name='logout'),
+    path('change-password/', views.ChangePasswordView.as_view(), name='change_password'),
+    path('password-reset/', views.PasswordResetView.as_view(), name='password_reset'),
+    path('password-reset/done/', views.PasswordResetDoneView.as_view(), name='password_reset_done'),
+    path('reset/<uidb64>/<token>/', views.PasswordResetConfirmView.as_view(), name='password_reset_confirm'),
+    path('reset/done/', views.PasswordResetCompleteView.as_view(), name='password_reset_complete'),
     path('dashboard/', views.dashboard_view, name='dashboard'),
     path('profile/', views.profile_view, name='profile'),
     path('notifications/', views.notifications_list, name='notifications'),

@@ -44,10 +44,17 @@
           </a>
         </li>
         <li>
+          <a class="dropdown-item" href="{% url 'core:change_password' %}">
+            <i class="fas fa-key me-2"></i>Change Password
+          </a>
+        </li>
+        {% if user.role == 'admin' %}
+        <li>
           <a class="dropdown-item" href="{% url 'core:settings' %}">
             <i class="fas fa-cog me-2"></i>Settings
           </a>
         </li>
+        {% endif %}
         <li><hr class="dropdown-divider"></li>
         <li>
           <a class="dropdown-item text-danger" href="{% url 'core:logout' %}">

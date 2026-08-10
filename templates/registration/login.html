@@ -169,6 +169,11 @@
             <i class="fas fa-sign-in-alt me-2"></i>Sign In
           </button>
         </form>
+        <div class="text-center mt-3">
+          <a href="{% url 'core:password_reset' %}" class="small" style="color: #1a3c6e;">
+            <i class="fas fa-lock me-1"></i>Forgot password?
+          </a>
+        </div>
       </div>
       <div class="login-footer">
         &copy; {% now 'Y' %} {{ company_settings.company_name|default:'SCHONES HEIM BUILDERS' }}. All rights reserved.

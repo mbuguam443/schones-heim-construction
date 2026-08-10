@@ -33,7 +33,10 @@
         {% endif %}
       </div>
       <div class="profile-body">
-        <h5 style="color: #1a3c6e; font-weight: 600; margin-bottom: 20px;"><i class="fas fa-edit me-2"></i>Edit Profile</h5>
+        <div class="d-flex justify-content-between align-items-center mb-3">
+          <h5 style="color: #1a3c6e; font-weight: 600; margin: 0;"><i class="fas fa-edit me-2"></i>Edit Profile</h5>
+          <a href="{% url 'core:change_password' %}" class="btn btn-sm btn-outline-primary"><i class="fas fa-key me-1"></i>Change Password</a>
+        </div>
         <form method="post" enctype="multipart/form-data">
           {% csrf_token %}
           {{ form|crispy }}

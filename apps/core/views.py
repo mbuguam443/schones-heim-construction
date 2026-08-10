@@ -1,10 +1,17 @@
 import json
+import logging
 import os
 from datetime import datetime, timedelta
 
 from django.contrib import messages
-from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth import authenticate, login, logout, update_session_auth_hash
 from django.contrib.auth.decorators import login_required
+from django.contrib.auth.views import (
+    PasswordResetConfirmView as AuthPasswordResetConfirmView,
+    PasswordResetCompleteView,
+    PasswordResetDoneView,
+    PasswordResetView as AuthPasswordResetView,
+)
 from django.db.models import Count, Sum
 from django.http import JsonResponse, HttpResponse
 from django.db.models.functions import TruncMonth
@@ -14,12 +21,14 @@ from django.utils.translation import gettext_lazy as _
 from django.views.decorators.http import require_POST, require_http_methods
 from django.views.decorators.cache import cache_control
 
-from django.views.generic import ListView, CreateView, DetailView, UpdateView
+logger = logging.getLogger(__name__)
+
+from django.views.generic import ListView, CreateView, DetailView, UpdateView, FormView, TemplateView
 from django.urls import reverse_lazy
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 
 from .decorators import role_required
-from .forms import CompanySettingsForm, ClientInquiryForm, InquiryResponseForm, LoginForm, UserProfileForm
+from .forms import CompanySettingsForm, ClientInquiryForm, InquiryResponseForm, LoginForm, PasswordChangeForm, PasswordResetForm, SetPasswordForm, UserProfileForm
 from .models import ActivityLog, ClientInquiry, CompanySettings, ContactSubmission, Notification, User
 
 
@@ -185,6 +194,56 @@ def mark_notification_read(request, pk):
 def logout_view(request):
     logout(request)
     return redirect('core:home')
+
+
+class ChangePasswordView(LoginRequiredMixin, FormView):
+    form_class = PasswordChangeForm
+    template_name = 'core/change_password.html'
+    success_url = reverse_lazy('core:profile')
+
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        kwargs['user'] = self.request.user
+        return kwargs
+
+    def form_valid(self, form):
+        form.save()
+        update_session_auth_hash(self.request, self.request.user)
+        messages.success(self.request, _('Your password has been changed successfully.'))
+        return super().form_valid(form)
+
+
+class PasswordResetView(AuthPasswordResetView):
+    template_name = 'registration/password_reset_form.html'
+    email_template_name = 'registration/password_reset_email.html'
+    subject_template_name = 'registration/password_reset_subject.txt'
+    form_class = PasswordResetForm
+    success_url = reverse_lazy('core:password_reset_done')
+
+    def form_valid(self, form):
+        opts = {
+            'use_https': self.request.is_secure(),
+            'token_generator': self.token_generator,
+            'from_email': self.from_email,
+            'email_template_name': self.email_template_name,
+            'subject_template_name': self.subject_template_name,
+            'request': self.request,
+            'html_email_template_name': self.html_email_template_name,
+            'extra_email_context': self.extra_email_context,
+        }
+        try:
+            form.save(**opts)
+        except Exception:
+            logger.exception('Password reset email could not be sent')
+        return redirect(self.get_success_url())
+
+
+class PasswordResetConfirmView(AuthPasswordResetConfirmView):
+    template_name = 'registration/password_reset_confirm.html'
+    form_class = SetPasswordForm
+    success_url = reverse_lazy('core:password_reset_complete')
+
+
 
 @login_required
 @role_required(User.Role.ADMIN)
