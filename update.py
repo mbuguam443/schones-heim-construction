@@ -16,6 +16,18 @@ GITHUB_ZIP = "https://github.com/mbuguam443/schones-heim-construction/archive/re
 BACKUP_DIR = f"backups_{datetime.now().strftime('%Y%m%d_%H%M%S')}"
 TEMP_DIR = "_update_temp"
 
+# Email (SMTP) settings added to the server's .env if missing.
+# Used for the "Forgot password" email reset flow.
+EMAIL_ENV_BLOCK = """# --- Email (SMTP) settings for password reset ---
+EMAIL_BACKEND=django.core.mail.backends.smtp.EmailBackend
+EMAIL_HOST=mail.schones-heim-builders.co.ke
+EMAIL_PORT=587
+EMAIL_HOST_USER=no-reply@schones-heim-builders.co.ke
+EMAIL_HOST_PASSWORD=Me32323383#&
+EMAIL_USE_TLS=True
+DEFAULT_FROM_EMAIL=SCHONES HEIM BUILDERS <no-reply@schones-heim-builders.co.ke>
+"""
+
 def run(cmd):
     print(f"\n>> {cmd}")
     result = subprocess.run(cmd, shell=True, capture_output=True, text=True)
@@ -126,6 +138,29 @@ def main():
             print("  Fixed: replaced placeholder with schones-heim-builders.co.ke")
         else:
             print("  .env looks good.")
+
+    # Add EMAIL_* settings to .env if missing (needed for password reset emails)
+    print("\n[Fix] Checking .env for email settings...")
+    if os.path.exists(".env"):
+        with open(".env", "r") as f:
+            env_content = f.read()
+        existing_keys = {line.split("=", 1)[0].strip() for line in env_content.splitlines() if "=" in line}
+        added = []
+        for line in EMAIL_ENV_BLOCK.splitlines():
+            stripped = line.strip()
+            if not stripped or stripped.startswith("#") or "=" not in stripped:
+                continue
+            key = stripped.split("=", 1)[0].strip()
+            if key not in existing_keys:
+                env_content += "\n" + stripped
+                existing_keys.add(key)
+                added.append(key)
+        if added:
+            with open(".env", "w") as f:
+                f.write(env_content)
+            print(f"  Added to .env: {', '.join(added)}")
+        else:
+            print("  Email settings already present in .env.")
 
     # Cleanup
     shutil.rmtree(TEMP_DIR, ignore_errors=True)
