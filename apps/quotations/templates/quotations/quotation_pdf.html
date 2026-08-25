@@ -275,7 +275,7 @@
 
   @media print {
     body { background: #fff; padding: 0; color: #000 !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; color-adjust: exact; }
-    .container { box-shadow: none; border-radius: 0; padding: 10px 15px; max-width: 100%; }
+    .container { box-shadow: none; border-radius: 0; padding: 20px 25px; max-width: 100%; }
     .action-bar, .btn-print, .btn-download, .btn-back, .print-hint { display: none !important; }
     th { background: #1a3c6e !important; color: #fff !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; color-adjust: exact; }
     td, th { border-color: #333 !important; border-width: 1px !important; }
@@ -313,7 +313,7 @@
 
   <div class="header">
     <div class="logo-area">
-      <img src="{% if company and company.logo %}{{ company.logo.url }}{% else %}{% static 'logo.png' %}{% endif %}" alt="Logo" onerror="this.style.display='none'">
+      <img src="{% if company and company.logo %}{{ company.logo.url }}{% else %}{% static 'logo.png' %}{% endif %}" alt="Logo">
       <div>
         <div class="company-name">{{ company.company_name|default:'SCHONES HEIM BUILDERS' }}</div>
         <div class="tagline">Engineering &amp; Construction</div>
