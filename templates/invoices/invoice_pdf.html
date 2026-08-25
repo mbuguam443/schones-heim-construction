@@ -8,7 +8,7 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     <style>
-        @page { margin: 15mm 18mm; size: A4; }
+        @page { margin: 0; size: A4; }
         * { box-sizing: border-box; margin: 0; padding: 0; }
         body {
             font-family: 'Segoe UI', Arial, sans-serif;
@@ -16,7 +16,8 @@
             color: #333;
             line-height: 1.5;
             background: #f0f2f5;
-            padding: 30px 20px;
+            padding: 0;
+            margin: 0;
         }
         .container {
             max-width: 850px;
@@ -24,7 +25,7 @@
             background: #fff;
             border-radius: 12px;
             box-shadow: 0 4px 24px rgba(0,0,0,0.1);
-            padding: 40px 45px;
+            padding: 30px 35px;
         }
 
         .topbar { background: #1a3c6e; color: #fff; padding: 16px 22px; border-radius: 10px; display: flex; justify-content: space-between; align-items: center; }
@@ -107,8 +108,8 @@
         .print-hint strong { color: #1a3c6e; }
 
         @media print {
-            body { background: #fff; padding: 0; color: #000 !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; color-adjust: exact; }
-            .container { box-shadow: none; border-radius: 0; padding: 0; max-width: 100%; }
+            body { background: #fff; padding: 0; margin: 0; color: #000 !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; color-adjust: exact; }
+            .container { box-shadow: none; border-radius: 0; padding: 15px 20px; max-width: 100%; margin: 0; }
             .action-bar, .btn-print, .btn-download, .btn-back, .print-hint { display: none !important; }
             th { background: #1a3c6e !important; color: #fff !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; color-adjust: exact; }
             td, th { border-color: #333 !important; border-width: 1px !important; }
@@ -240,11 +241,12 @@ function downloadPDF() {
     btn.disabled = true;
     var element = document.querySelector('.container');
     var opt = {
-        margin:       [10, 10, 10, 10],
+        margin:       [10, 10, 15, 10],
         filename:     '{{ inv.invoice_number }}.pdf',
         image:        { type: 'jpeg', quality: 0.98 },
-        html2canvas:  { scale: 2, useCORS: true, letterRendering: true },
-        jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
+        html2canvas:  { scale: 2, useCORS: true, letterRendering: true, scrollY: 0 },
+        jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' },
+        pagebreak:    { mode: ['avoid-all', 'css', 'legacy'] }
     };
     html2pdf().set(opt).from(element).save().then(function() {
         btn.innerHTML = '<i class="fas fa-download"></i> Download PDF';
