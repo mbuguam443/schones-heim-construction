@@ -6,7 +6,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Receipt {{ payment.receipt_number }} - {{ company_settings.company_name|default:'SCHONES HEIM BUILDERS' }}</title>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     <style>
         @page { margin: 0; size: A4; }
         * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -219,32 +218,12 @@
         <div class="action-bar">
             <a href="javascript:history.back()" class="btn-back"><i class="fas fa-arrow-left"></i> Back</a>
             <button class="btn-print" onclick="window.print()"><i class="fas fa-print"></i> Print</button>
-            <button class="btn-download" id="downloadBtn" onclick="downloadPDF()"><i class="fas fa-download"></i> Download PDF</button>
+            <button class="btn-download" onclick="window.print()"><i class="fas fa-download"></i> Download PDF</button>
         </div>
 
         <div class="print-hint">If blue headers don't appear in the PDF, check <strong>More settings &rarr; Background graphics</strong> in your browser's print dialog.</div>
 
     </div>
 
-<script>
-function downloadPDF() {
-    var btn = document.getElementById('downloadBtn');
-    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Generating...';
-    btn.disabled = true;
-    var element = document.querySelector('.container');
-    var opt = {
-        margin:       [10, 10, 15, 10],
-        filename:     '{{ payment.receipt_number }}.pdf',
-        image:        { type: 'jpeg', quality: 0.98 },
-        html2canvas:  { scale: 2, useCORS: true, letterRendering: true, scrollY: 0 },
-        jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' },
-        pagebreak:    { mode: ['avoid-all', 'css', 'legacy'] }
-    };
-    html2pdf().set(opt).from(element).save().then(function() {
-        btn.innerHTML = '<i class="fas fa-download"></i> Download PDF';
-        btn.disabled = false;
-    });
-}
-</script>
 </body>
 </html>
