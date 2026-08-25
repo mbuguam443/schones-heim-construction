@@ -82,14 +82,6 @@
             cursor: pointer; transition: background 0.2s; text-decoration: none;
         }
         .btn-print:hover { background: #2a5a9e; color: #fff; }
-        .btn-download {
-            display: inline-flex; align-items: center; gap: 8px;
-            padding: 12px 36px; background: #198754; color: #fff;
-            border: none; border-radius: 8px; font-size: 15px; font-weight: 600;
-            cursor: pointer; transition: background 0.2s; text-decoration: none;
-            margin-left: 10px;
-        }
-        .btn-download:hover { background: #157347; color: #fff; }
         .btn-back {
             display: inline-flex; align-items: center; gap: 8px;
             margin-left: 10px; padding: 12px 24px; background: #6c757d; color: #fff;
@@ -108,7 +100,7 @@
             html, body { background: #fff !important; padding: 0 !important; margin: 0 !important; width: 100% !important; }
             body { color: #000 !important; -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; color-adjust: exact !important; }
             .container { box-shadow: none !important; border-radius: 0 !important; padding: 0 !important; max-width: 100% !important; width: 100% !important; margin: 0 !important; background: #fff !important; }
-            .action-bar, .btn-print, .btn-download, .btn-back, .print-hint, .watermark { display: none !important; }
+            .action-bar, .btn-print, .btn-back, .print-hint, .watermark { display: none !important; }
             .meta-bar { background: #eef0f5 !important; -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; border-color: #ccc !important; }
             .details-table td:first-child { background: #f4f7fb !important; -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
             table { width: 100% !important; border-collapse: collapse !important; }
@@ -129,7 +121,6 @@
             .footer { flex-direction: column; gap: 10px; }
             .footer .gen { text-align: left; }
             .btn-print { width: 100%; justify-content: center; }
-            .btn-download { width: 100%; justify-content: center; margin-left: 0; margin-top: 10px; }
             .btn-back { width: 100%; justify-content: center; margin-left: 0; margin-top: 10px; }
         }
     </style>
@@ -221,7 +212,6 @@
         <div class="action-bar">
             <a href="javascript:history.back()" class="btn-back"><i class="fas fa-arrow-left"></i> Back</a>
             <button class="btn-print" onclick="window.print()"><i class="fas fa-print"></i> Print</button>
-            <button class="btn-download" onclick="window.print()"><i class="fas fa-download"></i> Download PDF</button>
         </div>
 
         <div class="print-hint">If blue headers don't appear in the PDF, check <strong>More settings &rarr; Background graphics</strong> in your browser's print dialog.</div>
