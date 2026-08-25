@@ -227,7 +227,7 @@
         <div style="margin-top:30px; display:flex; justify-content:space-between; align-items:flex-end; border-top:2px solid #1a3c6e; padding-top:12px;">
             <div style="font-size:9pt; color:#666;">Authorised by:</div>
             <div style="text-align:center;">
-                {% if signature_data_uri %}<img src="{{ signature_data_uri }}" alt="Signature" style="max-height:50px;">{% endif %}
+                {% if signature_data_uri %}<img src="{{ signature_data_uri }}" alt="Signature" style="max-height:80px; image-rendering:-webkit-optimize-contrast; image-rendering:crisp-edges;">{% endif %}
                 <div style="border-top:1px solid #333; padding-top:4px; font-size:9pt; color:#666; min-width:180px;">{{ company_settings.company_name|default:'SCHONES HEIM BUILDERS' }}</div>
             </div>
             <div style="text-align:right; font-size:8pt; color:#888;">Date: {{ inv.date|date:"d M Y" }}</div>
