@@ -17,7 +17,7 @@ class EquipmentListView(LoginRequiredMixin, ListView):
     context_object_name = 'equipment_list'
 
     def get_queryset(self):
-        qs = super().get_queryset()
+        qs = super().get_queryset().order_by('-created_at')
         cancelled = self.request.GET.get('cancelled')
         if cancelled != '1':
             qs = qs.filter(is_active=True)
