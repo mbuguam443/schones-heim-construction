@@ -8,9 +8,20 @@ from django.http import HttpResponse
 from django.db import transaction
 from django.conf import settings
 from decimal import Decimal
+from pathlib import Path
+import base64
 from apps.core.mixins import filter_by_active_project
 from .models import Quotation, QuotationItem
 from .forms import QuotationForm, QuotationItemFormSet
+
+
+def _signature_data_uri():
+    path = Path(settings.BASE_DIR) / 'static' / 'signature.png'
+    try:
+        data = path.read_bytes()
+    except OSError:
+        return None
+    return 'data:image/png;base64,' + base64.b64encode(data).decode('ascii')
 
 
 class TilingQuotationView(LoginRequiredMixin, TemplateView):
@@ -153,6 +164,7 @@ def quotation_pdf(request, pk):
         'qtn': qtn,
         'MEDIA_URL': settings.MEDIA_URL,
         'company': company,
+        'signature_data_uri': _signature_data_uri(),
     })
     return HttpResponse(html)
 

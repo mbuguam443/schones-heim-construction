@@ -412,6 +412,7 @@
       <div style="font-weight:600;color:#1a3c6e;">{{ company.company_name|default:'SCHONES HEIM BUILDERS' }}</div>
     </div>
     <div class="right">
+      {% if signature_data_uri %}<img src="{{ signature_data_uri }}" alt="Signature" style="max-height:50px; margin-bottom:4px;"><br>{% endif %}
       <div class="name">{% if qtn.created_by %}{{ qtn.created_by.get_full_name|default:qtn.created_by.username }}{% else %}---{% endif %}</div>
       <div class="title">Authorized Signatory</div>
     </div>

@@ -240,6 +240,7 @@ def invoice_pdf(request, pk):
         'inv': inv,
         'company_settings': company_settings,
         'logo_data_uri': _logo_data_uri(),
+        'signature_data_uri': _signature_data_uri(),
         'MEDIA_URL': settings.MEDIA_URL,
     })
     return HttpResponse(html)
