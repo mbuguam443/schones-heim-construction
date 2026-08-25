@@ -432,16 +432,36 @@ function downloadPDF() {
     var btn = document.getElementById('downloadBtn');
     btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Generating...';
     btn.disabled = true;
-    var element = document.querySelector('.container');
+
+    var container = document.querySelector('.container');
+    var clone = container.cloneNode(true);
+
+    var actionBar = clone.querySelector('.action-bar');
+    var hint = clone.querySelector('.print-hint');
+    if (actionBar) actionBar.remove();
+    if (hint) hint.remove();
+
+    var tmp = document.createElement('div');
+    tmp.style.position = 'absolute';
+    tmp.style.left = '-9999px';
+    tmp.style.top = '0';
+    tmp.style.width = '800px';
+    tmp.style.background = '#fff';
+    tmp.style.padding = '0';
+    tmp.style.margin = '0';
+    tmp.appendChild(clone);
+    document.body.appendChild(tmp);
+
     var opt = {
-        margin:       [10, 10, 15, 10],
+        margin:       [8, 8, 8, 8],
         filename:     '{{ qtn.quotation_number }}.pdf',
-        image:        { type: 'jpeg', quality: 0.98 },
-        html2canvas:  { scale: 2, useCORS: true, letterRendering: true, scrollY: 0 },
+        image:        { type: 'jpeg', quality: 0.95 },
+        html2canvas:  { scale: 2, useCORS: true, letterRendering: true, scrollY: 0, windowWidth: 800, backgroundColor: '#ffffff' },
         jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' },
         pagebreak:    { mode: ['avoid-all', 'css', 'legacy'] }
     };
-    html2pdf().set(opt).from(element).save().then(function() {
+    html2pdf().set(opt).from(clone).save().then(function() {
+        document.body.removeChild(tmp);
         btn.innerHTML = '<i class="fas fa-download"></i> Download PDF';
         btn.disabled = false;
     });
