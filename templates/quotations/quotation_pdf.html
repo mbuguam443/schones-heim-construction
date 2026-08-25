@@ -246,8 +246,11 @@
   .print-hint strong { color: #1a3c6e; }
 
   @media print {
-    body { color: #000 !important; -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; color-adjust: exact !important; }
+    @page { margin: 20mm; size: A4; }
+    body { padding: 0; margin: 0; color: #000 !important; -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; color-adjust: exact !important; }
+    .container { overflow: visible !important; max-width: 100% !important; padding: 0 !important; }
     .header { margin: -20mm -20mm 20mm -20mm; padding: 15px 30px 16px; border-bottom: 3px solid #1a3c6e !important; }
+    .logo-area img { max-height: 70px !important; }
     th { background: #1a3c6e !important; color: #fff !important; -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; color-adjust: exact !important; }
     td, th { border-color: #000 !important; border-width: 1.5px !important; }
     .total-row { background: #e0e4ec !important; -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; color-adjust: exact !important; }
