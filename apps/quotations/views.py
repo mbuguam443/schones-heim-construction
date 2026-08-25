@@ -16,7 +16,7 @@ from .forms import QuotationForm, QuotationItemFormSet
 
 
 def _signature_data_uri():
-    path = Path(settings.BASE_DIR) / 'static' / 'newsignature.png'
+    path = Path(settings.BASE_DIR) / 'static' / 'newSignature.png'
     try:
         data = path.read_bytes()
     except OSError:
