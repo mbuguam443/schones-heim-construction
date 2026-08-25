@@ -107,16 +107,18 @@
         .print-hint strong { color: #1a3c6e; }
 
         @media print {
-            body { background: #fff; padding: 0; margin: 0; color: #000 !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; color-adjust: exact; }
-            .container { box-shadow: none; border-radius: 0; padding: 15px 20px; max-width: 100%; margin: 0; }
-            .action-bar, .btn-print, .btn-download, .btn-back, .print-hint { display: none !important; }
-            th { background: #1a3c6e !important; color: #fff !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; color-adjust: exact; }
-            td, th { border-color: #333 !important; border-width: 1px !important; }
+            @page { margin: 10mm 12mm; size: A4; }
+            html, body { background: #fff !important; padding: 0 !important; margin: 0 !important; width: 100% !important; }
+            body { color: #000 !important; -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; color-adjust: exact !important; }
+            .container { box-shadow: none !important; border-radius: 0 !important; padding: 0 !important; max-width: 100% !important; width: 100% !important; margin: 0 !important; background: #fff !important; }
+            .action-bar, .btn-print, .btn-download, .btn-back, .print-hint, .watermark { display: none !important; }
+            th { background: #1a3c6e !important; color: #fff !important; -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; color-adjust: exact !important; }
+            td, th { border-color: #999 !important; border-width: 1px !important; padding: 6px 8px !important; font-size: 9pt !important; }
+            table { width: 100% !important; border-collapse: collapse !important; }
             .totals .grand-total td { background: #1a3c6e !important; color: #fff !important; }
             .totals .balance-due td { background: #fdecea !important; color: #b02a37 !important; }
-            .meta-bar { background: #eef0f5 !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; border-color: #000 !important; }
-            .details-table td:first-child { background: #f4f7fb !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
-            .watermark { display: block; }
+            .meta-bar { background: #eef0f5 !important; -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; border-color: #ccc !important; }
+            .details-table td:first-child { background: #f4f7fb !important; -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
         }
 
         @media (max-width: 768px) {

@@ -13,5 +13,4 @@ urlpatterns = [
     path('<int:pk>/convert-to-invoice/', views.convert_to_invoice, name='convert_to_invoice'),
     path('<int:pk>/send-email/', views.send_quotation_email, name='send_email'),
     path('<int:pk>/document/', views.quotation_document, name='document'),
-    path('tiling/', views.TilingQuotationView.as_view(), name='tiling'),
 ]

@@ -24,10 +24,6 @@ def _signature_data_uri():
     return 'data:image/png;base64,' + base64.b64encode(data).decode('ascii')
 
 
-class TilingQuotationView(LoginRequiredMixin, TemplateView):
-    template_name = 'quotations/tiling_quotation.html'
-
-
 class QuotationListView(LoginRequiredMixin, ListView):
     model = Quotation
     template_name = 'quotations/quotation_list.html'
