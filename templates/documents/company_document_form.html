@@ -1,0 +1,158 @@
+{% extends 'base.html' %}
+{% load static crispy_forms_tags %}
+{% block title %}{% if editing %}Edit{% else %}Create{% endif %} Document - SCHONES HEIM BUILDERS{% endblock %}
+{% block page_title %}{% if editing %}Edit Document{% else %}Create Document{% endif %}{% endblock %}
+{% block extra_css %}
+<link href="https://cdn.quilljs.com/1.3.7/quill.snow.css" rel="stylesheet">
+<style>
+  .doc-meta-card { background:#f8f9fc; border:1px solid #e0e3e8; border-radius:10px; padding:20px; margin-bottom:20px; }
+  .doc-meta-card h6 { color:#1a3c6e; font-weight:700; margin-bottom:12px; }
+  #editor-container { border:1px solid #ccc; border-radius:0 0 6px 6px; min-height:400px; background:#fff; }
+  #editor-container .ql-editor { min-height:400px; font-size:12pt; line-height:1.7; }
+  .ql-toolbar.ql-snow { border-radius:6px 6px 0 0; background:#f8f9fc; }
+  .save-bar { position:sticky; bottom:0; background:#fff; border-top:1px solid #e0e3e8; padding:12px 0; z-index:100; }
+</style>
+{% endblock %}
+{% block content %}
+<form method="post" id="docForm">
+  {% csrf_token %}
+
+  <div class="doc-meta-card">
+    <h6><i class="fas fa-info-circle"></i> Document Details</h6>
+    <div class="row g-3">
+      <div class="col-md-3">
+        {{ form.doc_type|as_crispy_field }}
+      </div>
+      <div class="col-md-5">
+        {{ form.title|as_crispy_field }}
+      </div>
+      <div class="col-md-2">
+        {{ form.status|as_crispy_field }}
+      </div>
+      <div class="col-md-2">
+        {{ form.project|as_crispy_field }}
+      </div>
+    </div>
+
+    <div id="letterFields">
+      <hr>
+      <div class="row g-3">
+        <div class="col-md-4">
+          {{ form.recipient_name|as_crispy_field }}
+        </div>
+        <div class="col-md-4">
+          {{ form.recipient_organization|as_crispy_field }}
+        </div>
+        <div class="col-md-4">
+          {{ form.subject|as_crispy_field }}
+        </div>
+        <div class="col-md-4">
+          {{ form.recipient_address|as_crispy_field }}
+        </div>
+      </div>
+    </div>
+
+    <div id="reportFields" style="display:none;">
+      <hr>
+      <div class="row g-3">
+        <div class="col-md-3">
+          {{ form.report_date|as_crispy_field }}
+        </div>
+        <div class="col-md-3">
+          {{ form.prepared_by|as_crispy_field }}
+        </div>
+        <div class="col-md-3">
+          {{ form.report_period|as_crispy_field }}
+        </div>
+        <div class="col-md-3">
+          {{ form.department|as_crispy_field }}
+        </div>
+      </div>
+    </div>
+
+    <div class="row mt-2">
+      <div class="col-md-3">
+        <div class="form-check">
+          {{ form.show_signature }}
+          <label class="form-check-label" for="id_show_signature">Show signature in document</label>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-header" style="background:#1a3c6e;color:#fff;">
+      <i class="fas fa-pen-fancy"></i> Document Content
+    </div>
+    <div class="card-body p-0">
+      <div id="editor-container"></div>
+    </div>
+  </div>
+
+  <input type="hidden" name="content" id="contentInput">
+
+  <div class="save-bar">
+    <div class="d-flex justify-content-between align-items-center">
+      <a href="{% url 'documents:company_document_list' %}" class="btn btn-outline-secondary"><i class="fas fa-arrow-left"></i> Back to List</a>
+      <div class="d-flex gap-2">
+        <button type="submit" class="btn" style="background:#6c757d;color:#fff;"><i class="fas fa-save"></i> Save</button>
+        {% if editing %}
+        <a href="{% url 'documents:company_document_preview' object.pk %}" class="btn" style="background:#1a3c6e;color:#fff;" target="_blank"><i class="fas fa-eye"></i> Preview</a>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</form>
+{% endblock %}
+{% block extra_js %}
+<script src="https://cdn.quilljs.com/1.3.7/quill.min.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  var quill = new Quill('#editor-container', {
+    theme: 'snow',
+    placeholder: 'Start writing your document here...',
+    modules: {
+      toolbar: [
+        [{ 'header': [1, 2, 3, 4, 5, 6, false] }],
+        [{ 'font': [] }],
+        [{ 'size': ['small', false, 'large', 'huge'] }],
+        ['bold', 'italic', 'underline', 'strike'],
+        [{ 'color': [] }, { 'background': [] }],
+        [{ 'align': [] }],
+        [{ 'list': 'ordered'}, { 'list': 'bullet' }],
+        [{ 'indent': '-1'}, { 'indent': '+1' }],
+        ['blockquote', 'code-block'],
+        ['link', 'image'],
+        ['clean']
+      ]
+    }
+  });
+
+  var contentInput = document.getElementById('contentInput');
+  var existingContent = contentInput.value || '{{ doc.content|escapejs|default:"" }}';
+  if (existingContent) {
+    quill.root.innerHTML = existingContent;
+  }
+
+  document.getElementById('docForm').addEventListener('submit', function() {
+    contentInput.value = quill.root.innerHTML;
+  });
+
+  var docType = document.getElementById('id_doc_type');
+  var letterFields = document.getElementById('letterFields');
+  var reportFields = document.getElementById('reportFields');
+
+  function toggleFields() {
+    if (docType.value === 'report') {
+      letterFields.style.display = 'none';
+      reportFields.style.display = 'block';
+    } else {
+      letterFields.style.display = 'block';
+      reportFields.style.display = 'none';
+    }
+  }
+  docType.addEventListener('change', toggleFields);
+  toggleFields();
+});
+</script>
+{% endblock %}

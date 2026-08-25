@@ -92,6 +92,9 @@
   <a href="{% url 'documents:document_list' %}" class="nav-link">
     <i class="fas fa-folder-open"></i> Document Management
   </a>
+  <a href="{% url 'documents:company_document_list' %}" class="nav-link">
+    <i class="fas fa-file-alt"></i> Letters & Reports
+  </a>
   {% endif %}
 
   {% if user.role == 'admin' or user.role == 'accountant' or user.role == 'project_manager' %}

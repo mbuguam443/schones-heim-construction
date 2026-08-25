@@ -1,0 +1,276 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>{{ doc.title }} - {{ company.company_name|default:'SCHONES HEIM BUILDERS' }}</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  @page { margin: 25mm 20mm; size: A4; }
+  body {
+    font-family: 'Segoe UI', Arial, sans-serif;
+    font-size: 11pt;
+    color: #333;
+    line-height: 1.6;
+    padding: 0;
+  }
+  .container {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 10px;
+    position: relative;
+  }
+
+  .header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 3px solid #1a3c6e;
+    padding-bottom: 16px;
+    margin-bottom: 20px;
+  }
+  .logo-area {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
+  .logo-area img { max-height: 70px; }
+  .company-name {
+    font-size: 22px;
+    font-weight: 700;
+    color: #1a3c6e;
+    letter-spacing: 1px;
+  }
+  .tagline {
+    font-size: 11px;
+    color: #666;
+    font-style: italic;
+  }
+  .doc-title {
+    text-align: center;
+    font-size: 20px;
+    font-weight: 700;
+    color: #1a3c6e;
+    margin-bottom: 16px;
+    border-bottom: 1px dashed #ccc;
+    padding-bottom: 8px;
+    text-transform: uppercase;
+  }
+  .doc-meta {
+    margin-bottom: 20px;
+    padding: 14px;
+    background: #f8f9fc;
+    border-radius: 8px;
+    border: 1px solid #e0e3e8;
+    font-size: 10.5pt;
+  }
+  .doc-meta p { margin: 3px 0; }
+  .doc-meta strong { display: inline-block; width: 120px; color: #555; }
+  .doc-date { margin-bottom: 20px; font-size: 11pt; }
+  .doc-subject {
+    font-size: 12pt;
+    font-weight: 700;
+    color: #1a3c6e;
+    margin-bottom: 20px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid #e0e3e8;
+  }
+  .doc-body {
+    font-size: 11pt;
+    line-height: 1.7;
+    margin-bottom: 30px;
+    min-height: 200px;
+  }
+  .doc-body p { margin-bottom: 10px; }
+  .doc-body ul, .doc-body ol { margin-left: 20px; margin-bottom: 10px; }
+  .doc-body table { width: 100%; border-collapse: collapse; margin: 15px 0; }
+  .doc-body table th, .doc-body table td { border: 1px solid #ccc; padding: 8px 10px; text-align: left; font-size: 10pt; }
+  .doc-body table th { background: #1a3c6e; color: #fff; }
+
+  .signature {
+    margin-top: 40px;
+    padding-top: 16px;
+    border-top: 1px solid #ddd;
+  }
+  .signature .left { font-size: 10pt; color: #666; margin-bottom: 20px; }
+  .signature .right { text-align: right; min-width: 220px; }
+  .signature .right .name {
+    font-size: 14pt;
+    font-weight: 600;
+    color: #1a3c6e;
+  }
+  .signature .right .title {
+    font-size: 10pt;
+    color: #666;
+    margin-top: 3px;
+  }
+
+  .footer {
+    margin-top: 40px;
+    padding-top: 12px;
+    border-top: 2px solid #1a3c6e;
+    text-align: center;
+    font-size: 9pt;
+    color: #666;
+    line-height: 1.5;
+  }
+  .footer strong { color: #1a3c6e; }
+
+  .watermark {
+    display: none;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    opacity: 0.08;
+    pointer-events: none;
+    z-index: 9999;
+    max-width: 500px;
+    width: 60%;
+  }
+
+  .controls {
+    text-align: center;
+    padding: 30px 0 20px;
+    max-width: 800px;
+    margin: 0 auto;
+  }
+  .controls .btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 30px;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    border: none;
+    margin: 0 6px;
+  }
+  .btn-print { background: #1a3c6e; color: #fff; }
+  .btn-print:hover { background: #2a5a9e; color: #fff; text-decoration:none; }
+  .btn-edit { background: #6c757d; color: #fff; }
+  .btn-edit:hover { background: #5a6268; color: #fff; text-decoration:none; }
+  .btn-back { background: #e9ecef; color: #333; }
+  .btn-back:hover { background: #dee2e6; color: #333; text-decoration:none; }
+
+  .print-hint {
+    text-align: center;
+    font-size: 12px;
+    color: #888;
+    margin-top: 12px;
+    padding: 8px;
+    border: 1px dashed #ccc;
+    border-radius: 6px;
+    max-width: 800px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+  .print-hint strong { color: #1a3c6e; }
+
+  @media print {
+    @page { margin: 25mm 20mm; size: A4; }
+    body { padding: 0; margin: 0; color: #000 !important; -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; color-adjust: exact !important; }
+    .container { max-width: 100% !important; padding: 0 !important; }
+    .header { border-bottom: 3px solid #1a3c6e !important; }
+    .logo-area img { max-height: 70px !important; }
+    .watermark { display: block !important; }
+    .controls, .print-hint { display: none !important; }
+    .footer { position: fixed; bottom: 0; left: 0; right: 0; padding: 10px 20mm; border-top: 2px solid #1a3c6e; background: #fff; }
+  }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <img src="{% static 'logo.png' %}" class="watermark" alt="watermark">
+
+  <div class="header">
+    <div class="logo-area">
+      <img src="{% if company and company.logo %}{{ company.logo.url }}{% else %}{% static 'logo.png' %}{% endif %}" alt="Logo" onerror="this.style.display='none'">
+      <div>
+        <div class="company-name">{{ company.company_name|default:'SCHONES HEIM BUILDERS' }}</div>
+        <div class="tagline">Engineered by purpose, led by vision</div>
+      </div>
+    </div>
+    <div style="text-align:right;">
+      <div style="font-size:10pt; color:#888;">Ref: <strong>{{ doc.reference_number }}</strong></div>
+      <div style="font-size:10pt; color:#888; margin-top:3px;">
+        <span class="badge" style="background:{% if doc.status == 'draft' %}#6c757d{% elif doc.status == 'final' %}#198754{% else %}#ffc107{% endif %};color:{% if doc.status == 'archived' %}#333{% else %}#fff{% endif %};font-size:9pt;">{{ doc.get_status_display }}</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="doc-title">{{ doc.title }}</div>
+
+  {% if doc.doc_type == 'letter' %}
+  <div class="doc-meta">
+    {% if doc.recipient_name %}<p><strong>Recipient:</strong> {{ doc.recipient_name }}</p>{% endif %}
+    {% if doc.recipient_organization %}<p><strong>Organization:</strong> {{ doc.recipient_organization }}</p>{% endif %}
+    {% if doc.recipient_address %}<p><strong>Address:</strong> {{ doc.recipient_address }}</p>{% endif %}
+    {% if doc.project %}<p><strong>Project:</strong> {{ doc.project.name }}</p>{% endif %}
+  </div>
+  {% endif %}
+
+  {% if doc.doc_type == 'report' %}
+  <div class="doc-meta">
+    {% if doc.report_date %}<p><strong>Date:</strong> {{ doc.report_date|date:'d M Y' }}</p>{% endif %}
+    {% if doc.prepared_by %}<p><strong>Prepared By:</strong> {{ doc.prepared_by }}</p>{% endif %}
+    {% if doc.report_period %}<p><strong>Period:</strong> {{ doc.report_period }}</p>{% endif %}
+    {% if doc.department %}<p><strong>Department:</strong> {{ doc.department }}</p>{% endif %}
+    {% if doc.project %}<p><strong>Project:</strong> {{ doc.project.name }}</p>{% endif %}
+  </div>
+  {% endif %}
+
+  {% if doc.doc_type == 'letter' and doc.subject %}
+  <div class="doc-subject">Subject: {{ doc.subject }}</div>
+  {% endif %}
+
+  {% if doc.doc_type == 'letter' %}
+  <div class="doc-date">{{ doc.report_date|date:'d M Y'|default:doc.created_at|date:'d M Y' }}</div>
+  {% endif %}
+
+  <div class="doc-body">{{ doc.content|safe }}</div>
+
+  {% if doc.show_signature %}
+  <div class="signature">
+    <div class="left">
+      Sincerely,<br><br>
+      <div style="font-weight:600;color:#1a3c6e;">{{ company.company_name|default:'SCHONES HEIM BUILDERS' }}</div>
+    </div>
+    <div style="text-align:center; min-width:220px; margin-left:auto;">
+      {% if signature_data_uri %}
+        <div style="border-bottom:1px solid #333; padding-bottom:2px; min-height:70px; display:flex; align-items:flex-end; justify-content:center;">
+          <img src="{{ signature_data_uri }}" alt="Signature" style="height:60px; width:auto; display:block;">
+        </div>
+      {% else %}
+        <div style="border-bottom:1px solid #333; padding-bottom:2px; min-height:50px;"></div>
+      {% endif %}
+      <div style="font-size:10pt; color:#666; margin-top:4px;">Authorized Signatory</div>
+    </div>
+  </div>
+  {% endif %}
+
+  <div class="footer">
+    <strong>{{ company.company_name|default:'SCHONES HEIM BUILDERS' }}</strong><br>
+    {% if company.address %}{{ company.address }} | {% endif %}
+    {% if company.phone %}Tel: {{ company.phone }} | {% endif %}
+    {% if company.email %}Email: {{ company.email }}{% endif %}
+    {% if company.mpesa_number %}<br>Mpesa: {{ company.mpesa_number }} | KRA PIN: {{ company.kra_pin|default:'' }}{% endif %}
+  </div>
+
+</div>
+
+<div class="controls">
+  <a href="{% url 'documents:company_document_list' %}" class="btn btn-back"><i class="fas fa-arrow-left"></i> Back</a>
+  {% if doc.created_by == request.user or request.user.role == 'admin' %}
+  <a href="{% url 'documents:company_document_edit' doc.pk %}" class="btn btn-edit"><i class="fas fa-pen"></i> Edit</a>
+  {% endif %}
+  <button class="btn btn-print" onclick="window.print()"><i class="fas fa-print"></i> Print Document</button>
+</div>
+
+<div class="print-hint">Click <strong>Print Document</strong> then choose <strong>"Save as PDF"</strong> to download. If colors don't appear, check <strong>More settings &rarr; Background graphics</strong>.</div>
+
+</body>
+</html>

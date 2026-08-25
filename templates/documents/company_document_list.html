@@ -1,0 +1,112 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}Letters & Reports - SCHONES HEIM BUILDERS{% endblock %}
+{% block page_title %}Company Documents{% endblock %}
+{% block extra_css %}
+<style>
+  .status-draft { background:#6c757d; color:#fff; }
+  .status-final { background:#198754; color:#fff; }
+  .status-archived { background:#ffc107; color:#333; }
+  .type-letter { background:#e8eef6; color:#1a3c6e; }
+  .type-report { background:#e8f5e9; color:#2e7d32; }
+</style>
+{% endblock %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
+  <div>
+    <h5 class="mb-0" style="color:#1a3c6e; font-weight:700;">Letters & Reports</h5>
+    <small class="text-muted">Create and manage official company documents</small>
+  </div>
+  <div class="d-flex gap-2">
+    <a href="{% url 'documents:document_list' %}" class="btn btn-sm btn-outline-secondary"><i class="fas fa-folder-open"></i> File Documents</a>
+    {% if can_edit %}
+    <a href="{% url 'documents:company_document_create' %}" class="btn btn-sm btn-shb" style="background:#1a3c6e;color:#fff;border:none;"><i class="fas fa-plus"></i> Create Document</a>
+    {% endif %}
+  </div>
+</div>
+
+<div class="card mb-3">
+  <div class="card-body py-2">
+    <form method="get" class="d-flex gap-2 align-items-center flex-wrap">
+      <select name="type" class="form-select form-select-sm" style="width:auto;" onchange="this.form.submit()">
+        <option value="">All Types</option>
+        <option value="letter" {% if current_type == 'letter' %}selected{% endif %}>Letters</option>
+        <option value="report" {% if current_type == 'report' %}selected{% endif %}>Reports</option>
+      </select>
+      <select name="status" class="form-select form-select-sm" style="width:auto;" onchange="this.form.submit()">
+        <option value="">All Statuses</option>
+        <option value="draft" {% if current_status == 'draft' %}selected{% endif %}>Draft</option>
+        <option value="final" {% if current_status == 'final' %}selected{% endif %}>Final</option>
+        <option value="archived" {% if current_status == 'archived' %}selected{% endif %}>Archived</option>
+      </select>
+    </form>
+  </div>
+</div>
+
+<div class="card">
+  <div class="card-body p-0">
+    <div class="table-responsive">
+      <table class="table table-hover mb-0">
+        <thead>
+          <tr>
+            <th>Ref No.</th>
+            <th>Document</th>
+            <th>Type</th>
+            <th>Created By</th>
+            <th>Date</th>
+            <th>Status</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for doc in documents %}
+          <tr>
+            <td><code>{{ doc.reference_number }}</code></td>
+            <td class="fw-semibold">{{ doc.title }}</td>
+            <td>
+              {% if doc.doc_type == 'letter' %}
+              <span class="badge type-letter">Letter</span>
+              {% else %}
+              <span class="badge type-report">Report</span>
+              {% endif %}
+            </td>
+            <td>{{ doc.created_by|default:'--' }}</td>
+            <td><small class="text-muted">{{ doc.created_at|date:'d M Y' }}</small></td>
+            <td><span class="badge status-{{ doc.status }}">{{ doc.get_status_display }}</span></td>
+            <td>
+              <a href="{% url 'documents:company_document_preview' doc.pk %}" class="btn btn-sm btn-outline-primary" title="Preview"><i class="fas fa-eye"></i></a>
+              {% if can_edit %}
+              <a href="{% url 'documents:company_document_edit' doc.pk %}" class="btn btn-sm btn-outline-secondary" title="Edit"><i class="fas fa-pen"></i></a>
+              <form method="post" action="{% url 'documents:company_document_delete' doc.pk %}" class="d-inline" onsubmit="return confirm('Delete this document permanently?')">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-sm btn-outline-danger" title="Delete"><i class="fas fa-trash"></i></button>
+              </form>
+              {% endif %}
+            </td>
+          </tr>
+          {% empty %}
+          <tr><td colspan="7" class="text-center text-muted py-4">
+            <i class="fas fa-file-alt fa-2x mb-2 d-block" style="color:#ccc;"></i>
+            No documents yet. Click <strong>Create Document</strong> to get started.
+          </td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+{% if is_paginated %}
+<nav class="mt-3"><ul class="pagination justify-content-center">
+  {% if page_obj.has_previous %}
+  <li class="page-item"><a class="page-link" href="?page={{ page_obj.previous_page_number }}&type={{ current_type }}&status={{ current_status }}">&laquo;</a></li>
+  {% endif %}
+  {% for num in page_obj.paginator.page_range %}
+  <li class="page-item {% if page_obj.number == num %}active{% endif %}"><a class="page-link" href="?page={{ num }}&type={{ current_type }}&status={{ current_status }}">{{ num }}</a></li>
+  {% endfor %}
+  {% if page_obj.has_next %}
+  <li class="page-item"><a class="page-link" href="?page={{ page_obj.next_page_number }}&type={{ current_type }}&status={{ current_status }}">&raquo;</a></li>
+  {% endif %}
+</ul></nav>
+{% endif %}
+{% endblock %}
