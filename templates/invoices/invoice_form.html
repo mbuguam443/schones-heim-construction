@@ -16,24 +16,37 @@
     <h2><i class="fas fa-receipt"></i> {{ object|yesno:"Update,Create" }} Invoice</h2>
 </div>
 
-{% include 'includes/project_context_banner.html' %}
-
 <div class="row">
-    <div class="col-lg-8">
+    <div class="col-lg-12">
         <div class="card shadow-sm mb-4">
             <div class="card-header bg-primary text-white"><h5 class="mb-0">Invoice Details</h5></div>
             <div class="card-body">
                 <form method="post" id="invoiceForm">
                     {% csrf_token %}
-                    {{ form|crispy }}
+                    <div class="row">
+                        <div class="col-md-6">{{ form.client|as_crispy_field }}</div>
+                        <div class="col-md-6">{{ form.project|as_crispy_field }}</div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-3">{{ form.date|as_crispy_field }}</div>
+                        <div class="col-md-3">{{ form.due_date|as_crispy_field }}</div>
+                        <div class="col-md-3">{{ form.status|as_crispy_field }}</div>
+                        <div class="col-md-3">{{ form.quotation|as_crispy_field }}</div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-3">{{ form.tax_percent|as_crispy_field }}</div>
+                        <div class="col-md-3">{{ form.discount|as_crispy_field }}</div>
+                        <div class="col-md-6">{{ form.notes|as_crispy_field }}</div>
+                    </div>
 
-                    <hr><h5 class="text-primary">Line Items</h5>
+                    <hr><h5 class="text-primary"><i class="fas fa-list me-1"></i> Line Items</h5>
                     {{ items.management_form }}
                     <div class="table-responsive">
                         <table class="table table-bordered" id="items-table">
                             <thead class="table-primary">
                                 <tr>
-                                    <th style="width:40%">Description</th>
+                                    <th style="width:5%">#</th>
+                                    <th style="width:35%">Description</th>
                                     <th style="width:10%">Qty</th>
                                     <th style="width:10%">Unit</th>
                                     <th style="width:15%">Unit Price (KSh)</th>
@@ -44,6 +57,7 @@
                             <tbody id="items-tbody">
                                 {% for item in items %}
                                 <tr class="formset-row">
+                                    <td class="text-center align-middle">{{ forloop.counter }}</td>
                                     <td>{{ item.id }}{{ item.description }}</td>
                                     <td>{{ item.quantity }}</td>
                                     <td>{{ item.unit }}</td>
@@ -55,28 +69,28 @@
                             </tbody>
                             <tfoot>
                                 <tr>
-                                    <td colspan="6">
+                                    <td colspan="7">
                                         <button type="button" class="btn btn-sm btn-outline-success" id="add-item"><i class="fas fa-plus-circle"></i> Add Item</button>
                                     </td>
                                 </tr>
                                 <tr class="table-secondary fw-bold">
-                                    <td colspan="4" class="text-end">Subtotal:</td>
+                                    <td colspan="5" class="text-end">Subtotal:</td>
                                     <td id="subtotal">0.00</td>
                                     <td></td>
                                 </tr>
                                 <tr class="table-secondary fw-bold">
-                                    <td colspan="4" class="text-end">Tax ({{ form.tax_percent.value|default:16 }}%):</td>
+                                    <td colspan="5" class="text-end">Tax ({{ form.tax_percent.value|default:16 }}%):</td>
                                     <td id="tax-amount">0.00</td>
                                     <td></td>
                                 </tr>
                                 <tr class="table-secondary fw-bold">
-                                    <td colspan="4" class="text-end">Discount:</td>
+                                    <td colspan="5" class="text-end">Discount:</td>
                                     <td id="discount-amount">0.00</td>
                                     <td></td>
                                 </tr>
                                 <tr class="table-primary fw-bold">
-                                    <td colspan="4" class="text-end">Grand Total:</td>
-                                    <td id="grand-total">0.00</td>
+                                    <td colspan="5" class="text-end fs-5">Grand Total:</td>
+                                    <td id="grand-total" class="fs-5">0.00</td>
                                     <td></td>
                                 </tr>
                             </tfoot>
@@ -84,8 +98,8 @@
                     </div>
 
                     <div class="d-flex gap-2 mt-3">
-                        <button type="submit" class="btn btn-primary"><i class="fas fa-save"></i> Save</button>
-                        <a href="{% url 'invoices:list' %}" class="btn btn-outline-secondary">Cancel</a>
+                        <button type="submit" class="btn btn-primary btn-lg"><i class="fas fa-save"></i> Save</button>
+                        <a href="{% url 'invoices:list' %}" class="btn btn-outline-secondary btn-lg">Cancel</a>
                     </div>
                 </form>
             </div>
