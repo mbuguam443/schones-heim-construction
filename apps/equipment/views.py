@@ -27,7 +27,13 @@ class EquipmentListView(LoginRequiredMixin, ListView):
             equip_ids = EquipmentUsageLog.objects.filter(
                 project_id=project_id
             ).values_list('equipment_id', flat=True).distinct()
-            qs = qs.filter(pk__in=list(equip_ids))
+            used_ids = set(equip_ids)
+            unassigned_ids = Equipment.objects.filter(
+                usage_logs__isnull=True
+            ).values_list('pk', flat=True)
+            combined = used_ids | set(unassigned_ids)
+            if combined:
+                qs = qs.filter(pk__in=list(combined))
         elif client_id:
             from apps.projects.models import Project
             proj_ids = list(
@@ -36,7 +42,13 @@ class EquipmentListView(LoginRequiredMixin, ListView):
             equip_ids = EquipmentUsageLog.objects.filter(
                 project_id__in=proj_ids
             ).values_list('equipment_id', flat=True).distinct()
-            qs = qs.filter(pk__in=list(equip_ids))
+            used_ids = set(equip_ids)
+            unassigned_ids = Equipment.objects.filter(
+                usage_logs__isnull=True
+            ).values_list('pk', flat=True)
+            combined = used_ids | set(unassigned_ids)
+            if combined:
+                qs = qs.filter(pk__in=list(combined))
         return qs
 
     def get_context_data(self, **kwargs):
