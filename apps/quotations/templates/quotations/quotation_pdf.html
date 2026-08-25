@@ -5,20 +5,26 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Quotation {{ qtn.quotation_number }} - {{ company.company_name|default:'SCHONES HEIM BUILDERS' }}</title>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 <style>
   * { margin: 0; padding: 0; box-sizing: border-box; }
-  @page { margin: 20mm; size: A4; }
+  @page { margin: 20mm 18mm; size: A4; }
   body {
     font-family: 'Segoe UI', Arial, sans-serif;
-    font-size: 11pt;
+    font-size: 10.5pt;
     color: #333;
     line-height: 1.5;
-    padding: 0;
+    background: #f0f2f5;
+    padding: 30px 20px;
   }
   .container {
-    max-width: 900px;
+    max-width: 850px;
     margin: 0 auto;
-    padding: 10px;
+    background: #fff;
+    border-radius: 12px;
+    box-shadow: 0 4px 24px rgba(0,0,0,0.1);
+    padding: 45px 50px;
   }
   .header {
     display: flex;
@@ -28,60 +34,66 @@
     padding-bottom: 16px;
     margin-bottom: 20px;
   }
-  @media print {
-    .header { margin: -20mm -20mm 20mm -20mm; padding: 15px 30px 16px; }
-  }
   .logo-area {
     display: flex;
     align-items: center;
     gap: 16px;
   }
   .logo-area img {
-    max-height: 70px;
+    max-height: 65px;
   }
   .company-name {
-    font-size: 22px;
+    font-size: 20px;
     font-weight: 700;
     color: #1a3c6e;
     letter-spacing: 1px;
   }
   .tagline {
-    font-size: 11px;
+    font-size: 10px;
     color: #666;
     font-style: italic;
+    letter-spacing: 1px;
   }
+  .header-right {
+    text-align: right;
+    font-size: 10pt;
+    color: #666;
+  }
+  .header-right div { margin-bottom: 3px; }
+  .header-right strong { color: #1a3c6e; }
   .quotation-title {
     text-align: center;
-    font-size: 24px;
+    font-size: 22px;
     font-weight: 700;
     color: #1a3c6e;
     margin-bottom: 16px;
     border-bottom: 1px dashed #ccc;
     padding-bottom: 8px;
+    letter-spacing: 2px;
   }
   .info-grid {
     display: flex;
     justify-content: space-between;
-    margin-bottom: 20px;
-    padding: 14px;
+    margin-bottom: 18px;
+    padding: 14px 18px;
     background: #f8f9fc;
     border-radius: 8px;
     border: 1px solid #e0e3e8;
   }
   .info-grid .col p {
     margin: 3px 0;
-    font-size: 11pt;
+    font-size: 10pt;
   }
   .info-grid .col p strong {
     display: inline-block;
-    width: 110px;
+    width: 105px;
     color: #555;
   }
   .status-badge {
     display: inline-block;
     padding: 2px 10px;
     border-radius: 20px;
-    font-size: 10pt;
+    font-size: 9pt;
     font-weight: 600;
     text-transform: uppercase;
     letter-spacing: 0.5px;
@@ -97,20 +109,19 @@
     margin-bottom: 16px;
   }
   th, td {
-    border: 1px solid #ccc;
+    border: 1px solid #d0d5db;
     padding: 8px 10px;
     text-align: left;
-    font-size: 10pt;
+    font-size: 9.5pt;
   }
   th {
     background: #1a3c6e;
     color: #fff;
     font-weight: 600;
   }
-  th.right { text-align: right; }
-  th.center { text-align: center; }
-  td.right { text-align: right; }
-  td.center { text-align: center; }
+  th.right, td.right { text-align: right; }
+  th.center, td.center { text-align: center; }
+  .items-table tr:nth-child(even) td { background: #f9fbfd; }
   .total-row {
     font-weight: 700;
     background: #e8edf4;
@@ -119,23 +130,23 @@
     font-weight: 700;
     background: #1a3c6e;
     color: #fff;
-    font-size: 12pt;
+    font-size: 11pt;
   }
   .grand-total-row td { color: #fff; }
   .terms {
-    margin-bottom: 20px;
-    padding: 14px;
+    margin-bottom: 18px;
+    padding: 14px 18px;
     background: #f8f9fc;
     border-radius: 8px;
     border: 1px solid #e0e3e8;
   }
   .terms h3 {
-    font-size: 12pt;
+    font-size: 11pt;
     color: #1a3c6e;
     margin-bottom: 6px;
   }
   .terms p {
-    font-size: 10pt;
+    font-size: 9.5pt;
     line-height: 1.5;
     color: #444;
     white-space: pre-line;
@@ -143,24 +154,24 @@
   .payment-details {
     display: flex;
     gap: 40px;
-    margin-bottom: 20px;
-    padding: 14px;
+    margin-bottom: 18px;
+    padding: 14px 18px;
     background: #f8f9fc;
     border-radius: 8px;
     border: 1px solid #e0e3e8;
   }
   .payment-details h3 {
-    font-size: 12pt;
+    font-size: 11pt;
     color: #1a3c6e;
     margin-bottom: 6px;
   }
   .payment-details .field {
     margin-bottom: 3px;
-    font-size: 10pt;
+    font-size: 9.5pt;
   }
   .payment-details .field span {
     display: inline-block;
-    width: 100px;
+    width: 95px;
     font-weight: 600;
     color: #555;
   }
@@ -172,45 +183,130 @@
     padding-top: 16px;
     border-top: 1px solid #ddd;
   }
-  .signature .left { font-size: 10pt; color: #666; }
+  .signature .left { font-size: 9.5pt; color: #666; }
   .signature .right { text-align: right; }
   .signature .right .name {
-    font-size: 14pt;
+    font-size: 13pt;
     font-weight: 600;
     color: #1a3c6e;
   }
   .signature .right .title {
-    font-size: 10pt;
+    font-size: 9.5pt;
     color: #666;
     margin-top: 3px;
   }
+  .action-bar {
+    text-align: center;
+    padding: 20px 0 10px;
+  }
+  .btn-print {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 36px;
+    background: #1a3c6e;
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.2s;
+    text-decoration: none;
+  }
+  .btn-print:hover { background: #2a5a9e; color: #fff; }
+  .btn-download {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 36px;
+    background: #198754;
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.2s;
+    text-decoration: none;
+    margin-left: 10px;
+  }
+  .btn-download:hover { background: #157347; color: #fff; }
+  .btn-back {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    margin-left: 10px;
+    padding: 12px 24px;
+    background: #6c757d;
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.2s;
+    text-decoration: none;
+  }
+  .btn-back:hover { background: #5a6268; color: #fff; }
   .watermark {
     display: none;
     position: fixed;
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
-    opacity: 0.12;
+    opacity: 0.08;
     pointer-events: none;
     z-index: 9999;
-    max-width: 500px;
-    width: 60%;
+    max-width: 400px;
+    width: 50%;
   }
+  .print-hint {
+    display: block;
+    text-align: center;
+    font-size: 11px;
+    color: #888;
+    margin-top: 12px;
+    padding: 8px;
+    border: 1px dashed #ccc;
+    border-radius: 6px;
+  }
+  .print-hint strong { color: #1a3c6e; }
+
   @media print {
-    body { color: #000 !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; color-adjust: exact; }
+    body { background: #fff; padding: 0; color: #000 !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; color-adjust: exact; }
+    .container { box-shadow: none; border-radius: 0; padding: 10px 15px; max-width: 100%; }
+    .action-bar, .btn-print, .btn-download, .btn-back, .print-hint { display: none !important; }
     th { background: #1a3c6e !important; color: #fff !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; color-adjust: exact; }
-    td, th { border-color: #000 !important; border-width: 1.5px !important; }
+    td, th { border-color: #333 !important; border-width: 1px !important; }
     .total-row { background: #e0e4ec !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; color-adjust: exact; }
     .grand-total-row td { background: #1a3c6e !important; color: #fff !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; color-adjust: exact; }
     .info-grid { background: #eef0f5 !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; color-adjust: exact; border-color: #000 !important; }
-    .terms { background: #eef0f5 !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; color-adjust: exact; }
+    .terms { background: #eef0f5 !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; color-adjust: exact; border-color: #000 !important; }
     .payment-details { background: #eef0f5 !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; color-adjust: exact; border-color: #000 !important; }
     .status-badge { -webkit-print-color-adjust: exact; print-color-adjust: exact; color-adjust: exact; }
     .watermark { display: block; }
   }
+
+  @media (max-width: 768px) {
+    body { padding: 10px; }
+    .container { padding: 20px 16px; border-radius: 8px; }
+    .header { flex-direction: column; text-align: center; gap: 12px; }
+    .header-right { text-align: center; }
+    .info-grid { flex-direction: column; gap: 12px; }
+    .info-grid .col { text-align: left !important; }
+    .payment-details { flex-direction: column; gap: 16px; }
+    .signature { flex-direction: column; gap: 20px; }
+    .signature .right { text-align: left; }
+    .btn-print { width: 100%; justify-content: center; }
+    .btn-download { width: 100%; justify-content: center; margin-left: 0; margin-top: 10px; }
+    .btn-back { width: 100%; justify-content: center; margin-left: 0; margin-top: 10px; }
+    table.items-table th, table.items-table td { padding: 6px 5px; font-size: 8pt; }
+  }
 </style>
 </head>
 <body>
+
 <div class="container">
 
   <img src="{% static 'logo.png' %}" class="watermark" alt="watermark">
@@ -220,12 +316,12 @@
       <img src="{% if company and company.logo %}{{ company.logo.url }}{% else %}{% static 'logo.png' %}{% endif %}" alt="Logo" onerror="this.style.display='none'">
       <div>
         <div class="company-name">{{ company.company_name|default:'SCHONES HEIM BUILDERS' }}</div>
-        <div class="tagline">Engineered by purpose, led by vision</div>
+        <div class="tagline">Engineering &amp; Construction</div>
       </div>
     </div>
-    <div style="text-align:right;">
-      <div style="font-size:11pt; color:#666;">Date: <strong>{{ qtn.date|date:"d M Y" }}</strong></div>
-      <div style="font-size:11pt; color:#666; margin-top:3px;">Expiry: <strong>{{ qtn.expiry_date|date:"d M Y" }}</strong></div>
+    <div class="header-right">
+      <div>Date: <strong>{{ qtn.date|date:"d M Y" }}</strong></div>
+      <div>Expiry: <strong>{{ qtn.expiry_date|date:"d M Y" }}</strong></div>
     </div>
   </div>
 
@@ -247,7 +343,7 @@
   </div>
 
   {% if qtn.notes %}
-  <div style="margin-bottom:16px; font-size:11pt; line-height:1.5; color:#444;">{{ qtn.notes|linebreaksbr }}</div>
+  <div style="margin-bottom:16px; font-size:10pt; line-height:1.5; color:#444;">{{ qtn.notes|linebreaksbr }}</div>
   {% endif %}
 
   <table class="items-table">
@@ -255,16 +351,16 @@
       <tr>
         <th style="width:40px;">#</th>
         <th>Description</th>
-        <th style="width:60px;" class="center">Qty</th>
-        <th style="width:60px;" class="center">Unit</th>
-        <th style="width:100px;" class="right">Unit Price</th>
-        <th style="width:120px;" class="right">Total (KSh)</th>
+        <th style="width:55px;" class="center">Qty</th>
+        <th style="width:55px;" class="center">Unit</th>
+        <th style="width:95px;" class="right">Unit Price</th>
+        <th style="width:110px;" class="right">Total (KSh)</th>
       </tr>
     </thead>
     <tbody>
       {% for item in qtn.items.all %}
       <tr>
-        <td>{{ forloop.counter }}</td>
+        <td class="center">{{ forloop.counter }}</td>
         <td>{{ item.description }}</td>
         <td class="center">{{ item.quantity|floatformat:2 }}</td>
         <td class="center">{{ item.unit }}</td>
@@ -320,6 +416,34 @@
     </div>
   </div>
 
+  <div class="action-bar">
+    <a href="javascript:history.back()" class="btn-back"><i class="fas fa-arrow-left"></i> Back</a>
+    <button class="btn-print" onclick="window.print()"><i class="fas fa-print"></i> Print</button>
+    <button class="btn-download" id="downloadBtn" onclick="downloadPDF()"><i class="fas fa-download"></i> Download PDF</button>
+  </div>
+
+  <div class="print-hint">If blue headers don't appear in the PDF, check <strong>More settings &rarr; Background graphics</strong> in your browser's print dialog.</div>
+
 </div>
+
+<script>
+function downloadPDF() {
+    var btn = document.getElementById('downloadBtn');
+    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Generating...';
+    btn.disabled = true;
+    var element = document.querySelector('.container');
+    var opt = {
+        margin:       [15, 15, 15, 15],
+        filename:     '{{ qtn.quotation_number }}.pdf',
+        image:        { type: 'jpeg', quality: 0.98 },
+        html2canvas:  { scale: 2, useCORS: true, letterRendering: true },
+        jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
+    };
+    html2pdf().set(opt).from(element).save().then(function() {
+        btn.innerHTML = '<i class="fas fa-download"></i> Download PDF';
+        btn.disabled = false;
+    });
+}
+</script>
 </body>
 </html>

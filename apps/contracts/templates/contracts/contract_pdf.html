@@ -3,131 +3,231 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Contract {{ contract.contract_number }}</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Contract {{ contract.contract_number }} - {{ company_settings.company_name|default:'SCHONES HEIM BUILDERS' }}</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     <style>
-        @page { margin: 20mm; size: A4; }
-        body { font-family: 'Helvetica', 'Arial', sans-serif; font-size: 11pt; color: #333; line-height: 1.6; margin: 0; padding: 0; }
-        .header { background: #1a3c6e; color: #fff; padding: 16px 30px; margin: -20mm -20mm 20mm -20mm; display: flex; justify-content: space-between; align-items: center; }
+        @page { margin: 15mm 18mm; size: A4; }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            font-family: 'Segoe UI', Arial, sans-serif;
+            font-size: 10pt;
+            color: #333;
+            line-height: 1.6;
+            background: #f0f2f5;
+            padding: 30px 20px;
+        }
+        .container {
+            max-width: 850px;
+            margin: 0 auto;
+            background: #fff;
+            border-radius: 12px;
+            box-shadow: 0 4px 24px rgba(0,0,0,0.1);
+            padding: 40px 45px;
+        }
+        .header { background: #1a3c6e; color: #fff; padding: 16px 22px; border-radius: 10px; display: flex; justify-content: space-between; align-items: center; }
         .header .left { display: flex; align-items: center; gap: 16px; }
-        .header .left .company { font-size: 18pt; font-weight: 700; letter-spacing: 2px; }
-        .header .left .tagline { font-size: 9pt; opacity: 0.85; }
+        .header .left .company { font-size: 17pt; font-weight: 700; letter-spacing: 2px; }
+        .header .left .tagline { font-size: 8.5pt; opacity: 0.85; letter-spacing: 2px; }
         .header .right { text-align: right; }
-        .header .right .label { font-size: 16pt; font-weight: 700; }
-        h1.contract-title { color: #1a3c6e; font-size: 16pt; margin-bottom: 4px; }
-        h2 { color: #1a3c6e; font-size: 12pt; border-bottom: 2px solid #1a3c6e; padding-bottom: 4px; margin-top: 24px; }
-        .details-table { width: 100%; border-collapse: collapse; margin-bottom: 20px; }
-        .details-table td { padding: 6px 10px; border: 1px solid #ddd; }
-        .details-table td:first-child { background: #f0f4f8; font-weight: bold; width: 200px; }
-        .terms { white-space: pre-wrap; }
-        .sig-block { margin-top: 50px; }
+        .header .right .label { font-size: 15pt; font-weight: 700; letter-spacing: 1px; }
+        h1.contract-title { color: #1a3c6e; font-size: 14pt; margin-top: 16px; margin-bottom: 4px; }
+        .contract-meta { font-size: 9pt; color: #666; margin-bottom: 16px; }
+        h2 { color: #1a3c6e; font-size: 11pt; border-bottom: 2px solid #1a3c6e; padding-bottom: 4px; margin-top: 20px; margin-bottom: 10px; }
+        .details-table { width: 100%; border-collapse: collapse; margin-bottom: 16px; }
+        .details-table td { padding: 6px 10px; border: 1px solid #e1e6ec; font-size: 9.5pt; }
+        .details-table td:first-child { background: #f4f7fb; font-weight: bold; width: 180px; color: #1a3c6e; }
+        .terms { white-space: pre-wrap; font-size: 9.5pt; line-height: 1.6; }
+        .sig-block { margin-top: 30px; }
         .sig-table { width: 100%; border-collapse: collapse; }
         .sig-table td { width: 50%; vertical-align: top; padding: 0 20px; }
         .sig-line { border-top: 1px solid #333; margin-top: 50px; padding-top: 6px; font-size: 9pt; text-align: center; }
-        .sig-image { max-height: 80px; max-width: 100%; background: #fff; margin-bottom: 4px; }
-        .sig-status { font-size: 9pt; color: #166534; font-weight: bold; }
-        .sig-pending { font-size: 9pt; color: #b45309; }
-        .footer { margin-top: 40px; border-top: 2px solid #1a3c6e; padding-top: 15px; font-size: 9pt; color: #666; }
-        .footer p { margin: 3px 0; }
+        .sig-image { max-height: 70px; max-width: 100%; background: #fff; margin-bottom: 4px; }
+        .sig-status { font-size: 8.5pt; color: #166534; font-weight: bold; margin-top: 4px; }
+        .sig-pending { font-size: 8.5pt; color: #b45309; }
+        .footer { margin-top: 30px; border-top: 2px solid #1a3c6e; padding-top: 12px; font-size: 8pt; color: #666; }
+        .footer p { margin: 2px 0; }
+
+        .action-bar { text-align: center; padding: 20px 0 10px; }
+        .btn-print {
+            display: inline-flex; align-items: center; gap: 8px;
+            padding: 12px 36px; background: #1a3c6e; color: #fff;
+            border: none; border-radius: 8px; font-size: 15px; font-weight: 600;
+            cursor: pointer; transition: background 0.2s; text-decoration: none;
+        }
+        .btn-print:hover { background: #2a5a9e; color: #fff; }
+        .btn-download {
+            display: inline-flex; align-items: center; gap: 8px;
+            padding: 12px 36px; background: #198754; color: #fff;
+            border: none; border-radius: 8px; font-size: 15px; font-weight: 600;
+            cursor: pointer; transition: background 0.2s; text-decoration: none;
+            margin-left: 10px;
+        }
+        .btn-download:hover { background: #157347; color: #fff; }
+        .btn-back {
+            display: inline-flex; align-items: center; gap: 8px;
+            margin-left: 10px; padding: 12px 24px; background: #6c757d; color: #fff;
+            border: none; border-radius: 8px; font-size: 14px; font-weight: 600;
+            cursor: pointer; transition: background 0.2s; text-decoration: none;
+        }
+        .btn-back:hover { background: #5a6268; color: #fff; }
+        .print-hint {
+            display: block; text-align: center; font-size: 11px; color: #888;
+            margin-top: 12px; padding: 8px; border: 1px dashed #ccc; border-radius: 6px;
+        }
+        .print-hint strong { color: #1a3c6e; }
+
+        @media print {
+            body { background: #fff; padding: 0; color: #000 !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; color-adjust: exact; }
+            .container { box-shadow: none; border-radius: 0; padding: 0; max-width: 100%; }
+            .action-bar, .btn-print, .btn-download, .btn-back, .print-hint { display: none !important; }
+            .header { border-radius: 0; }
+            .details-table td:first-child { background: #f4f7fb !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+        }
+
+        @media (max-width: 768px) {
+            body { padding: 10px; }
+            .container { padding: 20px 16px; border-radius: 8px; }
+            .header { flex-direction: column; text-align: center; gap: 12px; padding: 14px 16px; }
+            .header .right { text-align: center; }
+            .details-table td:first-child { width: auto; }
+            .sig-table td { display: block; width: 100%; padding: 0; margin-bottom: 20px; }
+            .btn-print { width: 100%; justify-content: center; }
+            .btn-download { width: 100%; justify-content: center; margin-left: 0; margin-top: 10px; }
+            .btn-back { width: 100%; justify-content: center; margin-left: 0; margin-top: 10px; }
+        }
     </style>
 </head>
 <body>
-    <div class="header">
-        <div class="left">
-            <div>
-                <div class="company">{{ company_settings.company_name|default:'SCHONES HEIM BUILDERS' }}</div>
-                <div class="tagline">Engineering & Construction</div>
+    <div class="container">
+        <div class="header">
+            <div class="left">
+                <div>
+                    <div class="company">{{ company_settings.company_name|default:'SCHONES HEIM BUILDERS' }}</div>
+                    <div class="tagline">Engineering &amp; Construction</div>
+                </div>
+            </div>
+            <div class="right">
+                <div class="label">CONSTRUCTION CONTRACT AGREEMENT</div>
             </div>
         </div>
-        <div class="right">
-            <div class="label">CONSTRUCTION CONTRACT AGREEMENT</div>
-        </div>
-    </div>
 
-    <h1 class="contract-title">{{ contract.title }}</h1>
-    <div class="text-muted">Contract No: <strong>{{ contract.contract_number }}</strong> &nbsp;|&nbsp; Date: {{ contract.created_at|date:"d M Y" }}</div>
+        <h1 class="contract-title">{{ contract.title }}</h1>
+        <div class="contract-meta">Contract No: <strong>{{ contract.contract_number }}</strong> &nbsp;|&nbsp; Date: {{ contract.created_at|date:"d M Y" }}</div>
 
-    <h2>Parties</h2>
-    <table class="details-table">
-        <tr>
-            <td>Contractor</td>
-            <td><strong>{{ company_settings.company_name|default:'Schones Heim Builders' }}</strong><br>
-                {% if company_settings %}{{ company_settings.address }}<br>{{ company_settings.phone }} | {{ company_settings.email }}{% endif %}
-            </td>
-        </tr>
-        <tr>
-            <td>Client</td>
-            <td><strong>{{ contract.client.full_name }}</strong><br>
-                {{ contract.client.company_name }}<br>
-                {% if contract.client.phone %}Tel: {{ contract.client.phone }}<br>{% endif %}
-                {% if contract.client.email %}Email: {{ contract.client.email }}<br>{% endif %}
-                {% if contract.client.address %}{{ contract.client.address }}<br>{% endif %}
-                {% if contract.client.kra_pin %}KRA PIN: {{ contract.client.kra_pin }}{% endif %}
-            </td>
-        </tr>
-    </table>
-
-    <h2>Project Details</h2>
-    <table class="details-table">
-        {% if contract.project %}
-        <tr><td>Project</td><td>{{ contract.project.name }}</td></tr>
-        <tr><td>Location</td><td>{{ contract.project.location|default:"-" }}</td></tr>
-        {% endif %}
-        {% if contract.quotation %}
-        <tr><td>Reference Quotation</td><td>{{ contract.quotation }}</td></tr>
-        {% endif %}
-        <tr><td>Contract Amount</td><td><strong>KSh {{ contract.contract_amount|floatformat:2 }}</strong></td></tr>
-        <tr><td>Deposit ({{ contract.deposit_percent }}%)</td><td>KSh {{ contract.deposit_amount|floatformat:2 }}</td></tr>
-        <tr><td>Balance Payable</td><td>KSh {{ contract.balance_amount|floatformat:2 }}</td></tr>
-        <tr><td>Commencement Date</td><td>{{ contract.start_date|date:"d M Y"|default:"-" }}</td></tr>
-        <tr><td>Completion Date</td><td>{{ contract.end_date|date:"d M Y"|default:"-" }}</td></tr>
-    </table>
-
-    <h2>Scope of Works</h2>
-    <p>{{ contract.description|linebreaksbr|default:"As per the agreed terms of reference." }}</p>
-
-    {% if contract.terms %}
-    <h2>Terms and Conditions</h2>
-    <div class="terms">{{ contract.terms|linebreaksbr }}</div>
-    {% endif %}
-
-    {% if contract.notes %}
-    <h2>Notes</h2>
-    <p>{{ contract.notes|linebreaksbr }}</p>
-    {% endif %}
-
-    <div class="sig-block">
-        <table class="sig-table">
+        <h2>Parties</h2>
+        <table class="details-table">
             <tr>
-                <td>
-                    <div class="sig-line">
-                        {% if contract.client_signed %}
-                        {% if contract.client_signature_data %}<img src="{{ contract.client_signature_data }}" class="sig-image" alt="Client signature">{% endif %}
-                        {{ contract.client_signature_name }}<br>Client Signatory<br>{{ contract.signed_at|date:"d M Y H:i" }}
-                        <div class="sig-status">&#10003; Electronically Signed</div>
-                        {% else %}
-                        Client's Signature & Date<br><span class="sig-pending">(pending signature)</span>
-                        {% endif %}
-                    </div>
+                <td>Contractor</td>
+                <td><strong>{{ company_settings.company_name|default:'Schones Heim Builders' }}</strong><br>
+                    {% if company_settings %}{{ company_settings.address }}<br>{{ company_settings.phone }} | {{ company_settings.email }}{% endif %}
                 </td>
-                <td>
-                    <div class="sig-line">
-                        {% if contract.owner_signed %}
-                        {% if contract.owner_signature_data %}<img src="{{ contract.owner_signature_data }}" class="sig-image" alt="Company signature">{% endif %}
-                        {{ contract.owner_signature_name }}<br>{{ company_settings.company_name|default:'Schones Heim Builders' }} - Authorised Signatory<br>{{ contract.owner_signed_at|date:"d M Y H:i" }}
-                        <div class="sig-status">&#10003; Electronically Signed</div>
-                        {% else %}
-                        {{ company_settings.company_name|default:'Schones Heim Builders' }} - Authorised Signatory<br><span class="sig-pending">(pending signature)</span>
-                        {% endif %}
-                    </div>
+            </tr>
+            <tr>
+                <td>Client</td>
+                <td><strong>{{ contract.client.full_name }}</strong><br>
+                    {{ contract.client.company_name }}<br>
+                    {% if contract.client.phone %}Tel: {{ contract.client.phone }}<br>{% endif %}
+                    {% if contract.client.email %}Email: {{ contract.client.email }}<br>{% endif %}
+                    {% if contract.client.address %}{{ contract.client.address }}<br>{% endif %}
+                    {% if contract.client.kra_pin %}KRA PIN: {{ contract.client.kra_pin }}{% endif %}
                 </td>
             </tr>
         </table>
+
+        <h2>Project Details</h2>
+        <table class="details-table">
+            {% if contract.project %}
+            <tr><td>Project</td><td>{{ contract.project.name }}</td></tr>
+            <tr><td>Location</td><td>{{ contract.project.location|default:"-" }}</td></tr>
+            {% endif %}
+            {% if contract.quotation %}
+            <tr><td>Reference Quotation</td><td>{{ contract.quotation }}</td></tr>
+            {% endif %}
+            <tr><td>Contract Amount</td><td><strong>KSh {{ contract.contract_amount|floatformat:2 }}</strong></td></tr>
+            <tr><td>Deposit ({{ contract.deposit_percent }}%)</td><td>KSh {{ contract.deposit_amount|floatformat:2 }}</td></tr>
+            <tr><td>Balance Payable</td><td>KSh {{ contract.balance_amount|floatformat:2 }}</td></tr>
+            <tr><td>Commencement Date</td><td>{{ contract.start_date|date:"d M Y"|default:"-" }}</td></tr>
+            <tr><td>Completion Date</td><td>{{ contract.end_date|date:"d M Y"|default:"-" }}</td></tr>
+        </table>
+
+        <h2>Scope of Works</h2>
+        <p style="font-size:9.5pt;">{{ contract.description|linebreaksbr|default:"As per the agreed terms of reference." }}</p>
+
+        {% if contract.terms %}
+        <h2>Terms and Conditions</h2>
+        <div class="terms">{{ contract.terms|linebreaksbr }}</div>
+        {% endif %}
+
+        {% if contract.notes %}
+        <h2>Notes</h2>
+        <p style="font-size:9.5pt;">{{ contract.notes|linebreaksbr }}</p>
+        {% endif %}
+
+        <div class="sig-block">
+            <table class="sig-table">
+                <tr>
+                    <td>
+                        <div class="sig-line">
+                            {% if contract.client_signed %}
+                            {% if contract.client_signature_data %}<img src="{{ contract.client_signature_data }}" class="sig-image" alt="Client signature">{% endif %}
+                            {{ contract.client_signature_name }}<br>Client Signatory<br>{{ contract.signed_at|date:"d M Y H:i" }}
+                            <div class="sig-status">&#10003; Electronically Signed</div>
+                            {% else %}
+                            Client's Signature & Date<br><span class="sig-pending">(pending signature)</span>
+                            {% endif %}
+                        </div>
+                    </td>
+                    <td>
+                        <div class="sig-line">
+                            {% if contract.owner_signed %}
+                            {% if contract.owner_signature_data %}<img src="{{ contract.owner_signature_data }}" class="sig-image" alt="Company signature">{% endif %}
+                            {{ contract.owner_signature_name }}<br>{{ company_settings.company_name|default:'Schones Heim Builders' }} - Authorised Signatory<br>{{ contract.owner_signed_at|date:"d M Y H:i" }}
+                            <div class="sig-status">&#10003; Electronically Signed</div>
+                            {% else %}
+                            {{ company_settings.company_name|default:'Schones Heim Builders' }} - Authorised Signatory<br><span class="sig-pending">(pending signature)</span>
+                            {% endif %}
+                        </div>
+                    </td>
+                </tr>
+            </table>
+        </div>
+
+        <div class="footer">
+            <p><strong>{{ company_settings.company_name|default:'SCHONES HEIM BUILDERS' }}</strong> &mdash; Engineering &amp; Construction</p>
+            <p>{{ company_settings.address }} | {{ company_settings.phone }} | {{ company_settings.email }}</p>
+            <p>Generated on {{ contract.updated_at|date:"d M Y H:i" }} from Schones Heim Builders Management System</p>
+        </div>
+
+        <div class="action-bar">
+            <a href="javascript:history.back()" class="btn-back"><i class="fas fa-arrow-left"></i> Back</a>
+            <button class="btn-print" onclick="window.print()"><i class="fas fa-print"></i> Print</button>
+            <button class="btn-download" id="downloadBtn" onclick="downloadPDF()"><i class="fas fa-download"></i> Download PDF</button>
+        </div>
+
+        <div class="print-hint">If blue headers don't appear in the PDF, check <strong>More settings &rarr; Background graphics</strong> in your browser's print dialog.</div>
+
     </div>
 
-    <div class="footer">
-        <p><strong>{{ company_settings.company_name|default:'SCHONES HEIM BUILDERS' }}</strong> &mdash; Engineering &amp; Construction</p>
-        <p>{{ company_settings.address }} | {{ company_settings.phone }} | {{ company_settings.email }}</p>
-        <p>Generated on {{ contract.updated_at|date:"d M Y H:i" }} from Schones Heim Builders Management System</p>
-    </div>
+<script>
+function downloadPDF() {
+    var btn = document.getElementById('downloadBtn');
+    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Generating...';
+    btn.disabled = true;
+    var element = document.querySelector('.container');
+    var opt = {
+        margin:       [10, 10, 10, 10],
+        filename:     '{{ contract.contract_number }}.pdf',
+        image:        { type: 'jpeg', quality: 0.98 },
+        html2canvas:  { scale: 2, useCORS: true, letterRendering: true },
+        jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
+    };
+    html2pdf().set(opt).from(element).save().then(function() {
+        btn.innerHTML = '<i class="fas fa-download"></i> Download PDF';
+        btn.disabled = false;
+    });
+}
+</script>
 </body>
 </html>

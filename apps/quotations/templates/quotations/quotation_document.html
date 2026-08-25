@@ -6,219 +6,75 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Quotation {{ qtn.quotation_number }} - {{ company_settings.company_name|default:'SCHONES HEIM BUILDERS' }}</title>
 <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 <style>
   * { margin: 0; padding: 0; box-sizing: border-box; }
   body {
     font-family: 'Segoe UI', Arial, sans-serif;
     background: #f0f2f5;
-    padding: 40px 20px;
+    padding: 30px 20px;
     color: #333;
   }
   .container {
-    max-width: 900px;
+    max-width: 850px;
     margin: 0 auto;
     background: #fff;
     border-radius: 12px;
-    box-shadow: 0 4px 20px rgba(0,0,0,0.1);
-    padding: 40px 50px;
+    box-shadow: 0 4px 24px rgba(0,0,0,0.1);
+    padding: 45px 50px;
   }
   .header {
     display: flex;
     justify-content: space-between;
     align-items: center;
     border-bottom: 3px solid #1a3c6e;
-    padding-bottom: 20px;
-    margin-bottom: 24px;
+    padding-bottom: 16px;
+    margin-bottom: 20px;
   }
   .logo-area {
     display: flex;
     align-items: center;
     gap: 16px;
   }
-  .logo-area img {
-    max-height: 70px;
-  }
+  .logo-area img { max-height: 65px; }
   .company-name {
-    font-size: 22px;
+    font-size: 20px;
     font-weight: 700;
     color: #1a3c6e;
     letter-spacing: 1px;
   }
   .tagline {
-    font-size: 12px;
+    font-size: 10px;
     color: #666;
     font-style: italic;
+    letter-spacing: 1px;
   }
   .quotation-title {
     text-align: center;
-    font-size: 26px;
+    font-size: 22px;
     font-weight: 700;
     color: #1a3c6e;
-    margin-bottom: 20px;
+    margin-bottom: 16px;
     border-bottom: 1px dashed #ccc;
-    padding-bottom: 10px;
+    padding-bottom: 8px;
+    letter-spacing: 2px;
   }
   .info-grid {
     display: flex;
     justify-content: space-between;
-    margin-bottom: 24px;
-    padding: 16px;
+    margin-bottom: 18px;
+    padding: 14px 18px;
     background: #f8f9fc;
     border-radius: 8px;
     border: 1px solid #e0e3e8;
   }
-  .info-grid .col p {
-    margin: 4px 0;
-    font-size: 13px;
-  }
-  .info-grid .col p strong {
-    display: inline-block;
-    width: 110px;
-    color: #555;
-  }
-  .intro-text {
-    margin-bottom: 20px;
-    font-size: 14px;
-    line-height: 1.6;
-    color: #444;
-  }
-  table {
-    width: 100%;
-    border-collapse: collapse;
-    margin-bottom: 20px;
-  }
-  th, td {
-    border: 1px solid #ccc;
-    padding: 10px 12px;
-    text-align: left;
-    font-size: 13px;
-  }
-  th {
-    background: #1a3c6e;
-    color: #fff;
-    font-weight: 600;
-  }
-  .total-row {
-    font-weight: 700;
-    background: #e8edf4;
-  }
-  .grand-total-row {
-    font-weight: 700;
-    background: #1a3c6e;
-    color: #fff;
-    font-size: 15px;
-  }
-  .terms {
-    margin-bottom: 24px;
-    padding: 16px;
-    background: #f8f9fc;
-    border-radius: 8px;
-    border: 1px solid #e0e3e8;
-  }
-  .terms h3 {
-    font-size: 14px;
-    color: #1a3c6e;
-    margin-bottom: 8px;
-  }
-  .terms p {
-    font-size: 13px;
-    line-height: 1.6;
-    color: #444;
-    white-space: pre-line;
-  }
-  .payment-details {
-    display: flex;
-    gap: 40px;
-    margin-bottom: 24px;
-    padding: 16px;
-    background: #f8f9fc;
-    border-radius: 8px;
-    border: 1px solid #e0e3e8;
-  }
-  .payment-details h3 {
-    font-size: 14px;
-    color: #1a3c6e;
-    margin-bottom: 8px;
-  }
-  .payment-details .field {
-    margin-bottom: 4px;
-    font-size: 13px;
-  }
-  .payment-details .field span {
-    display: inline-block;
-    width: 100px;
-    font-weight: 600;
-    color: #555;
-  }
-  .signature {
-    display: flex;
-    justify-content: space-between;
-    align-items: end;
-    margin-top: 30px;
-    padding-top: 20px;
-    border-top: 1px solid #ddd;
-  }
-  .signature .left { font-size: 13px; color: #666; }
-  .signature .right { text-align: right; }
-  .signature .right .name {
-    font-size: 16px;
-    font-weight: 600;
-    color: #1a3c6e;
-  }
-  .signature .right .title {
-    font-size: 13px;
-    color: #666;
-    margin-top: 4px;
-  }
-  .btn-back {
-    display: inline-block;
-    margin: 30px 10px 0 0;
-    padding: 12px 24px;
-    background: #6c757d;
-    color: #fff;
-    border: none;
-    border-radius: 8px;
-    font-size: 14px;
-    font-weight: 600;
-    cursor: pointer;
-    transition: background 0.2s;
-    text-decoration: none;
-  }
-  .btn-back:hover { background: #5a6268; color: #fff; }
-  .btn-print {
-    display: inline-block;
-    margin: 30px auto 0;
-    padding: 12px 40px;
-    background: #1a3c6e;
-    color: #fff;
-    border: none;
-    border-radius: 8px;
-    font-size: 16px;
-    font-weight: 600;
-    cursor: pointer;
-    transition: background 0.2s;
-  }
-  .btn-print:hover { background: #2a5a9e; color: #fff; }
-  .watermark {
-    display: none;
-    position: fixed;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    opacity: 0.12;
-    pointer-events: none;
-    z-index: 9999;
-    max-width: 500px;
-    width: 60%;
-  }
-  .action-bar {
-    text-align: center;
-  }
+  .info-grid .col p { margin: 3px 0; font-size: 10pt; }
+  .info-grid .col p strong { display: inline-block; width: 105px; color: #555; }
   .status-badge {
     display: inline-block;
-    padding: 4px 12px;
+    padding: 2px 10px;
     border-radius: 20px;
-    font-size: 12px;
+    font-size: 9pt;
     font-weight: 600;
     text-transform: uppercase;
     letter-spacing: 0.5px;
@@ -228,37 +84,126 @@
   .status-badge.Accepted { background: #198754; color: #fff; }
   .status-badge.Rejected { background: #dc3545; color: #fff; }
   .status-badge.Converted { background: #0dcaf0; color: #000; }
-  @media print {
-    body { background: #fff; padding: 0; color: #000 !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; color-adjust: exact; }
-    .container { box-shadow: none; padding: 20px; border-radius: 0; }
-    .btn-print, .btn-back, .action-bar { display: none; }
-    th { background: #1a3c6e !important; color: #fff !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; color-adjust: exact; }
-    td, th { border-color: #000 !important; border-width: 1.5px !important; }
-    .total-row { background: #e0e4ec !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; color-adjust: exact; }
-    .grand-total-row td { background: #1a3c6e !important; color: #fff !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; color-adjust: exact; }
-    .grand-total-row td { color: #fff !important; }
-    .info-grid { background: #eef0f5 !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; color-adjust: exact; border-color: #000 !important; }
-    .terms { background: #eef0f5 !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; color-adjust: exact; }
-    .payment-details { background: #eef0f5 !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; color-adjust: exact; border-color: #000 !important; }
-    .status-badge { -webkit-print-color-adjust: exact; print-color-adjust: exact; color-adjust: exact; }
-    .watermark { display: block; }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 16px;
   }
+  th, td {
+    border: 1px solid #d0d5db;
+    padding: 8px 10px;
+    text-align: left;
+    font-size: 9.5pt;
+  }
+  th {
+    background: #1a3c6e;
+    color: #fff;
+    font-weight: 600;
+  }
+  .total-row { font-weight: 700; background: #e8edf4; }
+  .grand-total-row { font-weight: 700; background: #1a3c6e; color: #fff; font-size: 11pt; }
+  .grand-total-row td { color: #fff; }
+  .terms {
+    margin-bottom: 18px;
+    padding: 14px 18px;
+    background: #f8f9fc;
+    border-radius: 8px;
+    border: 1px solid #e0e3e8;
+  }
+  .terms h3 { font-size: 11pt; color: #1a3c6e; margin-bottom: 6px; }
+  .terms p { font-size: 9.5pt; line-height: 1.5; color: #444; white-space: pre-line; }
+  .payment-details {
+    display: flex;
+    gap: 40px;
+    margin-bottom: 18px;
+    padding: 14px 18px;
+    background: #f8f9fc;
+    border-radius: 8px;
+    border: 1px solid #e0e3e8;
+  }
+  .payment-details h3 { font-size: 11pt; color: #1a3c6e; margin-bottom: 6px; }
+  .payment-details .field { margin-bottom: 3px; font-size: 9.5pt; }
+  .payment-details .field span { display: inline-block; width: 95px; font-weight: 600; color: #555; }
+  .signature {
+    display: flex;
+    justify-content: space-between;
+    align-items: end;
+    margin-top: 24px;
+    padding-top: 16px;
+    border-top: 1px solid #ddd;
+  }
+  .signature .left { font-size: 9.5pt; color: #666; }
+  .signature .right { text-align: right; }
+  .signature .right .name { font-size: 13pt; font-weight: 600; color: #1a3c6e; }
+  .signature .right .title { font-size: 9.5pt; color: #666; margin-top: 3px; }
+  .btn-back {
+    display: inline-flex; align-items: center; gap: 8px;
+    margin: 24px 10px 0 0; padding: 12px 24px;
+    background: #6c757d; color: #fff; border: none; border-radius: 8px;
+    font-size: 14px; font-weight: 600; cursor: pointer; transition: background 0.2s;
+    text-decoration: none;
+  }
+  .btn-back:hover { background: #5a6268; color: #fff; }
+  .btn-print {
+    display: inline-flex; align-items: center; gap: 8px;
+    margin: 24px auto 0; padding: 12px 36px;
+    background: #1a3c6e; color: #fff; border: none; border-radius: 8px;
+    font-size: 15px; font-weight: 600; cursor: pointer; transition: background 0.2s;
+  }
+  .btn-print:hover { background: #2a5a9e; color: #fff; }
+  .btn-download {
+    display: inline-flex; align-items: center; gap: 8px;
+    margin: 24px auto 0; padding: 12px 36px;
+    background: #198754; color: #fff; border: none; border-radius: 8px;
+    font-size: 15px; font-weight: 600; cursor: pointer; transition: background 0.2s;
+    margin-left: 10px;
+  }
+  .btn-download:hover { background: #157347; color: #fff; }
+  .watermark {
+    display: none; position: fixed; top: 50%; left: 50%;
+    transform: translate(-50%, -50%); opacity: 0.08;
+    pointer-events: none; z-index: 9999; max-width: 400px; width: 50%;
+  }
+  .action-bar { text-align: center; }
   .print-hint {
-    display: block;
-    text-align: center;
-    font-size: 12px;
-    color: #888;
-    margin-top: 10px;
-    padding: 8px;
-    border: 1px dashed #ccc;
-    border-radius: 6px;
+    display: block; text-align: center; font-size: 11px; color: #888;
+    margin-top: 12px; padding: 8px; border: 1px dashed #ccc; border-radius: 6px;
   }
   .print-hint strong { color: #1a3c6e; }
+
+  @media print {
+    body { background: #fff; padding: 0; color: #000 !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; color-adjust: exact; }
+    .container { box-shadow: none; padding: 10px 15px; border-radius: 0; max-width: 100%; }
+    .btn-print, .btn-download, .btn-back, .action-bar, .print-hint { display: none !important; }
+    th { background: #1a3c6e !important; color: #fff !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; color-adjust: exact; }
+    td, th { border-color: #333 !important; border-width: 1px !important; }
+    .total-row { background: #e0e4ec !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; color-adjust: exact; }
+    .grand-total-row td { background: #1a3c6e !important; color: #fff !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; color-adjust: exact; }
+    .info-grid { background: #eef0f5 !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; color-adjust: exact; border-color: #000 !important; }
+    .terms { background: #eef0f5 !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; color-adjust: exact; border-color: #000 !important; }
+    .payment-details { background: #eef0f5 !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; color-adjust: exact; border-color: #000 !important; }
+    .watermark { display: block; }
+  }
+
+  @media (max-width: 768px) {
+    body { padding: 10px; }
+    .container { padding: 20px 16px; border-radius: 8px; }
+    .header { flex-direction: column; text-align: center; gap: 12px; }
+    .info-grid { flex-direction: column; gap: 12px; }
+    .info-grid .col { text-align: left !important; }
+    .payment-details { flex-direction: column; gap: 16px; }
+    .signature { flex-direction: column; gap: 20px; }
+    .signature .right { text-align: left; }
+    .btn-print { width: 100%; justify-content: center; }
+    .btn-download { width: 100%; justify-content: center; margin-left: 0; margin-top: 10px; }
+    .btn-back { width: 100%; justify-content: center; margin-right: 0; margin-top: 10px; }
+    table th, table td { padding: 6px 5px; font-size: 8pt; }
+  }
 </style>
 </head>
 <body>
 
-<div class="container" id="quotation">
+<div class="container">
 
   <img src="{% static 'logo.png' %}" class="watermark" alt="watermark">
 
@@ -267,12 +212,12 @@
       <img src="{% static 'logo.png' %}" alt="Logo">
       <div>
         <div class="company-name">{{ company_settings.company_name|default:'SCHONES HEIM BUILDERS' }}</div>
-        <div class="tagline">Engineered by purpose, led by vision</div>
+        <div class="tagline">Engineering &amp; Construction</div>
       </div>
     </div>
     <div style="text-align:right;">
-      <div style="font-size:13px; color:#666;">Date: <strong>{{ qtn.date|date:"d M Y" }}</strong></div>
-      <div style="font-size:13px; color:#666; margin-top:4px;">Expiry: <strong>{{ qtn.expiry_date|date:"d M Y" }}</strong></div>
+      <div style="font-size:10pt; color:#666;">Date: <strong>{{ qtn.date|date:"d M Y" }}</strong></div>
+      <div style="font-size:10pt; color:#666; margin-top:3px;">Expiry: <strong>{{ qtn.expiry_date|date:"d M Y" }}</strong></div>
     </div>
   </div>
 
@@ -294,24 +239,24 @@
   </div>
 
   {% if qtn.notes %}
-  <div class="intro-text">{{ qtn.notes|linebreaksbr }}</div>
+  <div style="margin-bottom:16px; font-size:10pt; line-height:1.5; color:#444;">{{ qtn.notes|linebreaksbr }}</div>
   {% endif %}
 
   <table>
     <thead>
       <tr>
-        <th style="width:50px;">#</th>
+        <th style="width:40px;">#</th>
         <th>Description</th>
-        <th style="width:70px;" class="text-center">Qty</th>
-        <th style="width:70px;" class="text-center">Unit</th>
-        <th style="width:110px;" class="text-end">Unit Price</th>
-        <th style="width:130px;" class="text-end">Total (KSh)</th>
+        <th style="width:55px;" class="text-center">Qty</th>
+        <th style="width:55px;" class="text-center">Unit</th>
+        <th style="width:95px;" class="text-end">Unit Price</th>
+        <th style="width:110px;" class="text-end">Total (KSh)</th>
       </tr>
     </thead>
     <tbody>
       {% for item in qtn.items.all %}
       <tr>
-        <td>{{ forloop.counter }}</td>
+        <td class="text-center">{{ forloop.counter }}</td>
         <td>{{ item.description }}</td>
         <td class="text-center">{{ item.quantity|floatformat:2 }}</td>
         <td class="text-center">{{ item.unit }}</td>
@@ -367,13 +312,34 @@
     </div>
   </div>
 
-  <div class="print-hint">If blue headers don't appear, check <strong>More settings → Background graphics</strong> in your browser's print dialog.</div>
-
   <div class="action-bar">
-    <a href="{{ back_url }}" class="btn-back"><i class="fas fa-arrow-left me-1"></i>Back</a>
-    <button class="btn-print" onclick="window.print()"><i class="fas fa-print me-1"></i>Print / Save as PDF</button>
+    <a href="{{ back_url }}" class="btn-back"><i class="fas fa-arrow-left"></i> Back</a>
+    <button class="btn-print" onclick="window.print()"><i class="fas fa-print"></i> Print</button>
+    <button class="btn-download" id="downloadBtn" onclick="downloadPDF()"><i class="fas fa-download"></i> Download PDF</button>
   </div>
+
+  <div class="print-hint">If blue headers don't appear in the PDF, check <strong>More settings &rarr; Background graphics</strong> in your browser's print dialog.</div>
+
 </div>
 
+<script>
+function downloadPDF() {
+    var btn = document.getElementById('downloadBtn');
+    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Generating...';
+    btn.disabled = true;
+    var element = document.querySelector('.container');
+    var opt = {
+        margin:       [15, 15, 15, 15],
+        filename:     '{{ qtn.quotation_number }}.pdf',
+        image:        { type: 'jpeg', quality: 0.98 },
+        html2canvas:  { scale: 2, useCORS: true, letterRendering: true },
+        jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
+    };
+    html2pdf().set(opt).from(element).save().then(function() {
+        btn.innerHTML = '<i class="fas fa-download"></i> Download PDF';
+        btn.disabled = false;
+    });
+}
+</script>
 </body>
 </html>

@@ -29,3 +29,11 @@ if os.path.exists(env_path):
 # Django WSGI application
 from django.core.wsgi import get_wsgi_application
 application = get_wsgi_application()
+
+# Run pending migrations on app startup (safe to call repeatedly)
+try:
+    import django
+    from django.core.management import call_command
+    call_command('migrate', verbosity=0)
+except Exception:
+    pass

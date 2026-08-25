@@ -1,8 +1,12 @@
+import json
+import logging
 from datetime import datetime
 
 from django.db.models import Count
 
 from .models import CompanySettings, Notification
+
+logger = logging.getLogger(__name__)
 
 
 def site_settings(request):
@@ -12,11 +16,17 @@ def site_settings(request):
         'current_year': datetime.now().year,
     }
     if request.user.is_authenticated:
-        ctx['unread_count'] = Notification.objects.filter(
-            recipient=request.user, is_read=False
-        ).count()
+        try:
+            ctx['unread_count'] = Notification.objects.filter(
+                recipient=request.user, is_read=False
+            ).count()
+        except Exception:
+            ctx['unread_count'] = 0
 
-        _inject_project_context(request, ctx)
+        try:
+            _inject_project_context(request, ctx)
+        except Exception:
+            logger.exception('Error in _inject_project_context')
 
         try:
             company = CompanySettings.objects.first()
@@ -30,7 +40,6 @@ def site_settings(request):
 
 def _inject_project_context(request, ctx):
     """Add active_client, active_project, and dropdown lists to context."""
-    import json
     from apps.clients.models import Client
     from apps.projects.models import Project
 
