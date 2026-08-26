@@ -24,7 +24,7 @@ class CompanyDocumentForm(forms.ModelForm):
     class Meta:
         model = CompanyDocument
         fields = [
-            'doc_type', 'title', 'status', 'project',
+            'doc_type', 'title', 'content', 'status', 'project',
             'recipient_name', 'recipient_organization', 'recipient_address', 'subject',
             'report_date', 'prepared_by', 'report_period', 'department', 'show_signature',
         ]
