@@ -8,6 +8,17 @@
     .formset-row .delete-row { color: #dc3545; cursor: pointer; }
     .item-total { font-weight: 600; }
     #items-table input[readonly] { background: #f8f9fa; cursor: default; }
+    #items-table input[type="text"],
+    #items-table input[type="number"] {
+        width: 100%;
+        min-width: 60px;
+    }
+    #items-table td { padding: 0.35rem 0.5rem; }
+    .card-body input[type="text"],
+    .card-body input[type="number"],
+    .card-body input[type="date"],
+    .card-body select,
+    .card-body textarea { width: 100%; }
 </style>
 {% endblock %}
 
@@ -23,16 +34,16 @@
             <div class="card-body">
                 <form method="post" id="quotationForm">
                     {% csrf_token %}
-                    <div class="row">
-                        <div class="col-md-6">{{ form.client|as_crispy_field }}</div>
-                        <div class="col-md-6">{{ form.project|as_crispy_field }}</div>
+                    <div class="row g-3">
+                        <div class="col-lg-6">{{ form.client|as_crispy_field }}</div>
+                        <div class="col-lg-6">{{ form.project|as_crispy_field }}</div>
                     </div>
-                    <div class="row">
+                    <div class="row g-3">
                         <div class="col-md-4">{{ form.date|as_crispy_field }}</div>
                         <div class="col-md-4">{{ form.expiry_date|as_crispy_field }}</div>
                         <div class="col-md-4">{{ form.status|as_crispy_field }}</div>
                     </div>
-                    <div class="row">
+                    <div class="row g-3">
                         <div class="col-md-4">{{ form.tax_percent|as_crispy_field }}</div>
                         <div class="col-md-8">{{ form.notes|as_crispy_field }}</div>
                     </div>
@@ -47,12 +58,12 @@
                             <thead class="table-primary">
                                 <tr>
                                     <th style="width:4%">#</th>
-                                    <th>Description</th>
+                                    <th style="width:44%">Description</th>
                                     <th style="width:8%">Qty</th>
-                                    <th style="width:8%">Unit</th>
+                                    <th style="width:9%">Unit</th>
                                     <th style="width:14%">Unit Price (KSh)</th>
                                     <th style="width:14%">Total (KSh)</th>
-                                    <th style="width:5%"></th>
+                                    <th style="width:7%"></th>
                                 </tr>
                             </thead>
                             <tbody id="items-tbody">
